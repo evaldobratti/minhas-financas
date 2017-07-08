@@ -1,0 +1,26 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "org.bratti"
+    },
+    "jhipsterVersion": "4.6.0",
+    "baseName": "minhasfinancas",
+    "packageName": "org.bratti",
+    "packageFolder": "org/bratti",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "hibernateCache": "no",
+    "clusteredHttpSession": false,
+    "websocket": "spring-websocket",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSocialSignIn": true,
+    "jwtSecretKey": "5f025fe0b42b93047749eb6772213581170d064e",
+    "enableTranslation": false
+  }
+}
