@@ -1,14 +1,18 @@
 <template>
   <ProtectedRoute>
-      aqui é seu dashboard :)
+      <ContasDashboard></ContasDashboard>
   </ProtectedRoute>
 </template>
 
 <script>
 import ProtectedRoute from './ProtectedRoute';
+import ContasDashboard from './conta/ContasDashboard';
 
 export default {
-  components: {ProtectedRoute}
+  components: {
+    ProtectedRoute,
+    ContasDashboard
+  }
 }
 </script>
 

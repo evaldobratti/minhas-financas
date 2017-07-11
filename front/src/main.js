@@ -7,12 +7,14 @@ import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import store from './store'
 import { sync } from 'vuex-router-sync';
+import currency from './filters/currency';
 
 sync(store, router);
 
 Vue.config.productionTip = false
 
 Vue.use(Vuetify);
+Vue.filter('currency', currency);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
