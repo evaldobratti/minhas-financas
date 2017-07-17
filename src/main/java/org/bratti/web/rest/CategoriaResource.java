@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for managing Categoria.
@@ -85,7 +86,7 @@ public class CategoriaResource {
     @Timed
     public List<Categoria> getAllCategorias() {
         log.debug("REST request to get all Categorias");
-        return categoriaRepository.findAll();
+        return categoriaRepository.findAll();//.stream().filter(i -> i.getPai() == null).collect(Collectors.toList());
     }
 
     /**

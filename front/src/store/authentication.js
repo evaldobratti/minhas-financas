@@ -1,7 +1,8 @@
 import axios from 'axios';
 import router from '../router';
 const LOGGED_IN = 'loggedIn';
-const SET_USER_DATA = 'setUserData'
+const SET_USER_DATA = 'setUserData';
+const LOGIN_FORM_RESET = 'loginFormReset';
 
 export default {
   state: {
@@ -38,6 +39,10 @@ export default {
     },
     setFormSenha: (state, senha) => {
       state.form.senha = senha;
+    },
+    [LOGIN_FORM_RESET]: (state, senha) => {
+      state.form.usuario = '';
+      state.form.senha = '';
     }
   },
   actions: {
@@ -58,8 +63,8 @@ export default {
         else
             router.push('dashboard');
         dispatch('getUserData');
+        commit(LOGIN_FORM_RESET);
       }).catch(err => {
-        console.info(err);
         commit('loggedFail', err);
       });
     },

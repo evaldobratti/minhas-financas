@@ -2,8 +2,9 @@ package org.bratti.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.bratti.domain.Conta;
-
+import org.bratti.domain.Lancamento;
 import org.bratti.repository.ContaRepository;
+import org.bratti.repository.LancamentoRepository;
 import org.bratti.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -29,17 +30,15 @@ public class ContaResource {
     private static final String ENTITY_NAME = "conta";
 
     private final ContaRepository contaRepository;
+    private final LancamentoRepository lancamentoRepository;
 
-    public ContaResource(ContaRepository contaRepository) {
+    public ContaResource(ContaRepository contaRepository, LancamentoRepository lancamentoRepository) {
         this.contaRepository = contaRepository;
+        this.lancamentoRepository = lancamentoRepository;
     }
 
     /**
      * POST  /contas : Create a new conta.
-     *
-     * @param conta the conta to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new conta, or with status 400 (Bad Request) if the conta has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PostMapping("/contas")
     @Timed
@@ -56,12 +55,6 @@ public class ContaResource {
 
     /**
      * PUT  /contas : Updates an existing conta.
-     *
-     * @param conta the conta to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated conta,
-     * or with status 400 (Bad Request) if the conta is not valid,
-     * or with status 500 (Internal Server Error) if the conta couldn't be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping("/contas")
     @Timed
@@ -78,8 +71,6 @@ public class ContaResource {
 
     /**
      * GET  /contas : get all the contas.
-     *
-     * @return the ResponseEntity with status 200 (OK) and the list of contas in body
      */
     @GetMapping("/contas")
     @Timed
@@ -90,9 +81,6 @@ public class ContaResource {
 
     /**
      * GET  /contas/:id : get the "id" conta.
-     *
-     * @param id the id of the conta to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the conta, or with status 404 (Not Found)
      */
     @GetMapping("/contas/{id}")
     @Timed
@@ -104,9 +92,6 @@ public class ContaResource {
 
     /**
      * DELETE  /contas/:id : delete the "id" conta.
-     *
-     * @param id the id of the conta to delete
-     * @return the ResponseEntity with status 200 (OK)
      */
     @DeleteMapping("/contas/{id}")
     @Timed
@@ -115,4 +100,13 @@ public class ContaResource {
         contaRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
+
+    @GetMapping("/contas/{id}/lancamentos")
+    @Timed
+    public List<Lancamento> getLancamentos(@PathVariable("id") Long contaId, 
+        @RequestParam("mes") Integer mes, @RequestParam("ano") Integer ano){
+        
+        return lancamentoRepository.findByContaMesAno(contaId, mes, ano);
+    }
+
 }

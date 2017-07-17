@@ -33,6 +33,12 @@ public class Conta implements Serializable {
         return id;
     }
 
+    public Conta(){}
+
+    public Conta(Long id) {
+        this.id = id;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

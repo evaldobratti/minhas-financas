@@ -4,6 +4,7 @@ import Hello from '@/components/Hello'
 import Login from '@/components/Login'
 import Dashboard from '@/components/Dashboard'
 import Conta from '@/components/conta/Conta'
+import Categorias from '@/components/categoria/Categorias'
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       path: '/contas/:id',
       name: 'detalhe-conta',
       component: Conta
+    },
+    {
+      path: '/categorias',
+      name: 'categorias',
+      component: Categorias
     }
 
   ]

@@ -8,6 +8,7 @@ export const CONTA_SET_ATUAL = 'contaSetAtual';
 export const CONTAS_CARREGADAS = 'contasCarregadas';
 export const CONTA_CARREGADA = 'contaCarregada';
 export const CARREGA_CONTA = 'carregaConta';
+export const CARREGA_CONTA_LANCAMENTOS = 'carregaContaLancamentos';
 export const LOAD_CONTAS = 'loadContas';
 
 export default {
@@ -34,7 +35,6 @@ export default {
       state.contaAtual = conta;
     },
     [CONTA_CARREGADA](state, conta) {
-      console.info('carregado');
       Vue.set(state.contas, String(conta.id), conta);
     }
   },
@@ -58,18 +58,23 @@ export default {
       })
     },
     [CARREGA_CONTA]({commit, state}, contaId){
-      console.info(contaId);
       if (state.contas[contaId]) {
         commit(CONTA_SET_ATUAL, state.contas[contaId]);
       } else {
         axios.get('/api/contas/' + contaId).then(res =>{
-          console.info('got');
           commit(CONTA_CARREGADA, res.data);
           commit(CONTA_SET_ATUAL, res.data);
         }).catch(err => {
           console.error(err);
         })
       }
+    },
+    [CARREGA_CONTA_LANCAMENTOS]({commit, state}, {contaId, mes, ano}) {
+      axios.get('/api/contas/' + contaId + "/lancamentos?mes=" + mes + '&ano=' + ano).then(res =>{
+        console.info(res);
+      }).catch(err => {
+        console.error(err);
+      })
     }
   }
 };

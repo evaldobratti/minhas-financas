@@ -3,6 +3,8 @@ package org.bratti.domain;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -24,6 +26,16 @@ public class Categoria implements Serializable {
 
     @ManyToOne
     private Categoria pai;
+
+//    private List<Categoria> filhas;
+
+    public Categoria() {
+//        filhas = new ArrayList<>();
+    }
+
+    public Categoria(Long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;
@@ -58,6 +70,14 @@ public class Categoria implements Serializable {
     public void setPai(Categoria categoria) {
         this.pai = categoria;
     }
+
+    // public void setFilhas(List<Categoria> categorias) {
+    //     this.filhas = categorias;
+    // }
+
+    // public List<Categoria> getFilhas() {
+    //     return this.filhas;
+    // }
 
     @Override
     public boolean equals(Object o) {
