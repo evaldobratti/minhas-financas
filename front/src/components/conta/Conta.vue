@@ -25,6 +25,21 @@
               </v-flex>
             </v-layout>
             <LancamentoForm :conta="conta"></LancamentoForm>
+
+            <v-data-table
+              :headers="headers"
+              :items="lancamentos"
+              hide-actions
+              class="elevation-5">
+              <template slot="items" scope="l">
+                <td xs3>{{ l.item.data }}</td>
+                <td>{{ l.item.local.nome }}</td>
+                <td>{{ l.item.categoria.nome }}</td>
+                <td class="text-xs-right">{{ l.item.valor | currency }}</td>
+                <td>{{ l.item.efetivada }}</td>
+
+              </template>
+            </v-data-table>
         </v-container>
       </v-card-text>
     </v-card>
@@ -47,6 +62,33 @@ export default {
   },
   data() {
     return {
+      headers: [
+        {
+          text: 'Data',
+          sortable: false,
+          align: 'left'
+        },
+        {
+          text: 'Local',
+          sortable: false,
+          align: 'left'
+        },
+        {
+          text: 'Categoria',
+          sortable: false,
+          align: 'left'
+        },
+        {
+          text: 'Valor',
+          sortable: false,
+          align: 'right'
+        },
+        {
+          text: 'Efetuada',
+          sortable: false,
+          align: 'left'
+        },
+      ],
       meses: [
         { nome: 'Janeiro', ix: 1},
         { nome: 'Fevereiro', ix: 2},
@@ -67,7 +109,10 @@ export default {
   },
   computed: {
     conta() {
-      return this.$store.state.conta.contaAtual;
+      return this.$store.state.conta.conta;
+    },
+    lancamentos() {
+      return this.$store.state.conta.lancamentos;
     }
   },
   components: {

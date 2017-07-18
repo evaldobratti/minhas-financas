@@ -1,11 +1,17 @@
 package org.bratti.domain;
 
 
-import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 /**
  * A Categoria.
@@ -27,11 +33,8 @@ public class Categoria implements Serializable {
     @ManyToOne
     private Categoria pai;
 
-//    private List<Categoria> filhas;
 
-    public Categoria() {
-//        filhas = new ArrayList<>();
-    }
+    public Categoria() { }
 
     public Categoria(Long id) {
         this.id = id;

@@ -18,7 +18,7 @@
               prepend-icon="event"
               readonly
             ></v-text-field>
-            <v-date-picker v-model="dataLancamento" :date-format="formatDate"
+            <v-date-picker v-model="data" :date-format="formatDate"
               :formatted-value.sync="dataLancamentoFormatada" no-title scrollable actions></v-date-picker>
           </v-menu>
       </v-flex>
@@ -32,9 +32,7 @@
           :items="categorias"
           v-model="categoria"
           item-text="nome"
-          item-value="value"
-          autocomplete
-          editable>
+          item-value="id">
         </v-select>
       </v-flex>
       <v-flex xs1>
@@ -54,34 +52,32 @@
 <script>
 import axios from 'axios';
 import { d } from '../../store/categorias';
+import { lancamentos } from '../../store/lancamento';
 
 export default {
   props: ['conta'],
   created() {
-    this.$store.dispatch(d.LOAD_CATEGORIAS)
-      .then((categorias) => this.categorias = categorias);
+    this.$store.dispatch(d.LOAD_CATEGORIAS);
+  },
+  watch: {
+    conta(val) {
+      this.$store.commit(lancamentos.m.LANCAMENTO_SET_CONTA, this.conta);  
+    }
   },
   data() {
     return {
-      categorias: [],
       menu: false,
-      dataLancamento: new Date(),
-      dataLancamentoFormatada: new Date().toLocaleDateString(),
-      valor: 0,
-      categoria: 0,
-      local: '',
-      efetuada: false
-
+      dataLancamentoFormatada: new Date().toLocaleDateString()
     }
   },
   methods: {
     formatDate(val) {
-      this.dataLancamento = new Date(val);
+      this.data = new Date(val);
       return new Date(val).toLocaleDateString();
     },
     submit() {
       axios.post('/api/lancamentos', {
-        data: this.dataLancamento,
+        data: this.data,
         conta: this.conta.id,
         valor: this.valor,
         categoria: this.categoria,
@@ -94,6 +90,31 @@ export default {
       })
     }
   },
+  computed: {
+    categorias() {
+      return this.$store.state.categorias.list;
+    },
+    data: {
+      get() { return this.$store.state.lancamentos.form.data},
+      set(data) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_DATA, data); }
+    },
+    valor: {
+      get() { return this.$store.state.lancamentos.form.valor},
+      set(valor) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_VALOR, valor); }
+    },
+    categoria: {
+      get() { return this.$store.state.lancamentos.form.categoria},
+      set(categoria) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_CATEGORIA, categoria); }
+    },
+    local: {
+      get() { return this.$store.state.lancamentos.form.local},
+      set(local) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_LOCAL, local); }
+    },
+    efetuada: {
+      get() { return this.$store.state.lancamentos.form.efetuada},
+      set(efetuada) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_EFETUADA, efetuada); }
+    }
+  }
 }
 </script>
 

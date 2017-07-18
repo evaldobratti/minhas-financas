@@ -1,9 +1,13 @@
 package org.bratti.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import org.bratti.domain.Categoria;
+import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
-
+import org.bratti.domain.Local;
 import org.bratti.repository.LancamentoRepository;
+import org.bratti.repository.LocalRepository;
+import org.bratti.web.rest.dto.LancamentoRequestDTO;
 import org.bratti.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -30,45 +34,47 @@ public class LancamentoResource {
 
     private final LancamentoRepository lancamentoRepository;
 
-    public LancamentoResource(LancamentoRepository lancamentoRepository) {
+	private final LocalRepository localRepository;
+    
+    public LancamentoResource(LancamentoRepository lancamentoRepository,
+        LocalRepository localRepository) {
         this.lancamentoRepository = lancamentoRepository;
+        this.localRepository = localRepository;
     }
 
-    /**
-     * POST  /lancamentos : Create a new lancamento.
-     *
-     * @param lancamento the lancamento to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new lancamento, or with status 400 (Bad Request) if the lancamento has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
     @PostMapping("/lancamentos")
     @Timed
-    public ResponseEntity<Lancamento> createLancamento(@RequestBody Lancamento lancamento) throws URISyntaxException {
-        log.debug("REST request to save Lancamento : {}", lancamento);
-        if (lancamento.getId() != null) {
+    public ResponseEntity<Lancamento> createLancamento(@RequestBody LancamentoRequestDTO lancamentoDTO) throws URISyntaxException {
+        log.debug("REST request to save Lancamento : {}", lancamentoDTO);
+        if (lancamentoDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new lancamento cannot already have an ID")).body(null);
         }
+
+        Local local = localRepository.findOneByNomeIgnoreCase(lancamentoDTO.getLocal());
+        if (local == null) {
+        	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal()));
+        }
+        
+        Lancamento lancamento = new Lancamento();
+        lancamento.setCategoria(lancamentoDTO.getCategoria());
+        lancamento.setConta(lancamentoDTO.getConta());
+        lancamento.setData(lancamentoDTO.getData());
+        lancamento.setEfetivada(lancamentoDTO.getEfetivada());
+		lancamento.setLocal(local);
+        lancamento.setValor(lancamentoDTO.getValor());
+
         Lancamento result = lancamentoRepository.save(lancamento);
         return ResponseEntity.created(new URI("/api/lancamentos/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
-    /**
-     * PUT  /lancamentos : Updates an existing lancamento.
-     *
-     * @param lancamento the lancamento to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated lancamento,
-     * or with status 400 (Bad Request) if the lancamento is not valid,
-     * or with status 500 (Internal Server Error) if the lancamento couldn't be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
     @PutMapping("/lancamentos")
     @Timed
     public ResponseEntity<Lancamento> updateLancamento(@RequestBody Lancamento lancamento) throws URISyntaxException {
         log.debug("REST request to update Lancamento : {}", lancamento);
         if (lancamento.getId() == null) {
-            return createLancamento(lancamento);
+            return createLancamento(null);
         }
         Lancamento result = lancamentoRepository.save(lancamento);
         return ResponseEntity.ok()

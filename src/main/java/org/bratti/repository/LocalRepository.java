@@ -13,4 +13,5 @@ import org.springframework.data.jpa.repository.*;
 @Repository
 public interface LocalRepository extends JpaRepository<Local,Long> {
     
+    public Local findOneByNomeIgnoreCase(String nome);
 }

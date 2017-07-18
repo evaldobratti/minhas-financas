@@ -11,6 +11,14 @@ export const CARREGA_CONTA = 'carregaConta';
 export const CARREGA_CONTA_LANCAMENTOS = 'carregaContaLancamentos';
 export const LOAD_CONTAS = 'loadContas';
 
+const m = {
+  CONTA_SET_LANCAMENTOS: 'contaSetLancamentos'
+};
+
+export const contas = {
+  m
+};
+
 export default {
   state: {
     form: {
@@ -18,8 +26,8 @@ export default {
       saldoInicial: 0
     },
     list: [],
-    contaAtual: {},
-    contas: {}
+    conta: {},
+    lancamentos: []
   },
   mutations: {
     [CONTA_SET_NOME]: (state, nome) => {
@@ -32,10 +40,10 @@ export default {
       state.list = contas;
     },
     [CONTA_SET_ATUAL](state, conta) {
-      state.contaAtual = conta;
+      state.conta = conta;
     },
-    [CONTA_CARREGADA](state, conta) {
-      Vue.set(state.contas, String(conta.id), conta);
+    [m.CONTA_SET_LANCAMENTOS](state, lancamentos) {
+      state.lancamentos = lancamentos
     }
   },
   actions: {
@@ -58,20 +66,15 @@ export default {
       })
     },
     [CARREGA_CONTA]({commit, state}, contaId){
-      if (state.contas[contaId]) {
-        commit(CONTA_SET_ATUAL, state.contas[contaId]);
-      } else {
-        axios.get('/api/contas/' + contaId).then(res =>{
-          commit(CONTA_CARREGADA, res.data);
-          commit(CONTA_SET_ATUAL, res.data);
-        }).catch(err => {
-          console.error(err);
-        })
-      }
+      axios.get('/api/contas/' + contaId).then(res =>{
+        commit(CONTA_SET_ATUAL, res.data);
+      }).catch(err => {
+        console.error(err);
+      })
     },
     [CARREGA_CONTA_LANCAMENTOS]({commit, state}, {contaId, mes, ano}) {
       axios.get('/api/contas/' + contaId + "/lancamentos?mes=" + mes + '&ano=' + ano).then(res =>{
-        console.info(res);
+        commit(m.CONTA_SET_LANCAMENTOS, res.data);
       }).catch(err => {
         console.error(err);
       })
