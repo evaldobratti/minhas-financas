@@ -32,7 +32,7 @@
           :items="categorias"
           v-model="categoria"
           item-text="nome"
-          item-value="id">
+          item-value="value">
         </v-select>
       </v-flex>
       <v-flex xs1>
@@ -76,18 +76,7 @@ export default {
       return new Date(val).toLocaleDateString();
     },
     submit() {
-      axios.post('/api/lancamentos', {
-        data: this.data,
-        conta: this.conta.id,
-        valor: this.valor,
-        categoria: this.categoria,
-        local: this.local,
-        efetivada: this.efetuada
-      }).then(res => {
-        console.info(res);
-      }).catch(err => {
-        console.error(err);
-      })
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT);
     }
   },
   computed: {

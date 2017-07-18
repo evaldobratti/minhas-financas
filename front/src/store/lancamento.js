@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { contas } from './conta';
 
 const m = {
   LANCAMENTO_SET_DATA: 'lancamentoSetData',
@@ -8,8 +10,13 @@ const m = {
   LANCAMENTO_SET_EFETUADA: 'lancamentoSetEfetuada'
 }
 
+const d = {
+  LANCAMENTO_SUBMIT: 'lancamentoFormSubmit'
+}
+
 export const lancamentos = {
-  m
+  m,
+  d
 }
 
 export default {
@@ -41,6 +48,24 @@ export default {
     },
     [m.LANCAMENTO_SET_CONTA](state, conta) {
       state.form.conta = conta;
+    }
+  },
+  actions: {
+    [d.LANCAMENTO_SUBMIT]({state, commit}) {
+      axios.post('/api/lancamentos', {
+        data: state.form.data,
+        conta: state.form.conta,
+        valor: state.form.valor,
+        categoria: state.form.categoria,
+        local: {
+          nome: state.form.local
+        },
+        efetivada: state.form.efetuada
+      }).then(res => {
+        commit(contas.m.LANCAMENTO_CRIADO, res.data);
+      }).catch(err => {
+        console.error(err);
+      })
     }
   }
 }

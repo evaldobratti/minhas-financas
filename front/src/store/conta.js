@@ -12,7 +12,8 @@ export const CARREGA_CONTA_LANCAMENTOS = 'carregaContaLancamentos';
 export const LOAD_CONTAS = 'loadContas';
 
 const m = {
-  CONTA_SET_LANCAMENTOS: 'contaSetLancamentos'
+  CONTA_SET_LANCAMENTOS: 'contaSetLancamentos',
+  LANCAMENTO_CRIADO: 'lancamentoCriado'
 };
 
 export const contas = {
@@ -44,6 +45,9 @@ export default {
     },
     [m.CONTA_SET_LANCAMENTOS](state, lancamentos) {
       state.lancamentos = lancamentos
+    },
+    [m.LANCAMENTO_CRIADO](state, lancamento) {
+      state.lancamentos.push(lancamento);
     }
   },
   actions: {

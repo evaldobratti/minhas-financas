@@ -44,22 +44,22 @@ public class LancamentoResource {
 
     @PostMapping("/lancamentos")
     @Timed
-    public ResponseEntity<Lancamento> createLancamento(@RequestBody LancamentoRequestDTO lancamentoDTO) throws URISyntaxException {
+    public ResponseEntity<Lancamento> createLancamento(@RequestBody Lancamento lancamentoDTO) throws URISyntaxException {
         log.debug("REST request to save Lancamento : {}", lancamentoDTO);
         if (lancamentoDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new lancamento cannot already have an ID")).body(null);
         }
 
-        Local local = localRepository.findOneByNomeIgnoreCase(lancamentoDTO.getLocal());
+        Local local = localRepository.findOneByNomeIgnoreCase(lancamentoDTO.getLocal().getNome());
         if (local == null) {
-        	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal()));
+        	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal().getNome()));
         }
         
         Lancamento lancamento = new Lancamento();
         lancamento.setCategoria(lancamentoDTO.getCategoria());
         lancamento.setConta(lancamentoDTO.getConta());
         lancamento.setData(lancamentoDTO.getData());
-        lancamento.setEfetivada(lancamentoDTO.getEfetivada());
+        lancamento.setEfetivada(lancamentoDTO.isEfetivada());
 		lancamento.setLocal(local);
         lancamento.setValor(lancamentoDTO.getValor());
 

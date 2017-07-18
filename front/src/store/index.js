@@ -6,6 +6,7 @@ import authentication from './authentication';
 import conta from './conta';
 import categorias from './categorias';
 import lancamento from './lancamento';
+
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
