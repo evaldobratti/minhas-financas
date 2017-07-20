@@ -1,9 +1,7 @@
 <template>
   <ProtectedRoute>
     <CategoriaForm :categoriaPai="null"></CategoriaForm>
-    <v-expansion-panel expand>
-      <CategoriaList v-for="categoria in list" :key="categoria.id" :categoria="categoria"></CategoriaList>
-    </v-expansion-panel>
+    <CategoriaListt v-for="c in list" :key="c.id" :categoria="c"></CategoriaListt>
   </ProtectedRoute>
 </template>
 
@@ -11,6 +9,7 @@
 import ProtectedRoute from '../ProtectedRoute';
 import CategoriaForm from './CategoriaForm';
 import CategoriaList from './CategoriaList';
+import CategoriaListt from './CategoriaListt';
 import { m, d } from '../../store/categorias';
 import { mapState } from 'vuex';
 
@@ -24,7 +23,8 @@ export default {
   components: {
     ProtectedRoute,
     CategoriaForm,
-    CategoriaList
+    CategoriaList,
+    CategoriaListt
   }
 }
 </script>
@@ -32,3 +32,4 @@ export default {
 <style>
   
 </style>
+
