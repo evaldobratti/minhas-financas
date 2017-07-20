@@ -1,22 +1,36 @@
 package org.bratti.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
 import org.bratti.repository.ContaRepository;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.web.rest.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.codahale.metrics.annotation.Timed;
 
-import java.util.List;
-import java.util.Optional;
+import io.github.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Conta.
@@ -37,9 +51,6 @@ public class ContaResource {
         this.lancamentoRepository = lancamentoRepository;
     }
 
-    /**
-     * POST  /contas : Create a new conta.
-     */
     @PostMapping("/contas")
     @Timed
     public ResponseEntity<Conta> createConta(@RequestBody Conta conta) throws URISyntaxException {
@@ -53,9 +64,6 @@ public class ContaResource {
             .body(result);
     }
 
-    /**
-     * PUT  /contas : Updates an existing conta.
-     */
     @PutMapping("/contas")
     @Timed
     public ResponseEntity<Conta> updateConta(@RequestBody Conta conta) throws URISyntaxException {
@@ -69,19 +77,21 @@ public class ContaResource {
             .body(result);
     }
 
-    /**
-     * GET  /contas : get all the contas.
-     */
     @GetMapping("/contas")
     @Timed
-    public List<Conta> getAllContas() {
+    public List<Map> getAllContas() {
         log.debug("REST request to get all Contas");
-        return contaRepository.findAll();
+        List<Conta> contas = contaRepository.findAll();
+        return contas.stream().map(c -> {
+        	Map<String, Object> conta = new HashMap<>();
+        	conta.put("id", c.getId());
+        	conta.put("nome", c.getNome());
+        	conta.put("saldoInicial", c.getSaldoInicial());
+        	conta.put("saldoAtual", saldoNoDia(LocalDate.now(), c));
+        	return conta;
+        }).collect(Collectors.toList());
     }
 
-    /**
-     * GET  /contas/:id : get the "id" conta.
-     */
     @GetMapping("/contas/{id}")
     @Timed
     public ResponseEntity<Conta> getConta(@PathVariable Long id) {
@@ -90,9 +100,6 @@ public class ContaResource {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(conta));
     }
 
-    /**
-     * DELETE  /contas/:id : delete the "id" conta.
-     */
     @DeleteMapping("/contas/{id}")
     @Timed
     public ResponseEntity<Void> deleteConta(@PathVariable Long id) {
@@ -107,6 +114,26 @@ public class ContaResource {
         @RequestParam("mes") Integer mes, @RequestParam("ano") Integer ano){
         
         return lancamentoRepository.findByContaMesAno(contaId, mes, ano);
+    }
+    
+    @GetMapping("/contas/{id}/saldo")
+    @Timed
+    public Object getSaldoFimDoDiaEm(@PathVariable("id") Long contaId, @RequestParam("data") LocalDate data) {
+    	Conta conta = contaRepository.findOne(contaId);
+		BigDecimal saldo = saldoNoDia(data, conta);
+    	    	
+		HashMap<String, Object> retorno = new HashMap<>();
+		
+		retorno.put("data", data);
+		retorno.put("saldo", saldo);
+		
+		return retorno;
+    }
+
+    private BigDecimal saldoNoDia(LocalDate data, Conta conta) {
+    	BigDecimal saldoLancamentos = lancamentoRepository.findByContaAteDia(conta, data).orElse(BigDecimal.ZERO);
+		BigDecimal saldo = saldoLancamentos.add(conta.getSaldoInicial());
+		return saldo;
     }
 
 }

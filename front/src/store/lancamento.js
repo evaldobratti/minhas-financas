@@ -51,7 +51,7 @@ export default {
     }
   },
   actions: {
-    [d.LANCAMENTO_SUBMIT]({state, commit}) {
+    [d.LANCAMENTO_SUBMIT]({state, dispatch, commit}) {
       axios.post('/api/lancamentos', {
         data: state.form.data,
         conta: state.form.conta,
@@ -63,6 +63,7 @@ export default {
         efetivada: state.form.efetuada
       }).then(res => {
         commit(contas.m.LANCAMENTO_CRIADO, res.data);
+        dispatch(contas.d.CONTA_CARREGA_SALDOS);
       }).catch(err => {
         console.error(err);
       })

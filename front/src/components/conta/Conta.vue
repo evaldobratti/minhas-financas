@@ -1,11 +1,16 @@
 <template>
   <ProtectedRoute>
+    <v-layout row>
+      <v-flex xs12>
     <v-card v-if="conta">
       <v-card-text>
         <v-container fluid>
             <v-layout row>
               <v-flex xs8>
-                <h3 class="headline mb-0">{{ conta.nome }}</h3>
+                <h3 class="headline mb-0">
+                  {{ conta.nome }}
+                  <small class="text-xs-right">Saldo Inicial: {{conta.saldoInicial | currency}}</small>
+                </h3>
               </v-flex>
               <v-flex xs1>
                 <v-select
@@ -25,7 +30,14 @@
               </v-flex>
             </v-layout>
             <LancamentoForm :conta="conta"></LancamentoForm>
-
+            <v-layout row>
+              <v-flex offset-xs8 xs2>
+                <v-text-field label="Saldo inicial" :value="saldoInicio | currency" readonly></v-text-field>
+              </v-flex>
+              <v-flex xs2>
+                <v-text-field label="Saldo final" :value="saldoFim | currency" readonly></v-text-field>
+              </v-flex>
+            </v-layout>
             <v-data-table
               :headers="headers"
               :items="lancamentos"
@@ -43,22 +55,25 @@
         </v-container>
       </v-card-text>
     </v-card>
+      </v-flex>
+    </v-layout>
   </ProtectedRoute>
 </template>
 
 <script>
-import { CARREGA_CONTA, CARREGA_CONTA_LANCAMENTOS } from '../../store/conta';
+import { CARREGA_CONTA, CARREGA_CONTA_LANCAMENTOS, contas } from '../../store/conta';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 
 export default {
   created() {
     this.$store.dispatch(CARREGA_CONTA, this.$route.params.id);
-    this.$store.dispatch(CARREGA_CONTA_LANCAMENTOS, {
+    this.$store.commit(contas.m.CONTA_SET_PARAMS, {
       contaId: this.$route.params.id, 
       mes: this.mes, 
       ano: this.ano
     });
+    this.$store.dispatch(CARREGA_CONTA_LANCAMENTOS);
   },
   data() {
     return {
@@ -113,6 +128,12 @@ export default {
     },
     lancamentos() {
       return this.$store.state.conta.lancamentos;
+    },
+    saldoInicio() {
+      return this.$store.state.conta.saldoInicio;
+    },
+    saldoFim() {
+      return this.$store.state.conta.saldoFim;
     }
   },
   components: {

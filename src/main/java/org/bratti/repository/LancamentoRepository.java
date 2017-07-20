@@ -1,13 +1,16 @@
 package org.bratti.repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-
+import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
-import org.springframework.stereotype.Repository;
-
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 
 /**
@@ -21,4 +24,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento,Long> {
     List<Lancamento> findByContaMesAno(@Param("contaId") Long contaId,
         @Param("mes") int mes,
         @Param("ano") int ano);
+
+    
+    @Query("select sum(l.valor) from Lancamento l where l.conta = :conta and l.data <= :data")
+	Optional<BigDecimal> findByContaAteDia(@Param("conta") Conta conta, @Param("data")LocalDate data);
 }

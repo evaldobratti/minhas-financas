@@ -32,7 +32,7 @@
           :items="categorias"
           v-model="categoria"
           item-text="nome"
-          item-value="value">
+          autocomplete>
         </v-select>
       </v-flex>
       <v-flex xs1>

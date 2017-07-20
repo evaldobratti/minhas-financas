@@ -1,5 +1,5 @@
 export default (value) => {
-  if (Number(value) === NaN)
+  if (!value || !Number(value))
     return '';
   
   return 'R$ ' + value.toFixed(2);
