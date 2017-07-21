@@ -30,7 +30,7 @@
           </v-list-tile>
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar class="teal" dark>
+      <v-toolbar class="teal" dark fixed>
         <v-toolbar-title>Minhas finanças</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-menu bottom right v-if="isAuthenticated">

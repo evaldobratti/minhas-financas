@@ -44,11 +44,12 @@
               hide-actions
               class="elevation-5">
               <template slot="items" scope="l">
-                <td xs3>{{ l.item.data }}</td>
+                <td xs3>{{ l.item.data | date }}</td>
                 <td>{{ l.item.local.nome }}</td>
                 <td>{{ l.item.categoria.nome }}</td>
-                <td class="text-xs-right">{{ l.item.valor | currency }}</td>
+                <td class="text-xs-right" :class="css(l.item.valor)">{{ l.item.valor | currency }}</td>
                 <td>{{ l.item.efetivada }}</td>
+                <td :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
 
               </template>
             </v-data-table>
@@ -61,7 +62,7 @@
 </template>
 
 <script>
-import { CARREGA_CONTA, CARREGA_CONTA_LANCAMENTOS, contas } from '../../store/conta';
+import { CARREGA_CONTA, contas } from '../../store/conta';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 
@@ -73,7 +74,7 @@ export default {
       mes: this.mes, 
       ano: this.ano
     });
-    this.$store.dispatch(CARREGA_CONTA_LANCAMENTOS);
+    this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
   },
   data() {
     return {
@@ -100,6 +101,11 @@ export default {
         },
         {
           text: 'Efetuada',
+          sortable: false,
+          align: 'left'
+        },
+        {
+          text: 'Saldo',
           sortable: false,
           align: 'left'
         },
@@ -134,6 +140,14 @@ export default {
     },
     saldoFim() {
       return this.$store.state.conta.saldoFim;
+    }
+  },
+  methods: {
+    css(valor) {
+      return { 
+        'red--text': valor < 0, 
+        'blue--text text--darken-3': valor > 0
+      }
     }
   },
   components: {

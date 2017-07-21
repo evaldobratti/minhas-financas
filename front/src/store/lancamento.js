@@ -62,8 +62,7 @@ export default {
         },
         efetivada: state.form.efetuada
       }).then(res => {
-        commit(contas.m.LANCAMENTO_CRIADO, res.data);
-        dispatch(contas.d.CONTA_CARREGA_SALDOS);
+        dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
       }).catch(err => {
         console.error(err);
       })
