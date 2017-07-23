@@ -81,11 +81,24 @@ export default {
       state.lancamentos = lancamentos
     },
     [m.CONTA_SET_SALDO_INICIO](state, saldo) {
-      state.saldoInicio = saldo.saldo;
-      atualizaSaldoDiario(state.saldoInicio, state.lancamentos);
+      state.saldoInicio = saldo;
+      atualizaSaldoDiario(state.saldoInicio.saldo, state.lancamentos);
+      
+      state.lancamentos = [{
+        data: moment(saldo.data),
+        local: {nome: 'Saldo inicial'},
+        categoria: {},
+        saldoDiario: saldo.saldo
+      }, ...state.lancamentos];
     },
     [m.CONTA_SET_SALDO_FIM](state, saldo) {
-      state.saldoFim = saldo.saldo;
+      state.saldoFim = saldo;
+      state.lancamentos.push({
+        data: moment(saldo.data),
+        local: {nome: 'Saldo final'},
+        categoria: {},
+        saldoDiario: saldo.saldo
+      });
     },
     [m.CONTA_SET_PARAMS](state, params) {
       state.params = params;
@@ -133,7 +146,7 @@ export default {
       const mesAtual = moment(state.params.ano + '-' + state.params.mes + '-1', 'YYYY-MM-DD')
       
       const fimMesAnterior = mesAtual.add(-1, 'day').format('YYYY-MM-DD');
-      const fimMesAtual = mesAtual.add(1, 'month').add(-1, 'day').format('YYYY-MM-DD');
+      const fimMesAtual = mesAtual.add(1, 'month').format('YYYY-MM-DD');
       
       axios.all([
         axios.get('/api/contas/' + state.params.contaId + "/saldo?data=" + fimMesAnterior),

@@ -9,10 +9,12 @@
               <v-flex xs8>
                 <h3 class="headline mb-0">
                   {{ conta.nome }}
-                  <small class="text-xs-right">Saldo Inicial: {{conta.saldoInicial | currency}}</small>
                 </h3>
               </v-flex>
               <v-flex xs1>
+                <v-btn class="small-btn" @click="mes -= 1; filtrar();"><v-icon>chevron_left</v-icon></v-btn>
+              </v-flex>
+              <v-flex xs1>              
                 <v-select
                         label="Mês"
                         v-bind:items="meses"
@@ -25,31 +27,45 @@
               <v-flex xs1>
                 <v-text-field v-model="ano" label="Ano"></v-text-field>
               </v-flex>
+              <v-flex xs1>
+                <v-btn class="small-btn" @click="mes += 1; filtrar();"><v-icon>chevron_right</v-icon></v-btn>
+              </v-flex>
               <v-flex xs2>
-                <v-btn>filtrar</v-btn>
+                <v-btn @click="filtrar">filtrar</v-btn>
               </v-flex>
             </v-layout>
             <LancamentoForm :conta="conta"></LancamentoForm>
-            <v-layout row>
-              <v-flex offset-xs8 xs2>
-                <v-text-field label="Saldo inicial" :value="saldoInicio | currency" readonly></v-text-field>
-              </v-flex>
-              <v-flex xs2>
-                <v-text-field label="Saldo final" :value="saldoFim | currency" readonly></v-text-field>
-              </v-flex>
-            </v-layout>
             <v-data-table
-              :headers="headers"
               :items="lancamentos"
               hide-actions
-              class="elevation-5">
+              class="elevation-5 lancamentos">
+              <template slot="headers" scope="props">
+                <th style="width: 10px">
+                  Data
+                </th>
+                <th>
+                  Local
+                </th>
+                <th style="width: 10px">
+                  Categoria
+                </th>
+                <th style="text-align: right; width: 120px">
+                  Valor
+                </th>
+                <th style="width: 10px">
+                  Efetuada
+                </th>
+                <th style="text-align: right; width: 120px">
+                  Saldo
+                </th>
+              </template>
               <template slot="items" scope="l">
                 <td xs3>{{ l.item.data | date }}</td>
                 <td>{{ l.item.local.nome }}</td>
                 <td>{{ l.item.categoria.nome }}</td>
                 <td class="text-xs-right" :class="css(l.item.valor)">{{ l.item.valor | currency }}</td>
-                <td>{{ l.item.efetivada }}</td>
-                <td :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
+                <td><v-checkbox v-if="l.item.efetivada != null" v-model="l.item.efetivada"></v-checkbox></td>
+                <td class="text-xs-right" :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
 
               </template>
             </v-data-table>
@@ -69,47 +85,10 @@ import LancamentoForm from '../lancamento/LancamentoForm';
 export default {
   created() {
     this.$store.dispatch(CARREGA_CONTA, this.$route.params.id);
-    this.$store.commit(contas.m.CONTA_SET_PARAMS, {
-      contaId: this.$route.params.id, 
-      mes: this.mes, 
-      ano: this.ano
-    });
-    this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+    this.filtrar();
   },
   data() {
     return {
-      headers: [
-        {
-          text: 'Data',
-          sortable: false,
-          align: 'left'
-        },
-        {
-          text: 'Local',
-          sortable: false,
-          align: 'left'
-        },
-        {
-          text: 'Categoria',
-          sortable: false,
-          align: 'left'
-        },
-        {
-          text: 'Valor',
-          sortable: false,
-          align: 'right'
-        },
-        {
-          text: 'Efetuada',
-          sortable: false,
-          align: 'left'
-        },
-        {
-          text: 'Saldo',
-          sortable: false,
-          align: 'left'
-        },
-      ],
       meses: [
         { nome: 'Janeiro', ix: 1},
         { nome: 'Fevereiro', ix: 2},
@@ -148,6 +127,14 @@ export default {
         'red--text': valor < 0, 
         'blue--text text--darken-3': valor > 0
       }
+    },
+    filtrar() {
+      this.$store.commit(contas.m.CONTA_SET_PARAMS, {
+        contaId: this.$route.params.id, 
+        mes: this.mes, 
+        ano: this.ano
+      });
+      this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
     }
   },
   components: {
@@ -158,6 +145,16 @@ export default {
 </script>
 
 <style>
-  
+.number-input input {
+  text-align: right;
+}
+
+.small-btn {
+  min-width: auto;
+}
+
+.lancamentos th {
+  text-align: left;
+}
 </style>
   

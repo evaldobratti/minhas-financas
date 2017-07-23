@@ -38,7 +38,8 @@
       <v-flex xs1>
         <v-text-field
           v-model="valor"
-          label="Valor">
+          label="Valor"
+          class="number-input">
         </v-text-field>
       </v-flex>
       <v-flex xs2>
