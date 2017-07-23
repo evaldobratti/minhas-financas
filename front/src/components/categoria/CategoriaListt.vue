@@ -6,7 +6,7 @@
       <v-icon @click="abre" v-else>folder_open</v-icon>
       <span @click="abre">{{ categoria.nome }}</span>
       <transition name="fade">
-      <v-btn v-if="showAdd" @click.native.stop="showModal" primary fab small dark class="categoria-add-btn">
+      <v-btn v-if="showAdd" @click.native.stop="showModal" primary fab small dark class="small-fab-btn">
         <v-icon>add</v-icon>
       </v-btn>
       </transition>
@@ -69,16 +69,10 @@ export default {
   height: 30px;
 }  
 
-.categoria-add-btn {
-  width: 20px !important; 
-  height: 20px !important;
-  margin: 0 !important;
-}
-
 .fade-enter-active, .fade-leave-active {
   transition: opacity .2s
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+.fade-enter, .fade-leave-to {
   opacity: 0
 }
 </style>

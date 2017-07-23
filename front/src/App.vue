@@ -76,4 +76,12 @@ export default {
 </script>
 
 <style>
+
+.small-fab-btn {
+  width: 20px !important; 
+  height: 20px !important;
+  margin: 0 !important;
+}
+
+
 </style>

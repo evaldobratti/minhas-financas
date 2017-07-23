@@ -20,7 +20,8 @@ const m = {
 
 const d = {
   CONTA_CARREGA_SALDOS: 'contaCarregaSaldoAnterior',
-  CARREGA_CONTA_LANCAMENTOS: 'carregaContaLancamentos'
+  CARREGA_CONTA_LANCAMENTOS: 'carregaContaLancamentos',
+  REMOVE_LANCAMENTO: 'contaRemoveLancamento'
 }
 
 export const contas = {
@@ -156,5 +157,12 @@ export default {
         commit(m.CONTA_SET_SALDO_FIM, resSaldoFim.data);
       }));
     },
+    [d.REMOVE_LANCAMENTO]({dispatch}, lancamento) {
+      axios.delete('/api/lancamentos/' + lancamento.id).then(() => {
+        dispatch(d.CARREGA_CONTA_LANCAMENTOS);
+      }).catch(err => {
+        console.info(err);
+      });
+    }
   }
 };

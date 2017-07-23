@@ -58,6 +58,7 @@
                 <th style="text-align: right; width: 120px">
                   Saldo
                 </th>
+                <th style="width: 70px"></th>
               </template>
               <template slot="items" scope="l">
                 <td xs3>{{ l.item.data | date }}</td>
@@ -66,7 +67,11 @@
                 <td class="text-xs-right" :class="css(l.item.valor)">{{ l.item.valor | currency }}</td>
                 <td><v-checkbox v-if="l.item.efetivada != null" v-model="l.item.efetivada"></v-checkbox></td>
                 <td class="text-xs-right" :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
-
+                <td>
+                  <v-btn @click="deleteLancamento(l.item)" v-if="l.item.categoria.nome != null" primary fab small dark class="small-fab-btn red">
+                    <v-icon>remove</v-icon>
+                  </v-btn>
+                </td>
               </template>
             </v-data-table>
         </v-container>
@@ -135,6 +140,9 @@ export default {
         ano: this.ano
       });
       this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+    },
+    deleteLancamento(lancamento) {
+      this.$store.dispatch(contas.d.REMOVE_LANCAMENTO, lancamento);
     }
   },
   components: {
@@ -155,6 +163,14 @@ export default {
 
 .lancamentos th {
   text-align: left;
+}
+
+table.table tbody tr .small-fab-btn {
+  display: none;
+}
+
+table.table tbody tr:hover .small-fab-btn {
+  display: block;
 }
 </style>
   
