@@ -7,7 +7,8 @@ const m = {
   LANCAMENTO_SET_CONTA: 'lancamentoSetConta',
   LANCAMENTO_SET_CATEGORIA: 'lancamentoSetCategoria',
   LANCAMENTO_SET_VALOR: 'lancamentoSetValor',
-  LANCAMENTO_SET_EFETUADA: 'lancamentoSetEfetuada'
+  LANCAMENTO_SET_EFETUADA: 'lancamentoSetEfetuada',
+  LIMPA_FORMULARIO: 'lancamentoLimpaFormulario'
 }
 
 const d = {
@@ -48,24 +49,36 @@ export default {
     },
     [m.LANCAMENTO_SET_CONTA](state, conta) {
       state.form.conta = conta;
+    },
+    [m.LIMPA_FORMULARIO](state) {
+      state.form.conta= null;
+      state.form.local= null;
+      state.form.categoria= null;
+      state.form.valor= null;
+      state.form.efetuada= false;
     }
   },
   actions: {
     [d.LANCAMENTO_SUBMIT]({state, dispatch, commit}) {
-      axios.post('/api/lancamentos', {
-        data: state.form.data,
-        conta: state.form.conta,
-        valor: state.form.valor,
-        categoria: state.form.categoria,
-        local: {
-          nome: state.form.local
-        },
-        efetivada: state.form.efetuada
-      }).then(res => {
-        dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
-      }).catch(err => {
-        console.error(err);
-      })
+      return new Promise((resolve, reject) => {
+        axios.post('/api/lancamentos', {
+          data: state.form.data,
+          conta: state.form.conta,
+          valor: state.form.valor,
+          categoria: state.form.categoria,
+          local: {
+            nome: state.form.local
+          },
+          efetivada: state.form.efetuada
+        }).then(res => {
+          commit(m.LIMPA_FORMULARIO);
+          dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+          resolve();
+        }).catch(err => {
+          console.error(err);
+          reject();
+        });
+      });
     }
   }
 }

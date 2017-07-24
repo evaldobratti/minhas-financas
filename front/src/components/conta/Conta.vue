@@ -46,7 +46,7 @@
                 <th>
                   Local
                 </th>
-                <th style="width: 10px">
+                <th style="width: 130px">
                   Categoria
                 </th>
                 <th style="text-align: right; width: 120px">

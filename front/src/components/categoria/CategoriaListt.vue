@@ -1,14 +1,17 @@
 <template>
   <div>
     <div @mouseover="hovered" @mouseleave="unhovered" class="categoria">
-      <v-icon @click="abre" v-if="categoria.filhas.length === 0">insert_drive_file</v-icon>
-      <v-icon @click="abre" v-else-if="!aberto">folder</v-icon>
-      <v-icon @click="abre" v-else>folder_open</v-icon>
+      <CategoriaIcone :aberto="aberto" :categoria="categoria" @abreFecha="abre"></CategoriaIcone>
       <span @click="abre">{{ categoria.nome }}</span>
       <transition name="fade">
-      <v-btn v-if="showAdd" @click.native.stop="showModal" primary fab small dark class="small-fab-btn">
-        <v-icon>add</v-icon>
-      </v-btn>
+        <v-btn v-if="showActions" @click.native.stop="showModalAdd" primary fab small dark class="small-fab-btn">
+          <v-icon>add</v-icon>
+        </v-btn>
+      </transition>
+      <transition name="fade">
+        <v-btn v-if="showActions" @click.native.stop="showModalRemove" primary fab small dark class="small-fab-btn red">
+          <v-icon>remove</v-icon>
+        </v-btn>
       </transition>
       <v-dialog v-model="dialog" lazy absolute>
         <v-layout row justify-center>
@@ -31,6 +34,7 @@
 
 <script>
 import CategoriaForm from './CategoriaForm';
+import CategoriaIcone from './CategoriaIcone';
 
 export default {
   props: ['categoria'],
@@ -39,7 +43,7 @@ export default {
     return {
       dialog: false,
       aberto: true,
-      showAdd: false
+      showActions: false
     }
   },
   methods: {
@@ -48,17 +52,21 @@ export default {
     },
     hovered(e) {
       e.stopPropagation();
-      this.showAdd = true;
+      this.showActions = true;
     },
     unhovered() {
-      this.showAdd = false;
+      this.showActions = false;
     },
     showModal() {
       this.dialog = true;
+    },
+    showModalRemove() {
+      alert("não implementado ainda :D")
     }
   },
   components: {
-    CategoriaForm
+    CategoriaForm,
+    CategoriaIcone
   }
 
 }

@@ -23,16 +23,24 @@
           </v-menu>
       </v-flex>
       <v-flex xs5>
-        <v-text-field label="Local"
+        <v-text-field 
+          ref="localTxt"
+          label="Local"
           v-model="local"></v-text-field>  
       </v-flex>
       <v-flex xs5>
         <v-select
           label="Categoria"
-          :items="categorias"
+          :items="categoriasFlat"
           v-model="categoria"
           item-text="nome"
           autocomplete>
+          <template slot="item" scope="data">
+            <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">
+              <CategoriaIcone :categoria="data.item"></CategoriaIcone>
+              {{ data.item.nome }}
+            </span>
+          </template>
         </v-select>
       </v-flex>
       <v-flex xs1>
@@ -54,6 +62,7 @@
 import axios from 'axios';
 import { d } from '../../store/categorias';
 import { lancamentos } from '../../store/lancamento';
+import CategoriaIcone from '../categoria/CategoriaIcone';
 
 export default {
   props: ['conta'],
@@ -65,7 +74,7 @@ export default {
       this.$store.commit(lancamentos.m.LANCAMENTO_SET_CONTA, this.conta);  
     }
   },
-  data() {
+  data() {  
     return {
       menu: false,
       dataLancamentoFormatada: new Date().toLocaleDateString()
@@ -77,10 +86,36 @@ export default {
       return new Date(val).toLocaleDateString();
     },
     submit() {
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT);
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT).then(() => {
+        this.$refs.localTxt.focus();
+      });
+    },
+    categoriaAsFlat(categoria) {
+      let flat = [ categoria ];
+      for (let c of categoria.filhas) {
+        for (let f of this.categoriaAsFlat(c))
+          flat.push(f);
+      }
+      return flat;
+    },
+    categoriaDistanciaAteRaiz(categoria) {
+      let pai = categoria.pai;
+      let nivel = 0;
+      while (pai != null) {
+        nivel += 1;
+        pai = pai.pai;
+      }
+      return nivel;
     }
   },
   computed: {
+    categoriasFlat() {
+      let flat = [];
+      for (let c of this.categorias) {
+        flat = flat.concat(this.categoriaAsFlat(c));
+      }
+      return flat;
+    },
     categorias() {
       return this.$store.state.categorias.list;
     },
@@ -104,6 +139,9 @@ export default {
       get() { return this.$store.state.lancamentos.form.efetuada},
       set(efetuada) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_EFETUADA, efetuada); }
     }
+  },
+  components: {
+    CategoriaIcone
   }
 }
 </script>
