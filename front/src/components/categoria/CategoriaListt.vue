@@ -13,9 +13,9 @@
           <v-icon>remove</v-icon>
         </v-btn>
       </transition>
-      <v-dialog v-model="dialog" lazy absolute>
+      <v-dialog v-model="dialog" lazy absolute width="600px">
         <v-layout row justify-center>
-          <v-card>
+          <v-card >
             <v-card-title>
               <div class="headline">Nova sub-categoia de {{ categoria.nome }}</div>
             </v-card-title>
@@ -57,7 +57,7 @@ export default {
     unhovered() {
       this.showActions = false;
     },
-    showModal() {
+    showModalAdd() {
       this.dialog = true;
     },
     showModalRemove() {

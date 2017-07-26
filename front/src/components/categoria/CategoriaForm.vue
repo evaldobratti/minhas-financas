@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="submit">
+  <form @submit.prevent="submit"style="min-width: 600px">
     <v-layout row>
       <v-flex xs8>
         <v-text-field v-model="nome" label="Nome"></v-text-field>

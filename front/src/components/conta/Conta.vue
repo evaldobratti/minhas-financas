@@ -71,6 +71,9 @@
                   <v-btn @click="deleteLancamento(l.item)" v-if="l.item.categoria.nome != null" primary fab small dark class="small-fab-btn red">
                     <v-icon>remove</v-icon>
                   </v-btn>
+                  <v-btn @click.native.stop="novaRecorrencia(l.item)" v-if="l.item.categoria.nome != null" primary fab small dark class="small-fab-btn">
+                    <v-icon>refresh</v-icon>
+                  </v-btn>
                 </td>
               </template>
             </v-data-table>
@@ -79,6 +82,18 @@
     </v-card>
       </v-flex>
     </v-layout>
+    <v-dialog v-model="recorrenciaDialog" lazy absolute width="600px">
+      <v-layout row justify-center>
+        <v-card >
+          <v-card-title>
+            <div class="headline">Nova recorrência</div>
+          </v-card-title>
+          <v-card-text>
+            <RecorrenciaForm :lancamento="recorrenciaLancamento"></RecorrenciaForm>
+          </v-card-text>
+        </v-card>
+      </v-layout>
+    </v-dialog>
   </ProtectedRoute>
 </template>
 
@@ -86,6 +101,7 @@
 import { CARREGA_CONTA, contas } from '../../store/conta';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
+import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
 
 export default {
   created() {
@@ -109,7 +125,9 @@ export default {
         { nome: 'Dezembro', ix: 12},
       ],
       mes: 7,
-      ano: 2017
+      ano: 2017,
+      recorrenciaDialog: false,
+      recorrenciaLancamento: null
     }
   },
   computed: {
@@ -143,11 +161,16 @@ export default {
     },
     deleteLancamento(lancamento) {
       this.$store.dispatch(contas.d.REMOVE_LANCAMENTO, lancamento);
+    },
+    novaRecorrencia(lancamento) {
+      this.recorrenciaLancamento = lancamento;
+      this.recorrenciaDialog = true;
     }
   },
   components: {
     ProtectedRoute,
-    LancamentoForm
+    LancamentoForm,
+    RecorrenciaForm
   }
 }
 </script>
