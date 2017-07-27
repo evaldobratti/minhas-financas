@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+    <!--
+        Added the constraints for entity Recorrencia.
+    -->
+    <changeSet id="20170726225835-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="recorrencias_id"
+                                 baseTableName="recorrencia_lancamento"
+                                 constraintName="fk_recorrencia_lancamento_recorrencias_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="recorrencia"/>
+        <addForeignKeyConstraint baseColumnNames="lancamentos_id"
+                                 baseTableName="recorrencia_lancamento"
+                                 constraintName="fk_recorrencia_lancamento_lancamentos_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="lancamento"/>
+        
+        <addForeignKeyConstraint baseColumnNames="conta_id"
+                                 baseTableName="recorrencia"
+                                 constraintName="fk_recorrencia_conta_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="conta"/>
+
+        <addForeignKeyConstraint baseColumnNames="categoria_id"
+                                 baseTableName="recorrencia"
+                                 constraintName="fk_recorrencia_categoria_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="categoria"/>
+
+    </changeSet>
+</databaseChangeLog>

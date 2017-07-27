@@ -74,7 +74,7 @@ public class LancamentoResource {
     public ResponseEntity<Lancamento> updateLancamento(@RequestBody Lancamento lancamento) throws URISyntaxException {
         log.debug("REST request to update Lancamento : {}", lancamento);
         if (lancamento.getId() == null) {
-            return createLancamento(null);
+            return createLancamento(lancamento);
         }
         Lancamento result = lancamentoRepository.save(lancamento);
         return ResponseEntity.ok()
