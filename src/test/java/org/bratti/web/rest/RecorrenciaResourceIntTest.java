@@ -43,7 +43,7 @@ import org.bratti.domain.enumeration.TipoFrequencia;
 public class RecorrenciaResourceIntTest {
 
     private static final TipoFrequencia DEFAULT_TIPO_FREQUENCIA = TipoFrequencia.DIA;
-    private static final TipoFrequencia UPDATED_TIPO_FREQUENCIA = TipoFrequencia.SEMANA;
+    private static final TipoFrequencia UPDATED_TIPO_FREQUENCIA = TipoFrequencia.DIA;
 
     private static final Integer DEFAULT_A_CADA = 1;
     private static final Integer UPDATED_A_CADA = 2;

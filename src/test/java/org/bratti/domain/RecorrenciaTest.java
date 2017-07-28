@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.bratti.domain.enumeration.TipoFrequencia;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -68,7 +67,7 @@ public class RecorrenciaTest {
 				.valor(BigDecimal.valueOf(10))
 				.aCada(1)
 				.categoria(categoria)
-				.conta(conta);;
+				.conta(conta);
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 11));
 		
@@ -91,7 +90,7 @@ public class RecorrenciaTest {
 				.valor(BigDecimal.valueOf(10))
 				.aCada(1)
 				.categoria(categoria)
-				.conta(conta);;
+				.conta(conta);
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 12));
 		
@@ -123,7 +122,7 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 15));
 		
-		//assertEquals(2, projecoes.size());
+		assertEquals(2, projecoes.size());
 		
 		assertEquals(LocalDate.of(1900, 1, 12), projecoes.get(0).getData());
 		assertEquals(LocalDate.of(1900, 1, 14), projecoes.get(1).getData());
@@ -229,9 +228,9 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 6, 28));
 		
-		assertEquals(LocalDate.of(1900, 2, 15), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 4, 15), projecoes.get(1).getData());
-		assertEquals(LocalDate.of(1900, 6, 15), projecoes.get(2).getData());
+		assertEquals(LocalDate.of(1900, 1, 15), projecoes.get(0).getData());
+		assertEquals(LocalDate.of(1900, 3, 15), projecoes.get(1).getData());
+		assertEquals(LocalDate.of(1900, 5, 15), projecoes.get(2).getData());
 	}
 	
 	@Test
@@ -247,11 +246,8 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 6, 28));
 		
-		assertEquals(3, projecoes.size());
-		
-		assertEquals(LocalDate.of(1900, 2, 5), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 4, 5), projecoes.get(1).getData());
-		assertEquals(LocalDate.of(1900, 6, 5), projecoes.get(2).getData());
+		assertEquals(LocalDate.of(1900, 3, 5), projecoes.get(0).getData());
+		assertEquals(LocalDate.of(1900, 5, 5), projecoes.get(1).getData());
 	}
 	
 	@Test
