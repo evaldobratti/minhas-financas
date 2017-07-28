@@ -39,6 +39,9 @@ public class Lancamento implements Serializable {
     @ManyToOne
     private Categoria categoria;
 
+    @OneToOne(cascade= {CascadeType.ALL})
+    private LancamentoMotivo motivo;
+    
     public Long getId() {
         return id;
     }
