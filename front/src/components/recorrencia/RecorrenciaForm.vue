@@ -8,12 +8,14 @@
       </v-flex>
       <v-flex xs5>
         <v-select
-          label=""
+          label="Frequência"
           :items="frequencias"
           item-text="text"
           item-value="value"
-          v-model="frequencia"></v-select>  
+          v-model="tipoFrequencia"></v-select>  
       </v-flex>
+    </v-layout>
+    <v-layout row>
       <v-flex xs2>
         <v-text-field 
           label="Valor"
@@ -22,7 +24,7 @@
       <v-flex xs2>
         <v-text-field 
           label="A partir de"
-          v-model="dia"></v-text-field>  
+          v-model="partirDe"></v-text-field>  
       </v-flex>
       
     </v-layout>
@@ -35,34 +37,110 @@
 </template>
 
 <script>
+import { RECORRENCIA } from '../../store/recorrencia';
+
 export default {
   props: ['lancamento'],
   data() {
     return {
       frequencias: [{
-        value: 'Diaria',
+        value: 'DIA',
         text: 'Dia'
       }, {
-        value: 'Semanal',
-        text: 'Semana'
-      }, {
-        value: 'Mensal',
+        value: 'MES',
         text: 'Mês'
       }, {
-        value: 'Anual',
+        value: 'ANO',
         text: 'Ano'
-      }],
-      frequencia: 'Mensal',
-      aCada: 1,
-      valor: 0,
-      dia: 20
+      }]
     }
-  }, 
+  },
+  mounted() {
+    this.updateLancamento(this.lancamento);
+  },
   watch: {
     lancamento(l) {
-      this.valor = l.valor;
-      this.dia = l.data;
+      this.updateLancamento(l);
     }
+  },
+  methods: {
+    updateLancamento(l) {
+      this.valor = l.valor;
+      this.partirDe = l.data;
+      this.conta = l.conta;
+      this.local = l.local;
+      this.categoria = l.categoria;
+      this.dia = l.data.date();
+    },
+    submit() {
+      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM);
+    }
+  },
+  computed: {
+    tipoFrequencia: {
+      get() {
+        return this.$store.state.recorrencias.form.tipoFrequencia;
+      },
+      set(tipoFrequencia) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { tipoFrequencia });
+      }
+    },
+    aCada: {
+      get() {
+        return this.$store.state.recorrencias.form.aCada;
+      },
+      set(aCada) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { aCada });
+      }
+    },
+    valor: {
+      get() {
+        return this.$store.state.recorrencias.form.valor;
+      },
+      set(valor) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { valor });
+      }
+    },
+    dia: {
+      get() {
+        return this.$store.state.recorrencias.form.dia;
+      },
+      set(dia) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { dia });
+      }
+    },
+    partirDe: {
+      get() {
+        return this.$store.state.recorrencias.form.partirDe;
+      },
+      set(partirDe) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { partirDe });
+      }
+    },
+    conta: {
+      get() {
+        return this.$store.state.recorrencias.form.conta;
+      },
+      set(conta) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { conta });
+      }
+    },
+    categoria: {
+      get() {
+        return this.$store.state.recorrencias.form.categoria;
+      },
+      set(categoria) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { categoria });
+      }
+    },
+    local: {
+      get() {
+        return this.$store.state.recorrencias.form.local;
+      },
+      set(local) {
+        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { local });
+      }
+    },
   }
 }
 </script>

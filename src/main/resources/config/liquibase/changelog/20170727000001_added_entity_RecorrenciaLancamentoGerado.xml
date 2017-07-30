@@ -30,6 +30,10 @@
                 <constraints nullable="false" />
             </column>
         </createTable>
-        
+        <addColumn tableName="lancamento">
+        	<column name="motivo_id" type="bigint">
+        		<constraints nullable="true" />
+        	</column>
+        </addColumn>
     </changeSet>
 </databaseChangeLog>

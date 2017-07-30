@@ -62,6 +62,7 @@ public class LancamentoResource {
         lancamento.setEfetivada(lancamentoDTO.isEfetivada());
 		lancamento.setLocal(local);
         lancamento.setValor(lancamentoDTO.getValor());
+        lancamento.setMotivo(lancamentoDTO.getMotivo());
 
         Lancamento result = lancamentoRepository.save(lancamento);
         return ResponseEntity.created(new URI("/api/lancamentos/" + result.getId()))

@@ -6,7 +6,7 @@ import authentication from './authentication';
 import conta from './conta';
 import categorias from './categorias';
 import lancamento from './lancamento';
-
+import recorrencia from './recorrencia';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -14,7 +14,8 @@ const store = new Vuex.Store({
       authentication,
       conta,
       categorias,
-      lancamentos: lancamento
+      lancamentos: lancamento,
+      recorrencias: recorrencia
     }
 });
 

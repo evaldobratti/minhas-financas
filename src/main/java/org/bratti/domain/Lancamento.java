@@ -142,6 +142,19 @@ public class Lancamento implements Serializable {
         }
         return Objects.equals(getId(), lancamento.getId());
     }
+    
+    public void setMotivo(LancamentoMotivo motivo) {
+    	this.motivo = motivo;
+    }
+    
+    public LancamentoMotivo getMotivo() {
+    	return motivo;
+    }
+    
+    public Lancamento motivo(LancamentoMotivo motivo) {
+    	this.motivo = motivo;
+    	return this;
+    }
 
     @Override
     public int hashCode() {

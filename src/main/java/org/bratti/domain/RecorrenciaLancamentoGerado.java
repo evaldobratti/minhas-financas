@@ -7,7 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 @Entity
+@JsonDeserialize(as = RecorrenciaLancamentoGerado.class)
 public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 	
     private static final long serialVersionUID = 1L;
@@ -16,6 +20,7 @@ public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
     private LocalDate data;
 
     @OneToOne(mappedBy="motivo")
+    @JsonIgnore
     private Lancamento lancamento;
     
     @ManyToOne
@@ -28,6 +33,11 @@ public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 	public void setData(LocalDate data) {
 		this.data = data;
 	}
+	
+	public RecorrenciaLancamentoGerado data(LocalDate data) {
+		this.data = data;
+		return this;
+	}
 
 	public Lancamento getLancamento() {
 		return lancamento;
@@ -36,7 +46,7 @@ public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 	public void setLancamento(Lancamento lancamento) {
 		this.lancamento = lancamento;
 	}
-
+	
 	public Recorrencia getRecorrencia() {
 		return recorrencia;
 	}
@@ -45,6 +55,9 @@ public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 		this.recorrencia = recorrencia;
 	}
     
-    
+	public RecorrenciaLancamentoGerado recorrencia(Recorrencia recorrencia) {
+		this.recorrencia = recorrencia;
+		return this;
+	}
 
 }

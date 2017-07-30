@@ -19,6 +19,7 @@ import org.bratti.MinhasfinancasApp;
 import org.bratti.domain.Conta;
 import org.bratti.repository.ContaRepository;
 import org.bratti.repository.LancamentoRepository;
+import org.bratti.repository.RecorrenciaRepository;
 import org.bratti.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +57,9 @@ public class ContaResourceIntTest {
     private LancamentoRepository lancamentoRepository;
     
     @Autowired
+    private RecorrenciaRepository recorrenciaRepository;
+    
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -74,7 +78,7 @@ public class ContaResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        ContaResource contaResource = new ContaResource(contaRepository, lancamentoRepository);
+        ContaResource contaResource = new ContaResource(contaRepository, lancamentoRepository, recorrenciaRepository);
         this.restContaMockMvc = MockMvcBuilders.standaloneSetup(contaResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

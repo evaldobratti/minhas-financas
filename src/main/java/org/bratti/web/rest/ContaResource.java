@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +13,10 @@ import java.util.stream.Collectors;
 
 import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
+import org.bratti.domain.Recorrencia;
 import org.bratti.repository.ContaRepository;
 import org.bratti.repository.LancamentoRepository;
+import org.bratti.repository.RecorrenciaRepository;
 import org.bratti.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +48,13 @@ public class ContaResource {
 
     private final ContaRepository contaRepository;
     private final LancamentoRepository lancamentoRepository;
-
-    public ContaResource(ContaRepository contaRepository, LancamentoRepository lancamentoRepository) {
+    private final RecorrenciaRepository recorrenciaRepository;
+    
+    public ContaResource(ContaRepository contaRepository, LancamentoRepository lancamentoRepository,
+    		RecorrenciaRepository recorrenciaRepository) {
         this.contaRepository = contaRepository;
         this.lancamentoRepository = lancamentoRepository;
+        this.recorrenciaRepository = recorrenciaRepository;
     }
 
     @PostMapping("/contas")
@@ -112,8 +118,22 @@ public class ContaResource {
     @Timed
     public List<Lancamento> getLancamentos(@PathVariable("id") Long contaId, 
         @RequestParam("mes") Integer mes, @RequestParam("ano") Integer ano){
-        
-        return lancamentoRepository.findByContaMesAno(contaId, mes, ano);
+    	
+    	List<Lancamento> lancamentosReais = lancamentoRepository.findByContaMesAno(contaId, mes, ano);
+
+    	List<Lancamento> lancamentosProjetados = projecoesAte(LocalDate.of(ano, mes, 1).plus(1, ChronoUnit.MONTHS).minus(1, ChronoUnit.DAYS));
+
+    	List<Lancamento> projetadosDoMes = lancamentosProjetados.stream().filter(l -> l.getData().getMonth().ordinal() + 1 == mes && l.getData().getYear() == ano).collect(Collectors.toList());
+    	
+    	lancamentosReais.addAll(projetadosDoMes);
+    	
+		return lancamentosReais;
+    }
+    
+    private List<Lancamento> projecoesAte(LocalDate ate) {
+    	return recorrenciaRepository.findAllWithEagerRelationships().stream().map(r -> {
+    		return r.projecaoAte(ate);
+    	}).flatMap(List::stream).collect(Collectors.toList());
     }
     
     @GetMapping("/contas/{id}/saldo")
@@ -121,11 +141,12 @@ public class ContaResource {
     public Object getSaldoFimDoDiaEm(@PathVariable("id") Long contaId, @RequestParam("data") LocalDate data) {
     	Conta conta = contaRepository.findOne(contaId);
 		BigDecimal saldo = saldoNoDia(data, conta);
+		BigDecimal saldoProjecoes = projecoesAte(data).stream().map(i -> i.getValor()).reduce(BigDecimal.ZERO, (x, y) -> x.add(y));
     	    	
 		HashMap<String, Object> retorno = new HashMap<>();
 		
 		retorno.put("data", data);
-		retorno.put("saldo", saldo);
+		retorno.put("saldo", saldo.add(saldoProjecoes));
 		
 		return retorno;
     }

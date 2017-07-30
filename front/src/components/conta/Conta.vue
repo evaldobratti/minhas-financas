@@ -64,7 +64,12 @@
                 <td xs3>{{ l.item.data | date }}</td>
                 <td>{{ l.item.local.nome }}</td>
                 <td>{{ l.item.categoria.nome }}</td>
-                <td class="text-xs-right" :class="css(l.item.valor)">{{ l.item.valor | currency }}</td>
+                <td class="text-xs-right" :class="css(l.item.valor)">
+                  {{ l.item.valor | currency }}
+                  <v-btn @click="efetiva(l.item)"primary fab small dark class="small-fab-btn">
+                    <v-icon>add</v-icon>
+                  </v-btn>
+                </td>
                 <td><v-checkbox v-if="l.item.efetivada != null" v-model="l.item.efetivada"></v-checkbox></td>
                 <td class="text-xs-right" :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
                 <td>
@@ -102,7 +107,7 @@ import { CARREGA_CONTA, contas } from '../../store/conta';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
-
+import axios from 'axios';
 export default {
   created() {
     this.$store.dispatch(CARREGA_CONTA, this.$route.params.id);
@@ -165,6 +170,13 @@ export default {
     novaRecorrencia(lancamento) {
       this.recorrenciaLancamento = lancamento;
       this.recorrenciaDialog = true;
+    },
+    efetiva(lancamento) {
+      axios.put('/api/lancamentos', lancamento).then(res => {
+        console.info('foi lul', res)
+      }).catch(err => {
+        console.error('nheca', err);
+      })
     }
   },
   components: {

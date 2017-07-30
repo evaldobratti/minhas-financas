@@ -31,5 +31,10 @@
                                  referencedColumnNames="id"
                                  referencedTableName="categoria"/>
 
+		<addForeignKeyConstraint baseColumnNames="local_id"
+                                 baseTableName="recorrencia"
+                                 constraintName="fk_recorrencia_local_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="local"/>
     </changeSet>
 </databaseChangeLog>

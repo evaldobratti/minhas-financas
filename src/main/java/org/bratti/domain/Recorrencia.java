@@ -22,6 +22,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
@@ -29,6 +30,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.bratti.domain.enumeration.TipoFrequencia;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * A Recorrencia.
@@ -68,17 +71,19 @@ public class Recorrencia implements Serializable {
     private LocalDate partirDe;
 
     @ManyToMany
-    @JoinTable(name = "recorrencia_lancamento",
-               joinColumns = @JoinColumn(name="recorrencias_id", referencedColumnName="id"),
-               inverseJoinColumns = @JoinColumn(name="lancamentos_id", referencedColumnName="id"))
-    private Set<Lancamento> lancamentos = new HashSet<>();
-
     @ManyToOne(optional = false)
     @NotNull
     private Conta conta;
 
     @ManyToOne
     private Categoria categoria;
+    
+    @ManyToOne
+    private Local local;
+    
+    @OneToMany(mappedBy="recorrencia")
+    @JsonIgnore
+    private Set<RecorrenciaLancamentoGerado> recorrenciaLancamentos = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -153,27 +158,27 @@ public class Recorrencia implements Serializable {
         this.partirDe = partirDe;
     }
 
-    public Set<Lancamento> getLancamentos() {
-        return lancamentos;
+    public Set<RecorrenciaLancamentoGerado> getRecorrenciaLancamentos() {
+        return recorrenciaLancamentos;
     }
 
-    public Recorrencia lancamentos(Set<Lancamento> lancamentos) {
-        this.lancamentos = lancamentos;
+    public Recorrencia recorrenciaLancamentos(Set<RecorrenciaLancamentoGerado> recorrenciaLancamentos) {
+        this.recorrenciaLancamentos = recorrenciaLancamentos;
         return this;
     }
 
-    public Recorrencia addLancamento(Lancamento lancamento) {
-        this.lancamentos.add(lancamento);
+    public Recorrencia addRecorrenciaLancamentos(RecorrenciaLancamentoGerado recorrenciaLancamento) {
+        this.recorrenciaLancamentos.add(recorrenciaLancamento);
         return this;
     }
 
-    public Recorrencia removeLancamento(Lancamento lancamento) {
-        this.lancamentos.remove(lancamento);
+    public Recorrencia removeRecorrenciaLancamentos(RecorrenciaLancamentoGerado recorrenciaLancamento) {
+        this.recorrenciaLancamentos.remove(recorrenciaLancamento);
         return this;
     }
 
-    public void setLancamentos(Set<Lancamento> lancamentos) {
-        this.lancamentos = lancamentos;
+    public void setRecorrenciaLancamentos(Set<RecorrenciaLancamentoGerado> recorrenciaLancamentos) {
+        this.recorrenciaLancamentos = recorrenciaLancamentos;
     }
 
     public Conta getConta() {
@@ -247,8 +252,11 @@ public class Recorrencia implements Serializable {
 						.categoria(categoria)
 						.conta(conta)
 						.data(dataBase)
-						.local(new Local())
-						.valor(valor));
+						.local(local)
+						.valor(valor)
+						.motivo(new RecorrenciaLancamentoGerado()
+								.data(dataBase)
+								.recorrencia(this)));
 		}
 		
 		while (dataBase.isBefore(ate) || dataBase.equals(ate)) {
@@ -257,15 +265,31 @@ public class Recorrencia implements Serializable {
 			
 			if (cada == 0) {
 				cada = aCada;
+				LocalDate data = LocalDate.of(dataBase.getYear(), dataBase.getMonth(), dataBase.getDayOfMonth());
 				retorno.add(new Lancamento()
 						.categoria(categoria)
 						.conta(conta)
-						.data(LocalDate.of(dataBase.getYear(), dataBase.getMonth(), dataBase.getDayOfMonth()))
-						.local(new Local())
-						.valor(valor));
+						.data(data)
+						.local(local)
+						.valor(valor)
+						.motivo(new RecorrenciaLancamentoGerado()
+								.data(data)
+								.recorrencia(this)));
 			}
 			
 		}
-		return retorno.stream().filter(l -> l.getData().isBefore(ate) || l.getData().equals(ate)).collect(Collectors.toList());
+		List<LocalDate> datasGeradas = recorrenciaLancamentos.stream().map(i -> i.getData()).collect(Collectors.toList());
+		
+		return retorno.stream().filter(l -> 
+			(l.getData().isBefore(ate) || l.getData().equals(ate))
+			&& !datasGeradas.contains(l.getData())).collect(Collectors.toList());
+	}
+
+	public Local getLocal() {
+		return local;
+	}
+
+	public void setLocal(Local local) {
+		this.local = local;
 	}
 }

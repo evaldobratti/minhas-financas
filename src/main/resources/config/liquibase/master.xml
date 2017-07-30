@@ -18,4 +18,7 @@
     <include file="classpath:config/liquibase/changelog/20170708144436_added_entity_constraints_Transferencia.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170726225835_added_entity_constraints_Recorrencia.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+    
+    <include file="classpath:config/liquibase/changelog/20170727000001_added_entity_RecorrenciaLancamentoGerado.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170727000002_added_entity_constraints_RecorrenciaLancamentoGerado.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

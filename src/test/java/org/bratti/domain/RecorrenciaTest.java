@@ -268,4 +268,27 @@ public class RecorrenciaTest {
 		assertEquals(LocalDate.of(1900, 3, 10), projecoes.get(0).getData());
 		assertEquals(LocalDate.of(1900, 5, 10), projecoes.get(1).getData());
 	}
+	
+	@Test
+	public void naoDeveProjetarLancamentosComDatasJaEfetivadas() {
+		Recorrencia recorrencia = new Recorrencia()
+				.partirDe(LocalDate.of(1900, 1, 10))
+				.tipoFrequencia(TipoFrequencia.MES)
+				.dia(10)
+				.valor(BigDecimal.valueOf(10))
+				.aCada(1)
+				.categoria(categoria)
+				.conta(conta)
+				.addRecorrenciaLancamentos(new RecorrenciaLancamentoGerado()
+						.data(LocalDate.of(1900, 3, 10)));
+		
+		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 4, 10));
+		
+		assertEquals(2, projecoes.size());
+		
+		assertEquals(LocalDate.of(1900, 2, 10), projecoes.get(0).getData());
+		assertEquals(LocalDate.of(1900, 4, 10), projecoes.get(1).getData());
+		
+	}
+	
 }

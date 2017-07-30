@@ -8,8 +8,13 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+@JsonDeserialize(as = RecorrenciaLancamentoGerado.class)
+//@JsonDeserialize(using = LancamentoMotivoDeserializer.class)
 public abstract class LancamentoMotivo {
 
     @Id

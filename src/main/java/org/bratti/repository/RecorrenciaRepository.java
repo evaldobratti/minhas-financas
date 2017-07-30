@@ -14,10 +14,10 @@ import java.util.List;
 @Repository
 public interface RecorrenciaRepository extends JpaRepository<Recorrencia,Long> {
     
-    @Query("select distinct recorrencia from Recorrencia recorrencia left join fetch recorrencia.lancamentos")
+    @Query("select distinct recorrencia from Recorrencia recorrencia left join fetch recorrencia.recorrenciaLancamentos")
     List<Recorrencia> findAllWithEagerRelationships();
 
-    @Query("select recorrencia from Recorrencia recorrencia left join fetch recorrencia.lancamentos where recorrencia.id =:id")
+    @Query("select recorrencia from Recorrencia recorrencia left join fetch recorrencia.recorrenciaLancamentos where recorrencia.id =:id")
     Recorrencia findOneWithEagerRelationships(@Param("id") Long id);
     
 }
