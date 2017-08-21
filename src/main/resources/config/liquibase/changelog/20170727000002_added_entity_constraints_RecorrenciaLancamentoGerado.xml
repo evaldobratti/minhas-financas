@@ -6,19 +6,8 @@
     <!--
         Added the constraints for entity Recorrencia.
     -->
-    <changeSet id="20170727000002-2" author="jhipster">
+    <changeSet id="20170727000002" author="jhipster">
         
-        <addForeignKeyConstraint baseColumnNames="lancamento_id"
-                                 baseTableName="recorrencia_lancamento_gerado"
-                                 constraintName="fk_rlg_l_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="lancamento"/>
-        
-        <addForeignKeyConstraint baseColumnNames="recorrencia_id"
-                                 baseTableName="recorrencia_lancamento_gerado"
-                                 constraintName="fk_rlg_r_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="recorrencia"/>
-        
+        <dropColumn tableName="recorrencia" columnName="dia"></dropColumn>        
     </changeSet>
 </databaseChangeLog>

@@ -7,6 +7,7 @@ import conta from './conta';
 import categorias from './categorias';
 import lancamento from './lancamento';
 import recorrencia from './recorrencia';
+import parcelamentos from './parcelamentos';
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
@@ -15,7 +16,8 @@ const store = new Vuex.Store({
       conta,
       categorias,
       lancamentos: lancamento,
-      recorrencias: recorrencia
+      recorrencias: recorrencia,
+      parcelamentos
     }
 });
 

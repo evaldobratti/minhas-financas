@@ -3,15 +3,22 @@ package org.bratti.domain;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @Entity
 @JsonDeserialize(as = RecorrenciaLancamentoGerado.class)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "TYPE")
 public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 	
     private static final long serialVersionUID = 1L;
@@ -19,10 +26,6 @@ public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
     @Column(name = "data")
     private LocalDate data;
 
-    @OneToOne(mappedBy="motivo")
-    @JsonIgnore
-    private Lancamento lancamento;
-    
     @ManyToOne
     private Recorrencia recorrencia;
 
@@ -39,14 +42,6 @@ public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 		return this;
 	}
 
-	public Lancamento getLancamento() {
-		return lancamento;
-	}
-
-	public void setLancamento(Lancamento lancamento) {
-		this.lancamento = lancamento;
-	}
-	
 	public Recorrencia getRecorrencia() {
 		return recorrencia;
 	}

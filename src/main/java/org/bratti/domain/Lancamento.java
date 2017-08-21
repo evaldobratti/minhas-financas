@@ -2,6 +2,9 @@ package org.bratti.domain;
 
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,6 +43,7 @@ public class Lancamento implements Serializable {
     private Categoria categoria;
 
     @OneToOne(cascade= {CascadeType.ALL})
+    @JoinColumn(name="motivo_id")
     private LancamentoMotivo motivo;
     
     public Long getId() {
@@ -170,4 +174,10 @@ public class Lancamento implements Serializable {
             ", efetivada='" + isEfetivada() + "'" +
             "}";
     }
+
+	public String descricao() {
+		if (motivo == null)
+			return this.local.getNome();
+		return this.local.getNome() + " " + this.motivo.complementoDescricao();
+	}
 }

@@ -21,6 +21,7 @@
 
 <script>
 import { RECORRENCIA } from '../../store/recorrencia';
+import mapGetSet from '../../store/mapGetSet';
 import DatePicker from '../DatePicker';
 
 export default {
@@ -61,76 +62,24 @@ export default {
       this.local = l.local;
       this.categoria = l.categoria;
       this.dia = l.data.date();
+      this.lancamentoInicial = l;
     },
     submit() {
       this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM);
     }
   },
   computed: {
-    tipoFrequencia: {
-      get() {
-        return this.$store.state.recorrencias.form.tipoFrequencia;
-      },
-      set(tipoFrequencia) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { tipoFrequencia });
-      }
-    },
-    aCada: {
-      get() {
-        return this.$store.state.recorrencias.form.aCada;
-      },
-      set(aCada) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { aCada });
-      }
-    },
-    valor: {
-      get() {
-        return this.$store.state.recorrencias.form.valor;
-      },
-      set(valor) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { valor });
-      }
-    },
-    dia: {
-      get() {
-        return this.$store.state.recorrencias.form.dia;
-      },
-      set(dia) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { dia });
-      }
-    },
-    partirDe: {
-      get() {
-        return this.$store.state.recorrencias.form.partirDe;
-      },
-      set(partirDe) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { partirDe });
-      }
-    },
-    conta: {
-      get() {
-        return this.$store.state.recorrencias.form.conta;
-      },
-      set(conta) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { conta });
-      }
-    },
-    categoria: {
-      get() {
-        return this.$store.state.recorrencias.form.categoria;
-      },
-      set(categoria) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { categoria });
-      }
-    },
-    local: {
-      get() {
-        return this.$store.state.recorrencias.form.local;
-      },
-      set(local) {
-        this.$store.commit(RECORRENCIA.m.UPDATE_FORM, { local });
-      }
-    },
+    ...mapGetSet({
+      tipoFrequencia: ['recorrencias.form.tipoFrequencia', RECORRENCIA.m.UPDATE_FORM_TIPO_FREQUENCIA],
+      valor: ['recorrencias.form.valor', RECORRENCIA.m.UPDATE_FORM_VALOR],
+      aCada: ['recorrencias.form.aCada', RECORRENCIA.m.UPDATE_FORM_A_CADA],
+      dia: ['recorrencias.form.dia', RECORRENCIA.m.UPDATE_FORM_DIA],
+      partirDe: ['recorrencias.form.partirDe', RECORRENCIA.m.UPDATE_FORM_PARTIR_DE],
+      conta: ['recorrencias.form.conta', RECORRENCIA.m.UPDATE_FORM_CONTA],
+      categoria: ['recorrencias.form.categoria', RECORRENCIA.m.UPDATE_FORM_CATEGORIA],
+      local: ['recorrencia.form.local', RECORRENCIA.m.UPDATE_FORM_LOCAL],
+      lancamentoInicial: ['recorrencia.form.lancamentoInicial', RECORRENCIA.m.UPDATE_FORM_LANCAMENTO_INICIAL]
+    }),
   }
 }
 </script>

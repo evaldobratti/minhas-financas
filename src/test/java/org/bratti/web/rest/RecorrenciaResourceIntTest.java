@@ -1,12 +1,35 @@
 package org.bratti.web.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+
 import org.bratti.MinhasfinancasApp;
-
-import org.bratti.domain.Recorrencia;
+import org.bratti.domain.Categoria;
 import org.bratti.domain.Conta;
+import org.bratti.domain.Lancamento;
+import org.bratti.domain.Recorrencia;
+import org.bratti.domain.RecorrenciaLancamentoGerado;
+import org.bratti.domain.enumeration.TipoFrequencia;
 import org.bratti.repository.RecorrenciaRepository;
+import org.bratti.service.dto.RecorrenciaDTO;
 import org.bratti.web.rest.errors.ExceptionTranslator;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,19 +43,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.bratti.domain.enumeration.TipoFrequencia;
 /**
  * Test class for the RecorrenciaResource REST controller.
  *
@@ -50,9 +60,6 @@ public class RecorrenciaResourceIntTest {
 
     private static final BigDecimal DEFAULT_VALOR = new BigDecimal(1);
     private static final BigDecimal UPDATED_VALOR = new BigDecimal(2);
-
-    private static final Integer DEFAULT_DIA = 1;
-    private static final Integer UPDATED_DIA = 2;
 
     private static final LocalDate DEFAULT_PARTIR_DE = LocalDate.ofEpochDay(0L);
     private static final LocalDate UPDATED_PARTIR_DE = LocalDate.now(ZoneId.systemDefault());
@@ -97,7 +104,6 @@ public class RecorrenciaResourceIntTest {
             .tipoFrequencia(DEFAULT_TIPO_FREQUENCIA)
             .aCada(DEFAULT_A_CADA)
             .valor(DEFAULT_VALOR)
-            .dia(DEFAULT_DIA)
             .partirDe(DEFAULT_PARTIR_DE);
         // Add required entity
         Conta conta = ContaResourceIntTest.createEntity(em);
@@ -130,7 +136,6 @@ public class RecorrenciaResourceIntTest {
         assertThat(testRecorrencia.getTipoFrequencia()).isEqualTo(DEFAULT_TIPO_FREQUENCIA);
         assertThat(testRecorrencia.getaCada()).isEqualTo(DEFAULT_A_CADA);
         assertThat(testRecorrencia.getValor()).isEqualTo(DEFAULT_VALOR);
-        assertThat(testRecorrencia.getDia()).isEqualTo(DEFAULT_DIA);
         assertThat(testRecorrencia.getPartirDe()).isEqualTo(DEFAULT_PARTIR_DE);
     }
 
@@ -191,24 +196,6 @@ public class RecorrenciaResourceIntTest {
 
     @Test
     @Transactional
-    public void checkDiaIsRequired() throws Exception {
-        int databaseSizeBeforeTest = recorrenciaRepository.findAll().size();
-        // set the field null
-        recorrencia.setDia(null);
-
-        // Create the Recorrencia, which fails.
-
-        restRecorrenciaMockMvc.perform(post("/api/recorrencias")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(recorrencia)))
-            .andExpect(status().isBadRequest());
-
-        List<Recorrencia> recorrenciaList = recorrenciaRepository.findAll();
-        assertThat(recorrenciaList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     public void checkPartirDeIsRequired() throws Exception {
         int databaseSizeBeforeTest = recorrenciaRepository.findAll().size();
         // set the field null
@@ -239,7 +226,6 @@ public class RecorrenciaResourceIntTest {
             .andExpect(jsonPath("$.[*].tipoFrequencia").value(hasItem(DEFAULT_TIPO_FREQUENCIA.toString())))
             .andExpect(jsonPath("$.[*].aCada").value(hasItem(DEFAULT_A_CADA)))
             .andExpect(jsonPath("$.[*].valor").value(hasItem(DEFAULT_VALOR.intValue())))
-            .andExpect(jsonPath("$.[*].dia").value(hasItem(DEFAULT_DIA)))
             .andExpect(jsonPath("$.[*].partirDe").value(hasItem(DEFAULT_PARTIR_DE.toString())));
     }
 
@@ -257,7 +243,6 @@ public class RecorrenciaResourceIntTest {
             .andExpect(jsonPath("$.tipoFrequencia").value(DEFAULT_TIPO_FREQUENCIA.toString()))
             .andExpect(jsonPath("$.aCada").value(DEFAULT_A_CADA))
             .andExpect(jsonPath("$.valor").value(DEFAULT_VALOR.intValue()))
-            .andExpect(jsonPath("$.dia").value(DEFAULT_DIA))
             .andExpect(jsonPath("$.partirDe").value(DEFAULT_PARTIR_DE.toString()));
     }
 
@@ -282,7 +267,6 @@ public class RecorrenciaResourceIntTest {
             .tipoFrequencia(UPDATED_TIPO_FREQUENCIA)
             .aCada(UPDATED_A_CADA)
             .valor(UPDATED_VALOR)
-            .dia(UPDATED_DIA)
             .partirDe(UPDATED_PARTIR_DE);
 
         restRecorrenciaMockMvc.perform(put("/api/recorrencias")
@@ -297,7 +281,6 @@ public class RecorrenciaResourceIntTest {
         assertThat(testRecorrencia.getTipoFrequencia()).isEqualTo(UPDATED_TIPO_FREQUENCIA);
         assertThat(testRecorrencia.getaCada()).isEqualTo(UPDATED_A_CADA);
         assertThat(testRecorrencia.getValor()).isEqualTo(UPDATED_VALOR);
-        assertThat(testRecorrencia.getDia()).isEqualTo(UPDATED_DIA);
         assertThat(testRecorrencia.getPartirDe()).isEqualTo(UPDATED_PARTIR_DE);
     }
 
@@ -335,6 +318,49 @@ public class RecorrenciaResourceIntTest {
         List<Recorrencia> recorrenciaList = recorrenciaRepository.findAll();
         assertThat(recorrenciaList).hasSize(databaseSizeBeforeDelete - 1);
     }
+    
+    @Test
+    @Transactional
+    public void efetivaRecorrenciaComLancamentoInicial() throws Exception {
+    	Categoria categoria = new Categoria().nome("categoria");
+    	Conta conta = new Conta().nome("conta").saldoInicial(BigDecimal.ZERO);
+		Lancamento lancamento = new Lancamento()
+			.categoria(categoria)
+			.conta(conta)
+			.data(LocalDate.now())
+			.valor(BigDecimal.valueOf(10));
+		
+		RecorrenciaDTO dto = new RecorrenciaDTO(recorrencia);
+		dto.setLancamentoInicial(lancamento);
+		
+		
+		em.persist(categoria);
+		em.persist(conta);
+		em.persist(lancamento);
+		em.flush();
+
+		int recorrenciasAntes = recorrenciaRepository.findAll().size();
+		int lancamentosGeradosAntes = em.createQuery("from " + RecorrenciaLancamentoGerado.class.getSimpleName()).getResultList().size();
+		assertEquals(0, lancamentosGeradosAntes);
+		
+		restRecorrenciaMockMvc.perform(post("/api/recorrencias")
+	            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+	            .content(TestUtil.convertObjectToJsonBytes(dto)))
+	            .andExpect(status().isCreated());
+		
+		int recorrenciasDepois = recorrenciaRepository.findAll().size();
+		RecorrenciaLancamentoGerado lancamentoGerado = em.createQuery("from " + RecorrenciaLancamentoGerado.class.getSimpleName(), RecorrenciaLancamentoGerado.class).getSingleResult();
+		
+		assertEquals(recorrenciasAntes + 1, recorrenciasDepois);
+		assertNotNull(lancamentoGerado);
+		assertNotNull(lancamentoGerado.getRecorrencia());
+		assertEquals(DEFAULT_PARTIR_DE, lancamentoGerado.getData());
+		
+		
+    }
+    
+    
+
 
     @Test
     @Transactional

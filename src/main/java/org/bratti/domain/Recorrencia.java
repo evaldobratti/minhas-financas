@@ -5,27 +5,27 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -38,6 +38,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "recorrencia")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "TYPE")
 public class Recorrencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -61,12 +63,6 @@ public class Recorrencia implements Serializable {
     private BigDecimal valor;
 
     @NotNull
-    @Min(value = 1)
-    @Max(value = 31)
-    @Column(name = "dia", nullable = false)
-    private Integer dia;
-
-    @NotNull
     @Column(name = "partir_de", nullable = false)
     private LocalDate partirDe;
 
@@ -81,9 +77,9 @@ public class Recorrencia implements Serializable {
     @ManyToOne
     private Local local;
     
-    @OneToMany(mappedBy="recorrencia")
+    @OneToMany(mappedBy="recorrencia", cascade=CascadeType.ALL)
     @JsonIgnore
-    private Set<RecorrenciaLancamentoGerado> recorrenciaLancamentos = new HashSet<>();
+    private List<RecorrenciaLancamentoGerado> recorrenciaLancamentos = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -132,19 +128,6 @@ public class Recorrencia implements Serializable {
         this.valor = valor;
     }
 
-    public Integer getDia() {
-        return dia;
-    }
-
-    public Recorrencia dia(Integer dia) {
-        this.dia = dia;
-        return this;
-    }
-
-    public void setDia(Integer dia) {
-        this.dia = dia;
-    }
-
     public LocalDate getPartirDe() {
         return partirDe;
     }
@@ -158,11 +141,11 @@ public class Recorrencia implements Serializable {
         this.partirDe = partirDe;
     }
 
-    public Set<RecorrenciaLancamentoGerado> getRecorrenciaLancamentos() {
+    public List<RecorrenciaLancamentoGerado> getRecorrenciaLancamentos() {
         return recorrenciaLancamentos;
     }
 
-    public Recorrencia recorrenciaLancamentos(Set<RecorrenciaLancamentoGerado> recorrenciaLancamentos) {
+    public Recorrencia recorrenciaLancamentos(List<RecorrenciaLancamentoGerado> recorrenciaLancamentos) {
         this.recorrenciaLancamentos = recorrenciaLancamentos;
         return this;
     }
@@ -177,7 +160,7 @@ public class Recorrencia implements Serializable {
         return this;
     }
 
-    public void setRecorrenciaLancamentos(Set<RecorrenciaLancamentoGerado> recorrenciaLancamentos) {
+    public void setRecorrenciaLancamentos(List<RecorrenciaLancamentoGerado> recorrenciaLancamentos) {
         this.recorrenciaLancamentos = recorrenciaLancamentos;
     }
 
@@ -234,7 +217,6 @@ public class Recorrencia implements Serializable {
             ", tipoFrequencia='" + getTipoFrequencia() + "'" +
             ", aCada='" + getaCada() + "'" +
             ", valor='" + getValor() + "'" +
-            ", dia='" + getDia() + "'" +
             ", partirDe='" + getPartirDe() + "'" +
             "}";
     }
@@ -243,23 +225,18 @@ public class Recorrencia implements Serializable {
 		if (ate.isBefore(partirDe))
 			return new ArrayList<>();
 		
-		LocalDate dataBase = LocalDate.of(partirDe.getYear(), partirDe.getMonth(), dia);
+		LocalDate dataBase = LocalDate.of(partirDe.getYear(), partirDe.getMonth(), partirDe.getDayOfMonth());
 		int cada = aCada;
 		List<Lancamento> retorno = new ArrayList<>();
-		
-		if (dataBase.isAfter(partirDe)) {
 			retorno.add(new Lancamento()
 						.categoria(categoria)
 						.conta(conta)
 						.data(dataBase)
 						.local(local)
 						.valor(valor)
-						.motivo(new RecorrenciaLancamentoGerado()
-								.data(dataBase)
-								.recorrencia(this)));
-		}
+						.motivo(novoMotivo(dataBase, true, retorno.size() + 1)));
 		
-		while (dataBase.isBefore(ate) || dataBase.equals(ate)) {
+		while ((dataBase.isBefore(ate) || dataBase.equals(ate)) && !deveParar(true, retorno)) {
 			cada -= 1;
 			dataBase = dataBase.plus(1, tipoFrequencia.unit());
 			
@@ -272,9 +249,7 @@ public class Recorrencia implements Serializable {
 						.data(data)
 						.local(local)
 						.valor(valor)
-						.motivo(new RecorrenciaLancamentoGerado()
-								.data(data)
-								.recorrencia(this)));
+						.motivo(novoMotivo(data, true, retorno.size() + 1)));
 			}
 			
 		}
@@ -285,6 +260,16 @@ public class Recorrencia implements Serializable {
 			&& !datasGeradas.contains(l.getData())).collect(Collectors.toList());
 	}
 
+	public RecorrenciaLancamentoGerado novoMotivo(LocalDate dataBase, boolean gerouParcelaInicial, int ix) {
+		return new RecorrenciaLancamentoGerado()
+				.data(dataBase)
+				.recorrencia(this);
+	}
+
+	protected boolean deveParar(boolean gerouParcelaInicial, List<Lancamento> retorno) {
+		return false;
+	}
+
 	public Local getLocal() {
 		return local;
 	}
@@ -292,4 +277,20 @@ public class Recorrencia implements Serializable {
 	public void setLocal(Local local) {
 		this.local = local;
 	}
+	
+	public Recorrencia local(Local local) {
+		this.local = local;
+		return this;
+	}
+	
+	public void efetivaCom(Lancamento lancamento) {
+		if (lancamento != null) {
+			RecorrenciaLancamentoGerado recorrenciaLancamento = (RecorrenciaLancamentoGerado) new RecorrenciaLancamentoGerado()
+					.data(getPartirDe())
+					.recorrencia(this);
+			addRecorrenciaLancamentos(recorrenciaLancamento);
+			lancamento.setMotivo(recorrenciaLancamento);
+		}
+	}
+	
 }

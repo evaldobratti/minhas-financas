@@ -79,6 +79,9 @@
                   <v-btn @click.native.stop="novaRecorrencia(l.item)" v-if="l.item.categoria.nome != null" primary fab small dark class="small-fab-btn">
                     <v-icon>refresh</v-icon>
                   </v-btn>
+                  <v-btn @click.native.stop="novoParcelamento(l.item)" v-if="l.item.categoria.nome != null" primary fab small class="small-fab-btn">
+                    <v-icon>refresh</v-icon>
+                  </v-btn>
                 </td>
               </template>
             </v-data-table>
@@ -93,7 +96,7 @@
             <div class="headline">Nova recorrência</div>
           </v-card-title>
           <v-card-text>
-            <RecorrenciaForm :lancamento="recorrenciaLancamento"></RecorrenciaForm>
+            <RecorrenciaForm :lancamento="lancamentoAcao"></RecorrenciaForm>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -105,6 +108,7 @@ import { CARREGA_CONTA, contas } from '../../store/conta';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
+import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
 import axios from 'axios';
 export default {
   created() {
@@ -127,10 +131,11 @@ export default {
         { nome: 'Novembro', ix: 11},
         { nome: 'Dezembro', ix: 12},
       ],
-      mes: 7,
+      mes: 8,
       ano: 2017,
       recorrenciaDialog: false,
-      recorrenciaLancamento: null
+      parcelamentoDialog: false,
+      lancamentoAcao: null
     }
   },
   computed: {
@@ -149,9 +154,9 @@ export default {
   },
   methods: {
     css(valor) {
-      return {
-        'red--text': valor < 0,
-        'blue--text text--darken-3': valor > 0
+      return { 
+        'red--text': valor < 0, 
+        'blue--text text--darken-3': valor >= 0
       }
     },
     filtrar() {
@@ -166,8 +171,12 @@ export default {
       this.$store.dispatch(contas.d.REMOVE_LANCAMENTO, lancamento);
     },
     novaRecorrencia(lancamento) {
-      this.recorrenciaLancamento = lancamento;
+      this.lancamentoAcao = lancamento;
       this.recorrenciaDialog = true;
+    },
+    novoParcelamento(lancamento) {
+      this.lancamentoAcao = lancamento;
+      this.parcelamentoDialog = true;
     },
     efetiva(lancamento) {
       axios.put('/api/lancamentos', lancamento).then(res => {
@@ -180,7 +189,8 @@ export default {
   components: {
     ProtectedRoute,
     LancamentoForm,
-    RecorrenciaForm
+    RecorrenciaForm,
+    ParcelamentoForm
   }
 }
 </script>

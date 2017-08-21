@@ -2,6 +2,7 @@ package org.bratti.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,19 +11,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.bratti.MinhasfinancasApp;
+import org.bratti.domain.Categoria;
+import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
 import org.bratti.domain.Local;
+import org.bratti.domain.Recorrencia;
+import org.bratti.domain.RecorrenciaLancamentoGerado;
+import org.bratti.domain.enumeration.TipoFrequencia;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.LocalRepository;
 import org.bratti.web.rest.errors.ExceptionTranslator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,12 +46,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.config.MvcNamespaceHandler;
 
-/**
- * Test class for the LancamentoResource REST controller.
- *
- * @see LancamentoResource
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = MinhasfinancasApp.class)
 public class LancamentoResourceIntTest {
@@ -261,5 +267,50 @@ public class LancamentoResourceIntTest {
         assertThat(lancamento1).isNotEqualTo(lancamento2);
         lancamento1.setId(null);
         assertThat(lancamento1).isNotEqualTo(lancamento2);
+    }
+    
+    @Test
+    @Transactional
+    public void efetivaLancamentoDeRecorrencia() throws IOException, Exception {
+    	Recorrencia recorrencia = new Recorrencia();
+    	
+    	Conta conta = new Conta().nome("conta").saldoInicial(BigDecimal.ZERO);
+		Local local = new Local().nome("local");
+		Categoria categoria = new Categoria().nome("raiz");
+		
+		recorrencia
+    		.aCada(1)
+    		.categoria(categoria)
+    		.conta(conta)
+    		.local(local)
+    		.partirDe(LocalDate.now())
+    		.tipoFrequencia(TipoFrequencia.MES)
+    		.valor(BigDecimal.TEN);
+		
+		em.persist(conta);
+		em.persist(local);
+		em.persist(categoria);
+		em.persist(recorrencia);
+		
+		Lancamento lancamentoProjecao = recorrencia.projecaoAte(LocalDate.now().plus(1, ChronoUnit.YEARS)).get(1);
+		
+		int lancamentosAntes = lancamentoRepository.findAll().size();
+		assertEquals(0, lancamentosAntes);
+		
+		restLancamentoMockMvc.perform(put("/api/lancamentos")
+				.contentType(TestUtil.APPLICATION_JSON_UTF8)
+		        .content(TestUtil.convertObjectToJsonBytes(lancamentoProjecao)))
+	            .andExpect(status().isCreated());
+		
+		List<Lancamento> lancamentos = lancamentoRepository.findAll();
+		int lancamentosDepois = lancamentos.size();
+		assertEquals(1, lancamentosDepois);
+		
+		em.refresh(recorrencia);
+		
+		assertEquals(1, recorrencia.getRecorrenciaLancamentos().size());
+		RecorrenciaLancamentoGerado lancamentoGerado = recorrencia.getRecorrenciaLancamentos().get(0);
+		assertEquals(lancamentoProjecao.getData(), lancamentoGerado.getData());
+		
     }
 }

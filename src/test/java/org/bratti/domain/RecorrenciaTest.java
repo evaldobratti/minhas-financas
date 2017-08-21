@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import junit.framework.Assert;
+
 public class RecorrenciaTest {
 
 	@Mock
@@ -31,7 +33,6 @@ public class RecorrenciaTest {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(10)
 				.aCada(1)
 				.categoria(categoria)
 				.conta(conta);
@@ -42,51 +43,26 @@ public class RecorrenciaTest {
 	}
 	
 	@Test
-	public void naoDeveGerarProjecoesParaADataDeInicioDaRecorrencia() {
+	public void deveGerarProjecoesParaADataDeInicioDaRecorrencia() {
 		LocalDate inicio = LocalDate.of(1900, 1, 10);
 		
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(inicio)
 				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(10)
 				.aCada(1)
 				.categoria(categoria)
 				.conta(conta);
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(inicio);
 		
-		assertTrue(projecoes.isEmpty());
-	}
-	
-	@Test
-	public void deveGerarUmaProjecaoDiariaParaDiaPosteriorAoInicioDaRecorrencia() {
-		Recorrencia recorrencia = new Recorrencia()
-				.partirDe(LocalDate.of(1900, 1, 10))
-				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(10)
-				.valor(BigDecimal.valueOf(10))
-				.aCada(1)
-				.categoria(categoria)
-				.conta(conta);
-		
-		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 11));
-		
 		assertEquals(1, projecoes.size());
-		
-		Lancamento lancamento = projecoes.get(0);
-		assertEquals(LocalDate.of(1900, 1, 11), lancamento.getData());
-		assertEquals(10, lancamento.getValor().intValue());
-		assertEquals(categoria, lancamento.getCategoria());
-		assertEquals(conta, lancamento.getConta());
 	}
-	
 
 	@Test
-	public void deveGerarDuasProjecoesDiariasPara2DiasPosterioresAoInicioDaRecorrencia() {
+	public void deveGerarTresProjecoesDiarias() {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(10)
 				.valor(BigDecimal.valueOf(10))
 				.aCada(1)
 				.categoria(categoria)
@@ -94,19 +70,21 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 12));
 		
-		assertEquals(2, projecoes.size());
+		assertEquals(3, projecoes.size());
 		
 		Lancamento lancamento1 = projecoes.get(0);
-		assertEquals(LocalDate.of(1900, 1, 11), lancamento1.getData());
+		assertEquals(LocalDate.of(1900, 1, 10), lancamento1.getData());
 		assertEquals(10, lancamento1.getValor().intValue());
 		assertEquals(categoria, lancamento1.getCategoria());
 		assertEquals(conta, lancamento1.getConta());
 		
 		Lancamento lancamento2 = projecoes.get(1);
-		assertEquals(LocalDate.of(1900, 1, 12), lancamento2.getData());
+		assertEquals(LocalDate.of(1900, 1, 11), lancamento2.getData());
 		assertEquals(10, lancamento2.getValor().intValue());
 		assertEquals(categoria, lancamento2.getCategoria());
 		assertEquals(conta, lancamento2.getConta());
+		
+		assertEquals(LocalDate.of(1900, 1, 12), projecoes.get(2).getData());
 	}
 	
 	@Test
@@ -114,7 +92,6 @@ public class RecorrenciaTest {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(10)
 				.valor(BigDecimal.valueOf(10))
 				.aCada(2)
 				.categoria(categoria)
@@ -122,39 +99,18 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 15));
 		
-		assertEquals(2, projecoes.size());
-		
-		assertEquals(LocalDate.of(1900, 1, 12), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 1, 14), projecoes.get(1).getData());
-	}
-	
-
-	@Test
-	public void deveGerarProjecaoACada3Dias() {
-		Recorrencia recorrencia = new Recorrencia()
-				.partirDe(LocalDate.of(1900, 1, 10))
-				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(12)
-				.valor(BigDecimal.valueOf(10))
-				.aCada(3)
-				.categoria(categoria)
-				.conta(conta);;
-		
-		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 18));
-		
 		assertEquals(3, projecoes.size());
 		
-		assertEquals(LocalDate.of(1900, 1, 12), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 1, 15), projecoes.get(1).getData());
-		assertEquals(LocalDate.of(1900, 1, 18), projecoes.get(2).getData());
+		assertEquals(LocalDate.of(1900, 1, 10), projecoes.get(0).getData());
+		assertEquals(LocalDate.of(1900, 1, 12), projecoes.get(1).getData());
+		assertEquals(LocalDate.of(1900, 1, 14), projecoes.get(2).getData());
 	}
 	
 	@Test
-	public void deveGerarTerceiraProjecaoDiariaPara3DiasPosterioresAoInicioDaRecorrencia() {
+	public void deveGerar4ProjecoesDiarias() {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.DIA)
-				.dia(10)
 				.valor(BigDecimal.valueOf(10))
 				.aCada(1)
 				.categoria(categoria)
@@ -162,21 +118,20 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 1, 13));
 		
-		assertEquals(3, projecoes.size());
+		assertEquals(4, projecoes.size());
 		
 		Lancamento lancamento = projecoes.get(2);
-		assertEquals(LocalDate.of(1900, 1, 13), lancamento.getData());
+		assertEquals(LocalDate.of(1900, 1, 12), lancamento.getData());
 		assertEquals(10, lancamento.getValor().intValue());
 		assertEquals(categoria, lancamento.getCategoria());
 		assertEquals(conta, lancamento.getConta());
 	}
 	
 	@Test
-	public void naoDeveGerarProjecaoMensalSeDataDeProjecaoForAnteriorAoVencimento() {
+	public void deveGerarLancamentoInicialParaProjecaoMensal() {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.MES)
-				.dia(5)
 				.valor(BigDecimal.valueOf(10))
 				.aCada(1)
 				.categoria(categoria)
@@ -184,70 +139,7 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 2, 4));
 		
-		assertEquals(0, projecoes.size());
-	}
-	
-	@Test
-	public void deveGerarDuasProjecoesMensaisSeDataDeProjecaoForDoisMesesAdiante() {
-		Recorrencia recorrencia = new Recorrencia()
-				.partirDe(LocalDate.of(1900, 1, 10))
-				.tipoFrequencia(TipoFrequencia.MES)
-				.dia(5)
-				.valor(BigDecimal.valueOf(10))
-				.aCada(1)
-				.categoria(categoria)
-				.conta(conta);
-		
-		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 3, 15));
-		
-		assertEquals(2, projecoes.size());
-		
-		Lancamento lancamento1 = projecoes.get(0);
-		assertEquals(LocalDate.of(1900, 2, 5), lancamento1.getData());
-		assertEquals(10, lancamento1.getValor().intValue());
-		assertEquals(categoria, lancamento1.getCategoria());
-		assertEquals(conta, lancamento1.getConta());
-		
-		Lancamento lancamento2 = projecoes.get(1);
-		assertEquals(LocalDate.of(1900, 3, 5), lancamento2.getData());
-		assertEquals(10, lancamento2.getValor().intValue());
-		assertEquals(categoria, lancamento2.getCategoria());
-		assertEquals(conta, lancamento2.getConta());
-	}
-	
-	@Test
-	public void deveGerar3ProjecoesBimestraisDuranteUmSemestreComInicioFuturo() {
-		Recorrencia recorrencia = new Recorrencia()
-				.partirDe(LocalDate.of(1900, 1, 10))
-				.tipoFrequencia(TipoFrequencia.MES)
-				.dia(15)
-				.valor(BigDecimal.valueOf(10))
-				.aCada(2)
-				.categoria(categoria)
-				.conta(conta);
-		
-		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 6, 28));
-		
-		assertEquals(LocalDate.of(1900, 1, 15), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 3, 15), projecoes.get(1).getData());
-		assertEquals(LocalDate.of(1900, 5, 15), projecoes.get(2).getData());
-	}
-	
-	@Test
-	public void deveGerar3ProjecoesBimestraisDuranteUmSemestreComInicioPassado() {
-		Recorrencia recorrencia = new Recorrencia()
-				.partirDe(LocalDate.of(1900, 1, 10))
-				.tipoFrequencia(TipoFrequencia.MES)
-				.dia(5)
-				.valor(BigDecimal.valueOf(10))
-				.aCada(2)
-				.categoria(categoria)
-				.conta(conta);
-		
-		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 6, 28));
-		
-		assertEquals(LocalDate.of(1900, 3, 5), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 5, 5), projecoes.get(1).getData());
+		assertEquals(1, projecoes.size());
 	}
 	
 	@Test
@@ -255,7 +147,6 @@ public class RecorrenciaTest {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.MES)
-				.dia(10)
 				.valor(BigDecimal.valueOf(10))
 				.aCada(2)
 				.categoria(categoria)
@@ -263,10 +154,11 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 6, 28));
 		
-		assertEquals(2, projecoes.size());
+		assertEquals(3, projecoes.size());
 		
-		assertEquals(LocalDate.of(1900, 3, 10), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 5, 10), projecoes.get(1).getData());
+		assertEquals(LocalDate.of(1900, 1, 10), projecoes.get(0).getData());
+		assertEquals(LocalDate.of(1900, 3, 10), projecoes.get(1).getData());
+		assertEquals(LocalDate.of(1900, 5, 10), projecoes.get(2).getData());
 	}
 	
 	@Test
@@ -274,7 +166,6 @@ public class RecorrenciaTest {
 		Recorrencia recorrencia = new Recorrencia()
 				.partirDe(LocalDate.of(1900, 1, 10))
 				.tipoFrequencia(TipoFrequencia.MES)
-				.dia(10)
 				.valor(BigDecimal.valueOf(10))
 				.aCada(1)
 				.categoria(categoria)
@@ -284,10 +175,11 @@ public class RecorrenciaTest {
 		
 		List<Lancamento> projecoes = recorrencia.projecaoAte(LocalDate.of(1900, 4, 10));
 		
-		assertEquals(2, projecoes.size());
+		assertEquals(3, projecoes.size());
 		
-		assertEquals(LocalDate.of(1900, 2, 10), projecoes.get(0).getData());
-		assertEquals(LocalDate.of(1900, 4, 10), projecoes.get(1).getData());
+		assertEquals(LocalDate.of(1900, 1, 10), projecoes.get(0).getData());
+		assertEquals(LocalDate.of(1900, 2, 10), projecoes.get(1).getData());
+		assertEquals(LocalDate.of(1900, 4, 10), projecoes.get(2).getData());
 		
 	}
 	
