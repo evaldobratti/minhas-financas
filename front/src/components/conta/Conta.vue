@@ -14,7 +14,7 @@
               <v-flex xs1>
                 <v-btn class="small-btn" @click="mes -= 1; filtrar();"><v-icon>chevron_left</v-icon></v-btn>
               </v-flex>
-              <v-flex xs1>              
+              <v-flex xs1>
                 <v-select
                         label="Mês"
                         v-bind:items="meses"
@@ -87,9 +87,8 @@
     </v-card>
       </v-flex>
     </v-layout>
-    <v-dialog v-model="recorrenciaDialog" lazy absolute width="600px">
-      <v-layout row justify-center>
-        <v-card >
+    <v-dialog v-model="recorrenciaDialog" width="500px">
+        <v-card>
           <v-card-title>
             <div class="headline">Nova recorrência</div>
           </v-card-title>
@@ -97,8 +96,7 @@
             <RecorrenciaForm :lancamento="recorrenciaLancamento"></RecorrenciaForm>
           </v-card-text>
         </v-card>
-      </v-layout>
-    </v-dialog>
+      </v-dialog>
   </ProtectedRoute>
 </template>
 
@@ -151,15 +149,15 @@ export default {
   },
   methods: {
     css(valor) {
-      return { 
-        'red--text': valor < 0, 
+      return {
+        'red--text': valor < 0,
         'blue--text text--darken-3': valor > 0
       }
     },
     filtrar() {
       this.$store.commit(contas.m.CONTA_SET_PARAMS, {
-        contaId: this.$route.params.id, 
-        mes: this.mes, 
+        contaId: this.$route.params.id,
+        mes: this.mes,
         ano: this.ano
       });
       this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
@@ -208,4 +206,3 @@ table.table tbody tr:hover .small-fab-btn {
   display: block;
 }
 </style>
-  

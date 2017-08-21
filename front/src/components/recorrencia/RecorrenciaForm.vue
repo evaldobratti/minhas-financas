@@ -1,46 +1,33 @@
 <template>
-  <form @submit.prevent="submit" style="min-width: 600px">
-    <v-layout row>
-      <v-flex xs2>
-        <v-text-field 
+  <form @submit.prevent="submit">
+        <v-text-field
           label="A cada"
-          v-model="aCada"></v-text-field>  
-      </v-flex>
-      <v-flex xs5>
+          v-model="aCada"></v-text-field>
         <v-select
           label="Frequência"
           :items="frequencias"
           item-text="text"
           item-value="value"
-          v-model="tipoFrequencia"></v-select>  
-      </v-flex>
-    </v-layout>
-    <v-layout row>
-      <v-flex xs2>
-        <v-text-field 
+          v-model="tipoFrequencia"></v-select>
+        <v-text-field
           label="Valor"
-          v-model="valor"></v-text-field>  
-      </v-flex>
-      <v-flex xs2>
-        <v-text-field 
-          label="A partir de"
-          v-model="partirDe"></v-text-field>  
-      </v-flex>
-      
-    </v-layout>
-    <v-layout row>
-      <v-flex xs5>
+          v-model="valor"></v-text-field>
+
+        <DatePicker v-model="partirDe"></DatePicker>
+
         <v-btn type="submit">Salvar</v-btn>
-      </v-flex>
-    </v-layout>
   </form>
 </template>
 
 <script>
 import { RECORRENCIA } from '../../store/recorrencia';
+import DatePicker from '../DatePicker';
 
 export default {
   props: ['lancamento'],
+  components: {
+    DatePicker
+  },
   data() {
     return {
       frequencias: [{
@@ -65,6 +52,9 @@ export default {
   },
   methods: {
     updateLancamento(l) {
+      if (!l)
+        return;
+
       this.valor = l.valor;
       this.partirDe = l.data;
       this.conta = l.conta;
@@ -146,5 +136,5 @@ export default {
 </script>
 
 <style>
-  
+
 </style>
