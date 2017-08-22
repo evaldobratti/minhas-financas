@@ -51,7 +51,6 @@ export default {
       state.form.conta = conta;
     },
     [m.LIMPA_FORMULARIO](state) {
-      state.form.conta= null;
       state.form.local= null;
       state.form.categoria= null;
       state.form.valor= null;

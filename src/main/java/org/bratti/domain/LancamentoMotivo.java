@@ -1,5 +1,6 @@
 package org.bratti.domain;
 
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,8 +16,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 
 @Entity
-@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-//@JsonDeserialize(as = RecorrenciaLancamentoGerado.class)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public abstract class LancamentoMotivo {
 

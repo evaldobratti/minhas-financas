@@ -14,14 +14,14 @@
     <property name="floatType" value="float" dbms="mysql, oracle, mssql"/>
 
     <changeSet id="20170727000001-1" author="jhipster">
-        <createTable tableName="recorrencia_lancamento_gerado">
+        <createTable tableName="lancamento_motivo">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="lancamento_id" type="bigint">
-                <constraints nullable="true" />
+            <column name="DTYPE" type="varchar(200)">
+                <constraints nullable="false" />
             </column>
-
+            
             <column name="data" type="date">
                 <constraints nullable="false" />
             </column>
@@ -29,6 +29,8 @@
             <column name="recorrencia_id" type="bigint">
                 <constraints nullable="false" />
             </column>
+            
+            <column name="parcela_numero" type="int"></column>
         </createTable>
         <addColumn tableName="lancamento">
         	<column name="motivo_id" type="bigint">

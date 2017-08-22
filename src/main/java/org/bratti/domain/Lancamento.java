@@ -2,6 +2,7 @@ package org.bratti.domain;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -34,12 +35,15 @@ public class Lancamento implements Serializable {
     private Boolean efetivada;
 
     @ManyToOne
+    @NotNull
     private Conta conta;
 
     @ManyToOne
+    @NotNull
     private Local local;
 
     @ManyToOne
+    @NotNull
     private Categoria categoria;
 
     @OneToOne(cascade= {CascadeType.ALL})
@@ -175,7 +179,7 @@ public class Lancamento implements Serializable {
             "}";
     }
 
-	public String descricao() {
+	public String getDescricao() {
 		if (motivo == null)
 			return this.local.getNome();
 		return this.local.getNome() + " " + this.motivo.complementoDescricao();

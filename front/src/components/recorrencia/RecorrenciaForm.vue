@@ -14,8 +14,9 @@
           v-model="valor"></v-text-field>
 
         <DatePicker v-model="partirDe"></DatePicker>
-
+      <v-layout justify-space-around>
         <v-btn type="submit">Salvar</v-btn>
+      </v-layout>
   </form>
 </template>
 

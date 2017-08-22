@@ -26,10 +26,10 @@ import org.bratti.domain.Lancamento;
 import org.bratti.domain.Recorrencia;
 import org.bratti.domain.RecorrenciaLancamentoGerado;
 import org.bratti.domain.enumeration.TipoFrequencia;
+import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.RecorrenciaRepository;
 import org.bratti.service.dto.RecorrenciaDTO;
 import org.bratti.web.rest.errors.ExceptionTranslator;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +66,9 @@ public class RecorrenciaResourceIntTest {
 
     @Autowired
     private RecorrenciaRepository recorrenciaRepository;
+    
+    @Autowired
+    private LancamentoRepository lancamentoRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -86,7 +89,7 @@ public class RecorrenciaResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        RecorrenciaResource recorrenciaResource = new RecorrenciaResource(recorrenciaRepository);
+        RecorrenciaResource recorrenciaResource = new RecorrenciaResource(recorrenciaRepository, lancamentoRepository);
         this.restRecorrenciaMockMvc = MockMvcBuilders.standaloneSetup(recorrenciaResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

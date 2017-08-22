@@ -7,8 +7,12 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.bratti.domain.Lancamento;
+import org.bratti.domain.Parcelamento;
 import org.bratti.domain.Recorrencia;
+import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.RecorrenciaRepository;
+import org.bratti.service.dto.ParcelamentoDTO;
 import org.bratti.service.dto.RecorrenciaDTO;
 import org.bratti.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
@@ -39,9 +43,11 @@ public class RecorrenciaResource {
     private static final String ENTITY_NAME = "recorrencia";
 
     private final RecorrenciaRepository recorrenciaRepository;
+    private final LancamentoRepository lancamentoRepository;
 
-    public RecorrenciaResource(RecorrenciaRepository recorrenciaRepository) {
+    public RecorrenciaResource(RecorrenciaRepository recorrenciaRepository, LancamentoRepository lancamentoRepository) {
         this.recorrenciaRepository = recorrenciaRepository;
+		this.lancamentoRepository = lancamentoRepository;
     }
 
     @PostMapping("/recorrencias")
@@ -51,11 +57,14 @@ public class RecorrenciaResource {
         if (recorrencia.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new recorrencia cannot already have an ID")).body(null);
         }
+        Lancamento lancamento = recorrencia.getLancamentoInicial();
         
         Recorrencia entity = recorrencia.toEntity();
-        entity.efetivaCom(recorrencia.getLancamentoInicial());
+		entity.efetivaCom(lancamento);
+        
         
 		Recorrencia result = recorrenciaRepository.save(entity);
+		lancamentoRepository.save(lancamento);
         return ResponseEntity.created(new URI("/api/recorrencias/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -63,18 +72,23 @@ public class RecorrenciaResource {
     
     @PostMapping("/parcelamentos")
     @Timed
-    public ResponseEntity<Recorrencia> createParcelamento(@Valid @RequestBody RecorrenciaDTO recorrencia) throws URISyntaxException {
-        log.debug("REST request to save Recorrencia : {}", recorrencia);
-        if (recorrencia.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new recorrencia cannot already have an ID")).body(null);
-        }
-        
-        Recorrencia entity = recorrencia.toEntity();
-        entity.efetivaCom(recorrencia.getLancamentoInicial());
-        
-		Recorrencia result = recorrenciaRepository.save(entity);
-        return ResponseEntity.created(new URI("/api/recorrencias/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+    public ResponseEntity<Recorrencia> createParcelamento(@Valid @RequestBody ParcelamentoDTO parcelamentoDTO) throws URISyntaxException {
+    	Lancamento lancamento = parcelamentoDTO.getLancamentoInicial();
+		
+    	Recorrencia parcelamento = Parcelamento.novoMensal()
+			.iniciandoNaParcela(parcelamentoDTO.getInicioParcelas())
+			.quantidadeParcelas(parcelamentoDTO.getQuantidadeParcelas())
+    		.categoria(lancamento.getCategoria())
+    		.conta(lancamento.getConta())
+    		.local(lancamento.getLocal())
+    		.partirDe(lancamento.getData())
+    		.valor(lancamento.getValor());
+		
+    	parcelamento.efetivaCom(lancamento);
+    	
+		Recorrencia result = recorrenciaRepository.save(parcelamento);
+		lancamentoRepository.save(lancamento);
+        return ResponseEntity.created(new URI("/api/parcelamentos"))
             .body(result);
     }
 

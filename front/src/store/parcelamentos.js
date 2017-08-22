@@ -1,8 +1,10 @@
-
+import axios from 'axios';
+import { contas } from './conta';
 
 export const m = {
   UPDATE_FORM_INICIO_PARCELAS: 'parcelamentoFormUpdateInicioParcelas',
-  UPDATE_FORM_QUANTIDADE_PARCELAS: 'parcelamentoFormUpdateQuantidadeParcelas'
+  UPDATE_FORM_QUANTIDADE_PARCELAS: 'parcelamentoFormUpdateQuantidadeParcelas',
+  UPDATE_FORM_LANCAMENTO_INICIAL: 'parelamentoFormUpdateLancamentoInicial'
 }
 
 export const d = {
@@ -17,7 +19,8 @@ export default {
   state: {
     form: {
       inicioParcelas: 1,
-      quantidadeParcelas: null
+      quantidadeParcelas: null,
+      lancamentoInicial: null
     }
   },
   mutations: {
@@ -26,11 +29,19 @@ export default {
     },
     [m.UPDATE_FORM_QUANTIDADE_PARCELAS](state, quantidadeParcelas) {
       state.form.quantidadeParcelas = quantidadeParcelas;
+    },
+    [m.UPDATE_FORM_LANCAMENTO_INICIAL](state, lancamentoInicial) {
+      state.form.lancamentoInicial = lancamentoInicial;
     }
   },
   actions: {
-    [d.SUBMIT_FORM]({commit}) {
-      console.info('créu');
+    [d.SUBMIT_FORM]({state, commit, dispatch}) {
+      axios.post('/api/parcelamentos', state.form).then(res => {
+        console.info('sucesso', res);
+        dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+      }).catch(err => {
+        console.info('falha', err);
+      });     
     }
   }
 }

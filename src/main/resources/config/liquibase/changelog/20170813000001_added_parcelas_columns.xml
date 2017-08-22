@@ -10,11 +10,6 @@
         	<column name="type" type="varchar(200)"></column>
         	<column name="quantidade_parcelas" type="int"></column>
         	<column name="inicio_parcelas" type="int"></column>
-        </addColumn>
-        
-        <addColumn tableName="recorrencia_lancamento_gerado" >
-        	<column name="type" type="varchar(200)"></column>
-        	<column name="parcela_numero" type="int"></column>
-        </addColumn>           
+        </addColumn>          
     </changeSet>
 </databaseChangeLog>

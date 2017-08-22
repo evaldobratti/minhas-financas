@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "recorrencia")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "TYPE")
+@DiscriminatorValue("Recorrencia")
 public class Recorrencia implements Serializable {
 
     private static final long serialVersionUID = 1L;

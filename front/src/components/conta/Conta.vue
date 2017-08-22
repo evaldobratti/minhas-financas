@@ -62,7 +62,7 @@
               </template>
               <template slot="items" scope="l">
                 <td xs3>{{ l.item.data | date }}</td>
-                <td>{{ l.item.local.nome }}</td>
+                <td>{{ l.item.descricao }}</td>
                 <td>{{ l.item.categoria.nome }}</td>
                 <td class="text-xs-right" :class="css(l.item.valor)">
                   {{ l.item.valor | currency }}
@@ -91,15 +91,25 @@
       </v-flex>
     </v-layout>
     <v-dialog v-model="recorrenciaDialog" width="500px">
-        <v-card>
-          <v-card-title>
-            <div class="headline">Nova recorrência</div>
-          </v-card-title>
-          <v-card-text>
-            <RecorrenciaForm :lancamento="lancamentoAcao"></RecorrenciaForm>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+      <v-card>
+        <v-card-title>
+          <div class="headline">Nova recorrência</div>
+        </v-card-title>
+        <v-card-text>
+          <RecorrenciaForm :lancamento="lancamentoAcao"></RecorrenciaForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="parcelamentoDialog">
+      <v-card>
+        <v-card-title>
+          <div class="headline">Novo Parcelamento</div>
+        </v-card-title>
+        <v-card-text>
+          <ParcelamentoForm :lancamento="lancamentoAcao"></ParcelamentoForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </ProtectedRoute>
 </template>
 
@@ -109,6 +119,7 @@ import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
 import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
+
 import axios from 'axios';
 export default {
   created() {

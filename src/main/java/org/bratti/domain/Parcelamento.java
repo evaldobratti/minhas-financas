@@ -3,6 +3,17 @@ package org.bratti.domain;
 import java.time.LocalDate;
 import java.util.List;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
+
+import org.bratti.domain.enumeration.TipoFrequencia;
+
+@Entity
+@DiscriminatorValue("Parcelamento")
 public class Parcelamento extends Recorrencia {
 
 	private static final long serialVersionUID = -6332880505277733471L;
@@ -42,16 +53,24 @@ public class Parcelamento extends Recorrencia {
 				.recorrencia(this);
 	}
 
-	public Recorrencia iniciandoNaParcela(int inicioParcelas) {
+	public Parcelamento iniciandoNaParcela(int inicioParcelas) {
 		this.inicioParcelas = inicioParcelas;
 		return this;
 	}
 	
 	public void efetivaCom(Lancamento lancamento) {
-		addRecorrenciaLancamentos((RecorrenciaLancamentoGerado) new ParcelamentoLancamentoGerado()
-				.parcelaNumero(1)
-				.data(getPartirDe())
-				.recorrencia(this));
+		if (lancamento != null) {
+			RecorrenciaLancamentoGerado recorrencia = (RecorrenciaLancamentoGerado) new ParcelamentoLancamentoGerado()
+					.parcelaNumero(1)
+					.data(getPartirDe())
+					.recorrencia(this);
+			addRecorrenciaLancamentos(recorrencia);
+			lancamento.setMotivo(recorrencia);
+		}
+	}
+
+	public static Parcelamento novoMensal() {
+		return (Parcelamento) new Parcelamento().aCada(1).tipoFrequencia(TipoFrequencia.MES);
 	}
 
 }
