@@ -5,6 +5,10 @@
         <div v-else v-for="conta in contas" :key="conta.id">
           <ContaCard :conta="conta"></ContaCard>
         </div>
+        <v-dialog v-model="novaConta" lazy absolute>
+          <v-btn primary dark slot="activator">nova conta</v-btn>
+          <ContaForm @cadastrado="novaConta = false"></ContaForm>
+        </v-dialog>
       </v-flex>
     </v-layout>
 </template>
@@ -12,11 +16,17 @@
 <script>
 import ContaNenhuma from './ContaNenhuma';
 import ContaCard from './ContaCard';
+import ContaForm from './ContaForm';
 import { LOAD_CONTAS } from '../../store/conta';
 
 export default {
   created() {
     this.$store.dispatch(LOAD_CONTAS);
+  },
+  data() {
+    return {
+      novaConta: false
+    }
   },
   computed: {
     contas() {
@@ -25,7 +35,8 @@ export default {
   },
   components: {
     ContaNenhuma,
-    ContaCard
+    ContaCard,
+    ContaForm
   }
 }
 

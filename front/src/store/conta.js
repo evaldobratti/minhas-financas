@@ -2,6 +2,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import Vue from 'vue';
 import moment from 'moment';
+import { SNACKS } from './snacks';
 
 export const CONTA_SET_NOME = 'contaSetNome';
 export const CONTA_SET_SALDO_INICIAL = 'contaSetSaldoInicial';
@@ -106,15 +107,23 @@ export default {
     }
   },
   actions: {
-    contaSubmit({commit, state, rootState}) {
-      axios.post('/api/contas', {
-        nome: state.form.nome,
-        saldoInicial: state.form.saldoInicial,
-        usuario: rootState.authentication.usuario.id
-      }).then(res => {
-        console.info(res);
-      }).catch(err => {
-        console.info(err);
+    contaSubmit({commit, state, dispatch, rootState}) {
+      return new Promise((resolve, reject) => {
+        axios.post('/api/contas', {
+          nome: state.form.nome,
+          saldoInicial: state.form.saldoInicial,
+          usuario: rootState.authentication.usuario.id
+        }).then(res => {
+          dispatch(LOAD_CONTAS);
+          commit(SNACKS.m.UPDATE_SNACK, {
+            text: 'Conta cadastrada!',
+            context: 'success', 
+            timeout: 1500
+          });
+          resolve();
+        }).catch(() => {
+          reject();
+        })
       })
     },
     [LOAD_CONTAS]({commit, state}) {

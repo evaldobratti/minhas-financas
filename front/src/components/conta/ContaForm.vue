@@ -28,7 +28,9 @@ import { CONTA_SET_NOME, CONTA_SET_SALDO_INICIAL } from '../../store/conta';
 export default {
   methods: {
     submit() {
-      this.$store.dispatch('contaSubmit');
+      this.$store.dispatch('contaSubmit').then(() => {
+        this.$emit('cadastrado');
+      });
     }
   },
   computed: {
