@@ -1,28 +1,39 @@
 <template>
   <div>
-    <v-snackbar 
-          :timeout="5000"
+    <v-snackbar
+          :success="context == 'success'"
+          :primary="context == 'primary'"
+          :error="context == 'error'"
+          :timeout="timeout"
           :top="true"
-          :right="true"
-          v-model="snackbar">
+          v-model="showing">
         {{ text }}
-        <v-btn flat class="pink--text" @click.native="snackbar = false">Close</v-btn>
+        <v-btn flat dark @click.native="showing = false">Close</v-btn>
       </v-snackbar>
   </div>
 </template>
 
 <script>
+
+import { SNACKS } from '../store/snacks';
 export default {
-  created() {
-    this.$root.$on('snack', (data) => {
-      this.snackbar = true;
-      this.text = data.text;
-    });
-  },
-  data() {
-    return {
-      snackbar: false,
-      text: ''
+  computed: {
+    timeout() {
+      return this.$store.state.snacks.notification.timeout;
+    },
+    context() {
+      return this.$store.state.snacks.notification.context;
+    },
+    text() {
+      return this.$store.state.snacks.notification.text;
+    },
+    showing: {
+      get() {
+        return this.$store.state.snacks.showing;
+      },
+      set(val) {
+        this.$store.commit(SNACKS.m.UPDATE_SHOWING, val);
+      }
     }
   }
 

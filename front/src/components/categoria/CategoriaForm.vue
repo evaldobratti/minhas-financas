@@ -20,7 +20,10 @@ export default {
       this.$store.dispatch(d.SAVE_CATEGORIA, {
         pai: this.categoriaPai ? this.categoriaPai.id : null,
         nome: this.nome
-      }).then(() => this.nome = '');
+      }).then(() => {
+        this.nome = '';
+        this.$emit('cadastrado');
+      }).catch(() => {});
     }
   }
 

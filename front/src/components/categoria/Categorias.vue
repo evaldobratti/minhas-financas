@@ -6,7 +6,7 @@
             <div class="headline">Nova categoria raíz</div>
           </v-card-title>
           <v-card-text>
-            <CategoriaForm :categoriaPai="null"></CategoriaForm>
+            <CategoriaForm :categoriaPai="null" @cadastrado="dialogRaiz = false"></CategoriaForm>
           </v-card-text>
         </v-card>
       </v-dialog>

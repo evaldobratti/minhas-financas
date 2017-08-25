@@ -19,7 +19,7 @@
               <div class="headline">Nova sub-categoria de {{ categoria.nome }}</div>
             </v-card-title>
             <v-card-text>
-              <CategoriaForm :categoriaPai="categoria"></CategoriaForm>
+              <CategoriaForm :categoriaPai="categoria" @cadastrado="dialog = false"></CategoriaForm>
             </v-card-text>
           </v-card>
       </v-dialog>

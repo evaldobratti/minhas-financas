@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 /**
  * A Categoria.
@@ -28,6 +29,7 @@ public class Categoria implements Serializable {
     private Long id;
 
     @Column(name = "nome")
+    @Size(max=255)
     private String nome;
 
     @ManyToOne

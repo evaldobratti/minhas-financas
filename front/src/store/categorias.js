@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { SNACKS } from './snacks';
 
 export const d = {
   LOAD_CATEGORIAS: 'loadCategorias',
@@ -39,11 +39,19 @@ export default {
         return Promise.resolve(state.list);
       }
     },
-    [d.SAVE_CATEGORIA]({dispatch}, categoria) {
-      axios.post('/api/categorias', categoria).then(res => {
-        dispatch(d.LOAD_CATEGORIAS, true);
-      }).catch(err => {
-        console.error(err)
+    [d.SAVE_CATEGORIA]({dispatch, commit}, categoria) {
+      return new Promise((resolve, reject) => {
+        axios.post('/api/categorias', categoria).then(res => {
+          dispatch(d.LOAD_CATEGORIAS, true);
+          resolve();
+          commit(SNACKS.m.UPDATE_SNACK, {
+            text: 'Categoria cadastrada!',
+            timeout: 1500,
+            context: 'success'
+          });
+        }).catch(err => {
+          reject();
+        });
       });
     }
   }
