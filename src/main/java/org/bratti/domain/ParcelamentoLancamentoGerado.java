@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@DiscriminatorValue("Parcelamento")
 public class ParcelamentoLancamentoGerado extends RecorrenciaLancamentoGerado {
 
 	private int parcelaNumero;

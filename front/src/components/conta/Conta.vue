@@ -12,7 +12,7 @@
                 </h3>
               </v-flex>
               <v-flex xs1>
-                <v-btn class="small-btn" @click="mes -= 1; filtrar();"><v-icon>chevron_left</v-icon></v-btn>
+                <v-btn class="small-btn" @click="mesRetrocede()"><v-icon>chevron_left</v-icon></v-btn>
               </v-flex>
               <v-flex xs1>
                 <v-select
@@ -28,7 +28,7 @@
                 <v-text-field v-model="ano" label="Ano"></v-text-field>
               </v-flex>
               <v-flex xs1>
-                <v-btn class="small-btn" @click="mes += 1; filtrar();"><v-icon>chevron_right</v-icon></v-btn>
+                <v-btn class="small-btn" @click="mesAvanca()"><v-icon>chevron_right</v-icon></v-btn>
               </v-flex>
               <v-flex xs2>
                 <v-btn @click="filtrar">filtrar</v-btn>
@@ -164,6 +164,14 @@ export default {
     }
   },
   methods: {
+    mesAvanca() {
+      this.mes += 1;
+      this.filtrar();
+    },
+    mesRetrocede() {
+      this.mes -= 1;
+      this.filtrar();
+    },
     css(valor) {
       return { 
         'red--text': valor < 0, 
@@ -171,6 +179,16 @@ export default {
       }
     },
     filtrar() {
+      if (this.mes > 12) {
+        this.mes = 1;
+        this.ano += 1;
+      }
+
+      if (this.mes < 1) {
+        this.mes = 12;
+        this.ano -= 1;
+      }
+
       this.$store.commit(contas.m.CONTA_SET_PARAMS, {
         contaId: this.$route.params.id,
         mes: this.mes,

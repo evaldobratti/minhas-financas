@@ -28,4 +28,9 @@ public interface LancamentoRepository extends JpaRepository<Lancamento,Long> {
     
     @Query("select sum(l.valor) from Lancamento l where l.conta = :conta and l.data <= :data")
 	Optional<BigDecimal> findByContaAteDia(@Param("conta") Conta conta, @Param("data")LocalDate data);
+
+    @Query("select l from Lancamento l where l.conta.id = :contaId and data >= :de and data <= :ate")
+	List<Lancamento> findByConta(@Param("contaId") Long contaId, 
+			@Param("de") LocalDate de, 
+			@Param("ate") LocalDate ate);
 }

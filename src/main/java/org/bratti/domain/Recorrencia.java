@@ -33,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import org.bratti.domain.enumeration.TipoFrequencia;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * A Recorrencia.
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "TYPE")
 @DiscriminatorValue("Recorrencia")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
 public class Recorrencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
