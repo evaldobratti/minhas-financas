@@ -22,6 +22,7 @@ public class Local implements Serializable {
 
     @NotNull
     @Column(name = "nome", nullable = false)
+    @Size(min=1)
     private String nome;
 
     public Long getId() {

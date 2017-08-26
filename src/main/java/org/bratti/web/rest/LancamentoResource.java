@@ -13,6 +13,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -44,7 +45,7 @@ public class LancamentoResource {
 
     @PostMapping("/lancamentos")
     @Timed
-    public ResponseEntity<Lancamento> createLancamento(@RequestBody Lancamento lancamentoDTO) throws URISyntaxException {
+    public ResponseEntity<Lancamento> createLancamento(@RequestBody @Validated Lancamento lancamentoDTO) throws URISyntaxException {
         log.debug("REST request to save Lancamento : {}", lancamentoDTO);
         if (lancamentoDTO.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new lancamento cannot already have an ID")).body(null);

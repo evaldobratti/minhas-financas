@@ -8,7 +8,8 @@ const m = {
   LANCAMENTO_SET_CATEGORIA: 'lancamentoSetCategoria',
   LANCAMENTO_SET_VALOR: 'lancamentoSetValor',
   LANCAMENTO_SET_EFETUADA: 'lancamentoSetEfetuada',
-  LIMPA_FORMULARIO: 'lancamentoLimpaFormulario'
+  LIMPA_FORMULARIO: 'lancamentoLimpaFormulario',
+  SET_BACKEND_ERRORS: 'lancamentoBackendErrors'
 }
 
 const d = {
@@ -29,6 +30,14 @@ export default {
       categoria: null,
       valor: null,
       efetuada: false
+    },
+    formErrors: {
+      data: [],
+      conta: [],
+      local: [],
+      categoria: [],
+      valor: [],
+      efetuada: []
     }
   },
   mutations: {
@@ -36,9 +45,11 @@ export default {
       state.form.data = data;
     },
     [m.LANCAMENTO_SET_LOCAL](state, local) {
+      state.formErrors.local = [];
       state.form.local = local;
     },
     [m.LANCAMENTO_SET_CATEGORIA](state, categoria) {
+      state.formErrors.categoria = [];
       state.form.categoria = categoria;
     },
     [m.LANCAMENTO_SET_VALOR](state, valor) {
@@ -55,6 +66,15 @@ export default {
       state.form.categoria= null;
       state.form.valor= null;
       state.form.efetuada= false;
+    },
+    [m.SET_BACKEND_ERRORS](state, errors) {
+      function getError(field) {
+        const error = errors.find(e => e.field === field);
+        return error ? [ error.message ] : [];
+      }
+
+      state.formErrors.local = getError('local.nome');
+      state.formErrors.categoria = getError('categoria');
     }
   },
   actions: {
@@ -74,7 +94,9 @@ export default {
           dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
           resolve();
         }).catch(err => {
-          console.error(err);
+          if (err.response.status === 400) {
+            commit(m.SET_BACKEND_ERRORS, err.response.data.fieldErrors);
+          }
           reject();
         });
       });

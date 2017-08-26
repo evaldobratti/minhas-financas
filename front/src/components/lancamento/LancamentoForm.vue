@@ -26,6 +26,7 @@
         <v-text-field 
           ref="localTxt"
           label="Local"
+          :error-messages="errorMessages('local')"
           v-model="local"></v-text-field>  
       </v-flex>
       <v-flex xs5>
@@ -34,6 +35,7 @@
           :items="categoriasFlat"
           v-model="categoria"
           item-text="nome"
+          :error-messages="errorMessages('categoria')"
           autocomplete>
           <template slot="item" scope="data">
             <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">
@@ -47,6 +49,7 @@
         <v-text-field
           v-model="valor"
           label="Valor"
+          type="number"
           class="number-input">
         </v-text-field>
       </v-flex>
@@ -81,6 +84,9 @@ export default {
     }
   },
   methods: {
+    errorMessages(field) {
+      return this.$store.state.lancamentos.formErrors[field];
+    },
     formatDate(val) {
       this.data = new Date(val);
       return new Date(val).toLocaleDateString();

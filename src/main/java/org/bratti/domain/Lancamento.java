@@ -2,6 +2,7 @@ package org.bratti.domain;
 
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +41,7 @@ public class Lancamento implements Serializable {
 
     @ManyToOne
     @NotNull
+    @Valid
     private Local local;
 
     @ManyToOne
