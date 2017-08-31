@@ -166,11 +166,13 @@ export default {
         commit(m.CONTA_SET_SALDO_FIM, resSaldoFim.data);
       }));
     },
-    [d.REMOVE_LANCAMENTO]({dispatch}, lancamento) {
-      axios.delete('/api/lancamentos/' + lancamento.id).then(() => {
+    [d.REMOVE_LANCAMENTO]({dispatch, commit}, lancamento) {
+      axios.delete('/api/lancamentos', {
+        data: lancamento
+      }).then(() => {
         dispatch(d.CARREGA_CONTA_LANCAMENTOS);
       }).catch(err => {
-        console.info(err);
+        commit(SNACKS.m.TRATA_ERRO, err);
       });
     }
   }

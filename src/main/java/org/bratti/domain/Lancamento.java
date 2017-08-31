@@ -48,10 +48,10 @@ public class Lancamento implements Serializable {
     @NotNull
     private Categoria categoria;
 
-    @OneToOne(cascade= {CascadeType.ALL})
+    @OneToOne(cascade= {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name="motivo_id")
     private LancamentoMotivo motivo;
-    
+
     public Long getId() {
         return id;
     }
@@ -152,15 +152,15 @@ public class Lancamento implements Serializable {
         }
         return Objects.equals(getId(), lancamento.getId());
     }
-    
+
     public void setMotivo(LancamentoMotivo motivo) {
     	this.motivo = motivo;
     }
-    
+
     public LancamentoMotivo getMotivo() {
     	return motivo;
     }
-    
+
     public Lancamento motivo(LancamentoMotivo motivo) {
     	this.motivo = motivo;
     	return this;

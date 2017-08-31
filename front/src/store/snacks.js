@@ -1,7 +1,8 @@
 
 const m = {
   UPDATE_SNACK: 'snackUpdateSnack',
-  UPDATE_SHOWING: 'snackUpdateShowing'
+  UPDATE_SHOWING: 'snackUpdateShowing',
+  TRATA_ERRO: 'snackTrataErro'
 }
 
 export const SNACKS = {
@@ -28,6 +29,14 @@ export default {
     },
     [m.UPDATE_SHOWING](state, showing) {
       state.showing = showing;
+    },
+    [m.TRATA_ERRO](state, err) {
+      state.notification = {
+        timeout: 0, 
+        context: 'error',
+        text: 'Erro: ' + err.response && err.response.data && err.response.data.message
+      };
+      state.showing = true;
     }
   }
 }

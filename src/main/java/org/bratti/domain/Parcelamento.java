@@ -23,15 +23,15 @@ public class Parcelamento extends Recorrencia {
 
 
 	private int inicioParcelas = 1;
-	
+
 	public void setQuantidadeParcelas(int quantidadeParcelas) {
 		this.quantidadeParcelas = quantidadeParcelas;
 	}
-	
+
 	public int getQuantidadeParcelas() {
 		return quantidadeParcelas;
 	}
-	
+
 	public Parcelamento quantidadeParcelas(int quantidadeParcelas) {
 		this.quantidadeParcelas = quantidadeParcelas;
 		return this;
@@ -42,11 +42,11 @@ public class Parcelamento extends Recorrencia {
 		int parcelasReais = quantidadeParcelas - inicioParcelas + 1 ;
 		return gerouParcelaInicial ? retorno.size() == parcelasReais : retorno.size() == parcelasReais - 1;
 	}
-	
+
 	@Override
 	public RecorrenciaLancamentoGerado novoMotivo(LocalDate dataBase, boolean gerouParcelaInicial, int ix) {
 		ix += inicioParcelas - 1;
-		
+
 		return new ParcelamentoLancamentoGerado()
 				.parcelaNumero(ix)
 				.data(dataBase)
@@ -57,11 +57,11 @@ public class Parcelamento extends Recorrencia {
 		this.inicioParcelas = inicioParcelas;
 		return this;
 	}
-	
+
 	public void efetivaCom(Lancamento lancamento) {
 		if (lancamento != null) {
 			RecorrenciaLancamentoGerado recorrencia = (RecorrenciaLancamentoGerado) new ParcelamentoLancamentoGerado()
-					.parcelaNumero(1)
+					.parcelaNumero(inicioParcelas)
 					.data(getPartirDe())
 					.recorrencia(this);
 			addRecorrenciaLancamentos(recorrencia);

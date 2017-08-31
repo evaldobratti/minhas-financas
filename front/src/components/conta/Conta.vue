@@ -40,25 +40,27 @@
               hide-actions
               class="elevation-5 lancamentos">
               <template slot="headers" scope="props">
-                <th style="width: 10px">
-                  Data
-                </th>
-                <th>
-                  Local
-                </th>
-                <th style="width: 130px">
-                  Categoria
-                </th>
-                <th style="text-align: right; width: 120px">
-                  Valor
-                </th>
-                <th style="width: 10px">
-                  Efetuada
-                </th>
-                <th style="text-align: right; width: 120px">
-                  Saldo
-                </th>
-                <th style="width: 70px"></th>
+                <tr>
+                  <th style="width: 10px">
+                    Data
+                  </th>
+                  <th>
+                    Local
+                  </th>
+                  <th style="width: 130px">
+                    Categoria
+                  </th>
+                  <th style="text-align: right; width: 120px">
+                    Valor
+                  </th>
+                  <th style="width: 10px">
+                    Efetuada
+                  </th>
+                  <th style="text-align: right; width: 120px">
+                    Saldo
+                  </th>
+                  <th style="width: 70px"></th>
+                </tr>
               </template>
               <template slot="items" scope="l">
                 <td xs3>{{ l.item.data | date }}</td>
@@ -173,8 +175,8 @@ export default {
       this.filtrar();
     },
     css(valor) {
-      return { 
-        'red--text': valor < 0, 
+      return {
+        'red--text': valor < 0,
         'blue--text text--darken-3': valor >= 0
       }
     },

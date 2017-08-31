@@ -36,7 +36,7 @@ public class LancamentoResource {
     private final LancamentoRepository lancamentoRepository;
 
 	private final LocalRepository localRepository;
-    
+
     public LancamentoResource(LancamentoRepository lancamentoRepository,
         LocalRepository localRepository) {
         this.lancamentoRepository = lancamentoRepository;
@@ -55,7 +55,7 @@ public class LancamentoResource {
         if (local == null) {
         	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal().getNome()));
         }
-        
+
         Lancamento lancamento = new Lancamento();
         lancamento.setCategoria(lancamentoDTO.getCategoria());
         lancamento.setConta(lancamentoDTO.getConta());
@@ -110,17 +110,23 @@ public class LancamentoResource {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(lancamento));
     }
 
-    /**
-     * DELETE  /lancamentos/:id : delete the "id" lancamento.
-     *
-     * @param id the id of the lancamento to delete
-     * @return the ResponseEntity with status 200 (OK)
-     */
     @DeleteMapping("/lancamentos/{id}")
     @Timed
     public ResponseEntity<Void> deleteLancamento(@PathVariable Long id) {
         log.debug("REST request to delete Lancamento : {}", id);
         lancamentoRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    @DeleteMapping("/lancamentos")
+    @Timed
+    public ResponseEntity<Void> deleteMaybeLancamento(@RequestBody Lancamento lancamento) throws URISyntaxException {
+        log.debug("REST request to delete Lancamento : {}", lancamento.getId());
+        
+        //createLancamento(lancamento);
+        log.debug("lancamento criado");
+        lancamentoRepository.delete(lancamento);
+        log.debug("lancamento apagado");
+        return ResponseEntity.ok().build();
     }
 }

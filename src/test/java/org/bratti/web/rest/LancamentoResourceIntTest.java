@@ -82,6 +82,9 @@ public class LancamentoResourceIntTest {
     private MockMvc restLancamentoMockMvc;
 
     private Lancamento lancamento;
+	private Conta conta;
+	private Local local;
+	private Categoria categoria;
 
     @Before
     public void setup() {
@@ -93,23 +96,24 @@ public class LancamentoResourceIntTest {
             .setMessageConverters(jacksonMessageConverter).build();
     }
 
-    /**
-     * Create an entity for this test.
-     *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
-    public static Lancamento createEntity(EntityManager em) {
-        Lancamento lancamento = new Lancamento()
-            .data(DEFAULT_DATA)
-            .valor(DEFAULT_VALOR)
-            .efetivada(DEFAULT_EFETIVADA);
-        return lancamento;
-    }
-
     @Before
     public void initTest() {
-        lancamento = createEntity(em);
+        conta = new Conta().nome("conta").saldoInicial(BigDecimal.ZERO);
+		local = new Local().nome("local");
+		categoria = new Categoria().nome("categoria");
+		
+		em.persist(conta);
+		em.persist(local);
+		em.persist(categoria);
+		
+		Lancamento lancamento1 = new Lancamento()
+			.conta(conta)
+			.local(local)
+			.categoria(categoria)
+		    .data(DEFAULT_DATA)
+		    .valor(DEFAULT_VALOR)
+		    .efetivada(DEFAULT_EFETIVADA);
+		lancamento = lancamento1;
     }
 
     @Test
@@ -272,25 +276,7 @@ public class LancamentoResourceIntTest {
     @Test
     @Transactional
     public void efetivaLancamentoDeRecorrencia() throws IOException, Exception {
-    	Recorrencia recorrencia = new Recorrencia();
-    	
-    	Conta conta = new Conta().nome("conta").saldoInicial(BigDecimal.ZERO);
-		Local local = new Local().nome("local");
-		Categoria categoria = new Categoria().nome("raiz");
-		
-		recorrencia
-    		.aCada(1)
-    		.categoria(categoria)
-    		.conta(conta)
-    		.local(local)
-    		.partirDe(LocalDate.now())
-    		.tipoFrequencia(TipoFrequencia.MES)
-    		.valor(BigDecimal.TEN);
-		
-		em.persist(conta);
-		em.persist(local);
-		em.persist(categoria);
-		em.persist(recorrencia);
+    	Recorrencia recorrencia = criaRecorrenciaPersistida();
 		
 		Lancamento lancamentoProjecao = recorrencia.projecaoAte(LocalDate.now().plus(1, ChronoUnit.YEARS)).get(1);
 		
@@ -311,6 +297,47 @@ public class LancamentoResourceIntTest {
 		assertEquals(1, recorrencia.getRecorrenciaLancamentos().size());
 		RecorrenciaLancamentoGerado lancamentoGerado = recorrencia.getRecorrenciaLancamentos().get(0);
 		assertEquals(lancamentoProjecao.getData(), lancamentoGerado.getData());
+    }
+
+	private Recorrencia criaRecorrenciaPersistida() {
+		Recorrencia recorrencia = new Recorrencia();
+    	
+		recorrencia
+    		.aCada(1)
+    		.categoria(categoria)
+    		.conta(conta)
+    		.local(local)
+    		.partirDe(LocalDate.now())
+    		.tipoFrequencia(TipoFrequencia.MES)
+    		.valor(BigDecimal.TEN);
 		
+		em.persist(recorrencia);
+		
+		return recorrencia;
+	}
+    
+    @Test
+    @Transactional
+    public void deletaLancamentoDeProjecaoDeRecorrenciaMasSalvaMotivo() throws IOException, Exception {
+    	Recorrencia recorrencia = criaRecorrenciaPersistida();
+		
+		Lancamento lancamentoProjecao = recorrencia.projecaoAte(LocalDate.now().plus(1, ChronoUnit.YEARS)).get(2);
+		
+		LocalDate dataProjecao = ((RecorrenciaLancamentoGerado)lancamentoProjecao.getMotivo()).getData();
+		
+		int lancamentosAntes = lancamentoRepository.findAll().size();
+		assertEquals(0, lancamentosAntes);
+		assertEquals(0, em.createQuery("from LancamentoMotivo").getResultList().size());
+		
+		restLancamentoMockMvc.perform(delete("/api/lancamentos")
+				.contentType(TestUtil.APPLICATION_JSON_UTF8)
+		        .content(TestUtil.convertObjectToJsonBytes(lancamentoProjecao)))
+	            .andExpect(status().isOk());
+		
+		assertEquals(0, lancamentosAntes);
+		List<?> motivos = em.createQuery("from LancamentoMotivo").getResultList();
+		assertEquals(dataProjecao, ((RecorrenciaLancamentoGerado)motivos.get(0)).getData());
+		assertEquals(1, motivos.size());
+
     }
 }
