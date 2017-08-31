@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+import { SNACKS } from './snacks';
+import { contas } from './conta';
 export const m = {
   UPDATE_FORM: 'recorrenciaUpdateForm',
   UPDATE_FORM_TIPO_FREQUENCIA: 'recorrenciaUpdateFormTipoFrequencia',
@@ -67,9 +68,15 @@ export default {
     [d.SUBMIT_FORM]({commit, state}) {
       return new Promise((resolve, reject) => {
         axios.post('/api/recorrencias', state.form).then(() => {
+          dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+          commit(SNACKS.m.UPDATE_SNACK, {
+            text: 'Recorrência cadastrada!',
+            timeout: 1500,
+            context: 'success'
+          });
           resolve();
         }).catch(err => {
-          reject(err);
+          commit(SNACKS.m.TRATA_ERRO, err);
         })
       })
     }

@@ -68,22 +68,49 @@
                 <td>{{ l.item.categoria.nome }}</td>
                 <td class="text-xs-right" :class="css(l.item.valor)">
                   {{ l.item.valor | currency }}
-                  <v-btn @click="efetiva(l.item)"primary fab small dark class="small-fab-btn">
-                    <v-icon>add</v-icon>
-                  </v-btn>
                 </td>
                 <td><v-checkbox v-if="l.item.efetivada != null" v-model="l.item.efetivada"></v-checkbox></td>
                 <td class="text-xs-right" :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
                 <td>
-                  <v-btn @click="deleteLancamento(l.item)" v-if="l.item.categoria.nome != null" primary fab small dark class="small-fab-btn red">
-                    <v-icon>remove</v-icon>
-                  </v-btn>
-                  <v-btn @click.native.stop="novaRecorrencia(l.item)" v-if="l.item.categoria.nome != null" primary fab small dark class="small-fab-btn">
-                    <v-icon>refresh</v-icon>
-                  </v-btn>
-                  <v-btn @click.native.stop="novoParcelamento(l.item)" v-if="l.item.categoria.nome != null" primary fab small class="small-fab-btn">
-                    <v-icon>refresh</v-icon>
-                  </v-btn>
+                  <v-menu bottom right>
+                    <v-btn icon slot="activator">
+                      <v-icon>more_vert</v-icon>
+                    </v-btn>
+                    <v-list>
+                      <v-list-tile @click="novaRecorrencia(l.item)">
+                        <v-list-tile-title>
+                          <v-btn primary fab small dark class="small-fab-btn">
+                            <v-icon>refresh</v-icon>
+                          </v-btn>
+                          Recorrencia
+                        </v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile @click="novoParcelamento(l.item)">
+                        <v-list-tile-title>
+                          <v-btn primary fab small dark class="small-fab-btn">
+                            <v-icon>refresh</v-icon>
+                          </v-btn>
+                          Parcelamento
+                        </v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile @click="deleteLancamento(l.item)">
+                        <v-list-tile-title>
+                          <v-btn primary fab small dark class="small-fab-btn">
+                            <v-icon>remove</v-icon>
+                          </v-btn>
+                          Apagar
+                        </v-list-tile-title>
+                      </v-list-tile>
+                      <v-list-tile @click="efetiva(l.item)">
+                        <v-list-tile-title>
+                          <v-btn primary fab small dark class="small-fab-btn">
+                            <v-icon>add</v-icon>
+                          </v-btn>
+                          Efetivar
+                        </v-list-tile-title>
+                      </v-list-tile>
+                    </v-list>
+                  </v-menu>
                 </td>
               </template>
             </v-data-table>
@@ -98,7 +125,7 @@
           <div class="headline">Nova recorrência</div>
         </v-card-title>
         <v-card-text>
-          <RecorrenciaForm :lancamento="lancamentoAcao"></RecorrenciaForm>
+          <RecorrenciaForm :lancamento="lancamentoAcao" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -108,7 +135,7 @@
           <div class="headline">Novo Parcelamento</div>
         </v-card-title>
         <v-card-text>
-          <ParcelamentoForm :lancamento="lancamentoAcao"></ParcelamentoForm>
+          <ParcelamentoForm :lancamento="lancamentoAcao" @cadastrado="parcelamentoDialog = false"></ParcelamentoForm>
         </v-card-text>
       </v-card>
     </v-dialog>

@@ -26,7 +26,9 @@ export default {
   },
   methods: {
     submit() {
-      this.$store.dispatch(PARCELAMENTOS.d.SUBMIT_FORM);
+      this.$store.dispatch(PARCELAMENTOS.d.SUBMIT_FORM).then(() => {
+        this.$emit('cadastrado');
+      });
     }
   },
   computed: {

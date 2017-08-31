@@ -66,7 +66,9 @@ export default {
       this.lancamentoInicial = l;
     },
     submit() {
-      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM);
+      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM).then(() => {
+        this.$emit('cadastrado');
+      });
     }
   },
   computed: {

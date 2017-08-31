@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { contas } from './conta';
-
+import { SNACKS } from './snacks';
 export const m = {
   UPDATE_FORM_INICIO_PARCELAS: 'parcelamentoFormUpdateInicioParcelas',
   UPDATE_FORM_QUANTIDADE_PARCELAS: 'parcelamentoFormUpdateQuantidadeParcelas',
@@ -36,12 +36,20 @@ export default {
   },
   actions: {
     [d.SUBMIT_FORM]({state, commit, dispatch}) {
-      axios.post('/api/parcelamentos', state.form).then(res => {
-        console.info('sucesso', res);
-        dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
-      }).catch(err => {
-        console.info('falha', err);
-      });     
+      return new Promise((resolve, reject) => {
+        axios.post('/api/parcelamentos', state.form).then(res => {
+          dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+          commit(SNACKS.m.UPDATE_SNACK, {
+            text: 'Recorrência cadastrada!',
+            timeout: 1500,
+            context: 'success'
+          });
+          resolve();
+        }).catch(err => {
+          commit(SNACKS.m.TRATA_ERRO, err);
+        });  
+      })
+      
     }
   }
 }
