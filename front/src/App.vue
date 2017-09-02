@@ -81,6 +81,7 @@ export default {
   width: 20px !important; 
   height: 20px !important;
   margin: 0 !important;
+  box-shadow: none;
 }
 
 

@@ -238,6 +238,7 @@ public class Recorrencia implements Serializable {
 						.data(dataBase)
 						.local(local)
 						.valor(valor)
+                        .efetivada(false)
 						.motivo(novoMotivo(dataBase, true, retorno.size() + 1)));
 		
 		while ((dataBase.isBefore(ate) || dataBase.equals(ate)) && !deveParar(true, retorno)) {
@@ -253,6 +254,7 @@ public class Recorrencia implements Serializable {
 						.data(data)
 						.local(local)
 						.valor(valor)
+                        .efetivada(false)
 						.motivo(novoMotivo(data, true, retorno.size() + 1)));
 			}
 			

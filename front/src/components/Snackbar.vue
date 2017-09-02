@@ -5,10 +5,11 @@
           :primary="context == 'primary'"
           :error="context == 'error'"
           :timeout="timeout"
-          :top="true"
+          :bottom="true"
+          :left="true"
           v-model="showing">
         {{ text }}
-        <v-btn flat dark @click.native="showing = false">Close</v-btn>
+        <v-btn flat dark v-if="timeout == 0" @click.native="showing = false">Close</v-btn>
       </v-snackbar>
   </div>
 </template>

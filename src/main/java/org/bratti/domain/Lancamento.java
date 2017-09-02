@@ -52,6 +52,10 @@ public class Lancamento implements Serializable {
     @JoinColumn(name="motivo_id")
     private LancamentoMotivo motivo;
 
+    public Lancamento() {
+        this.efetivada = false;
+    }
+
     public Long getId() {
         return id;
     }

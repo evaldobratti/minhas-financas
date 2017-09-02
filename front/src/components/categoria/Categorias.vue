@@ -6,7 +6,7 @@
             <div class="headline">Nova categoria raíz</div>
           </v-card-title>
           <v-card-text>
-            <CategoriaForm :categoriaPai="null" @cadastrado="dialogRaiz = false"></CategoriaForm>
+            <CategoriaForm ref="formRaiz" :categoriaPai="null" @cadastrado="dialogRaiz = false"></CategoriaForm>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -33,6 +33,13 @@ export default {
   data() {
     return {
       dialogRaiz: false
+    }
+  },
+  watch: {
+    dialogRaiz(val) {
+      if (val) {
+        this.$refs.formRaiz.showing();
+      }
     }
   },
   computed: mapState({

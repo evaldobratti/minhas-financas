@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="submit">
-    <v-text-field v-model="nome" label="Nome"></v-text-field>
+    <v-text-field ref="nome" v-model="nome" label="Nome"></v-text-field>
     <v-btn type="submit">salvar</v-btn>
   </form>
 </template>
@@ -16,6 +16,9 @@ export default {
     }
   },
   methods: {
+    showing() {
+      //console.info(this.$refs.nome.focus())
+    },
     submit () {
       this.$store.dispatch(d.SAVE_CATEGORIA, {
         pai: this.categoriaPai ? this.categoriaPai.id : null,

@@ -77,7 +77,7 @@
                       <v-icon>more_vert</v-icon>
                     </v-btn>
                     <v-list>
-                      <v-list-tile @click="novaRecorrencia(l.item)">
+                      <v-list-tile @click="novaRecorrencia(l.item)" :disabled="l.item.motivo != null">
                         <v-list-tile-title>
                           <v-btn primary fab small dark class="small-fab-btn">
                             <v-icon>refresh</v-icon>
@@ -85,7 +85,7 @@
                           Recorrencia
                         </v-list-tile-title>
                       </v-list-tile>
-                      <v-list-tile @click="novoParcelamento(l.item)">
+                      <v-list-tile @click="novoParcelamento(l.item)" :disabled="l.item.motivo != null">
                         <v-list-tile-title>
                           <v-btn primary fab small dark class="small-fab-btn">
                             <v-icon>refresh</v-icon>
@@ -95,15 +95,15 @@
                       </v-list-tile>
                       <v-list-tile @click="deleteLancamento(l.item)">
                         <v-list-tile-title>
-                          <v-btn primary fab small dark class="small-fab-btn">
+                          <v-btn primary fab small dark class="small-fab-btn red">
                             <v-icon>remove</v-icon>
                           </v-btn>
                           Apagar
                         </v-list-tile-title>
                       </v-list-tile>
-                      <v-list-tile @click="efetiva(l.item)">
+                      <v-list-tile @click="efetiva(l.item)" :disabled="l.item.id == null" >
                         <v-list-tile-title>
-                          <v-btn primary fab small dark class="small-fab-btn">
+                          <v-btn primary fab small dark class="small-fab-btn green">
                             <v-icon>add</v-icon>
                           </v-btn>
                           Efetivar
