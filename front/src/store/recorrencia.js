@@ -65,7 +65,7 @@ export default {
     },
   },
   actions: {
-    [d.SUBMIT_FORM]({commit, state}) {
+    [d.SUBMIT_FORM]({commit, state, dispatch}) {
       return new Promise((resolve, reject) => {
         axios.post('/api/recorrencias', state.form).then(() => {
           dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);

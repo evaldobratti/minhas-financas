@@ -101,7 +101,7 @@
                           Apagar
                         </v-list-tile-title>
                       </v-list-tile>
-                      <v-list-tile @click="efetiva(l.item)" :disabled="l.item.id == null" >
+                      <v-list-tile @click="efetiva(l.item)" :disabled="l.item.id != null" >
                         <v-list-tile-title>
                           <v-btn primary fab small dark class="small-fab-btn green">
                             <v-icon>add</v-icon>
