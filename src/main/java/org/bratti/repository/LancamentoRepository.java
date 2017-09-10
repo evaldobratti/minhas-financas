@@ -18,18 +18,21 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface LancamentoRepository extends JpaRepository<Lancamento,Long> {
+public interface LancamentoRepository extends UserOwnedRepository<Lancamento,Long> {
     
-    @Query("select l from Lancamento l where l.conta.id = :contaId and month(l.data) = :mes and year(l.data) = :ano")
+	@Query("select l from Lancamento l where l.usuario.login = ?#{principal.username}")
+    List<Lancamento> findByUsuarioIsCurrentUser();
+	
+    @Query("select l from Lancamento l where l.conta.id = :contaId and month(l.data) = :mes and year(l.data) = :ano and l.usuario.login = ?#{principal.username}")
     List<Lancamento> findByContaMesAno(@Param("contaId") Long contaId,
         @Param("mes") int mes,
         @Param("ano") int ano);
 
     
-    @Query("select sum(l.valor) from Lancamento l where l.conta = :conta and l.data <= :data")
+    @Query("select sum(l.valor) from Lancamento l where l.conta = :conta and l.data <= :data and l.usuario.login = ?#{principal.username}")
 	Optional<BigDecimal> findByContaAteDia(@Param("conta") Conta conta, @Param("data")LocalDate data);
 
-    @Query("select l from Lancamento l where l.conta.id = :contaId and data >= :de and data <= :ate")
+    @Query("select l from Lancamento l where l.conta.id = :contaId and data >= :de and data <= :ate and l.usuario.login = ?#{principal.username}")
 	List<Lancamento> findByConta(@Param("contaId") Long contaId, 
 			@Param("de") LocalDate de, 
 			@Param("ate") LocalDate ate);

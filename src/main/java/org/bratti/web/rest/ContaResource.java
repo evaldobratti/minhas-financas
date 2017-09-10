@@ -3,9 +3,7 @@ package org.bratti.web.rest;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +13,10 @@ import java.util.stream.Collectors;
 
 import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
-import org.bratti.domain.Recorrencia;
 import org.bratti.repository.ContaRepository;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.RecorrenciaRepository;
+import org.bratti.service.UserService;
 import org.bratti.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +49,14 @@ public class ContaResource {
     private final ContaRepository contaRepository;
     private final LancamentoRepository lancamentoRepository;
     private final RecorrenciaRepository recorrenciaRepository;
+	private final UserService userService;
     
     public ContaResource(ContaRepository contaRepository, LancamentoRepository lancamentoRepository,
-    		RecorrenciaRepository recorrenciaRepository) {
+    		RecorrenciaRepository recorrenciaRepository, UserService userService) {
         this.contaRepository = contaRepository;
         this.lancamentoRepository = lancamentoRepository;
         this.recorrenciaRepository = recorrenciaRepository;
+		this.userService = userService;
     }
 
     @PostMapping("/contas")
@@ -66,6 +66,8 @@ public class ContaResource {
         if (conta.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new conta cannot already have an ID")).body(null);
         }
+        conta.setUsuario(userService.getUserWithAuthorities());
+        
         Conta result = contaRepository.save(conta);
         return ResponseEntity.created(new URI("/api/contas/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -79,6 +81,7 @@ public class ContaResource {
         if (conta.getId() == null) {
             return createConta(conta);
         }
+        conta.setUsuario(userService.getUserWithAuthorities());
         Conta result = contaRepository.save(conta);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, conta.getId().toString()))
@@ -87,7 +90,7 @@ public class ContaResource {
 
     @GetMapping("/contas")
     @Timed
-    public List<Map> getAllContas() {
+    public List<Map<String, Object>> getAllContas() {
         log.debug("REST request to get all Contas");
         List<Conta> contas = contaRepository.findAll();
         return contas.stream().map(c -> {

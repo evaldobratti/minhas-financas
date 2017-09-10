@@ -8,6 +8,7 @@
           :bottom="true"
           :left="true"
           v-model="showing">
+          <v-icon dark>folder_open</v-icon>
         {{ text }}
         <v-btn flat dark v-if="timeout == 0" @click.native="showing = false">Close</v-btn>
       </v-snackbar>

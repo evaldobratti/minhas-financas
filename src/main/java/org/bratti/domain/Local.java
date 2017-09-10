@@ -11,7 +11,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "local")
-public class Local implements Serializable {
+public class Local extends UserOwned<Local> {
 
     private static final long serialVersionUID = 1L;
 

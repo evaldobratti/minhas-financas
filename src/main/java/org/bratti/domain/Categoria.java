@@ -20,14 +20,9 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "categoria")
-public class Categoria implements Serializable {
+public class Categoria extends UserOwned<Categoria> {
 
     private static final long serialVersionUID = 1L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    private Long id;
 
     @Column(name = "nome")
     @Size(min=1, max=255)
@@ -41,15 +36,7 @@ public class Categoria implements Serializable {
     public Categoria() { }
 
     public Categoria(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.setId(id);
     }
 
     public String getNome() {

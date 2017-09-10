@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.bratti.domain.Categoria;
 import org.bratti.repository.CategoriaRepository;
+import org.bratti.service.UserService;
 import org.bratti.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,11 @@ public class CategoriaResource {
 
     private final CategoriaRepository categoriaRepository;
 
-    public CategoriaResource(CategoriaRepository categoriaRepository) {
+	private UserService userService;
+
+    public CategoriaResource(CategoriaRepository categoriaRepository, UserService userService) {
         this.categoriaRepository = categoriaRepository;
+		this.userService = userService;
     }
 
     /**
@@ -57,6 +61,7 @@ public class CategoriaResource {
         if (categoria.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new categoria cannot already have an ID")).body(null);
         }
+        
         Categoria result = categoriaRepository.save(categoria);
         return ResponseEntity.created(new URI("/api/categorias/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -94,7 +99,7 @@ public class CategoriaResource {
     @Timed
     public List<Categoria> getAllCategorias() {
         log.debug("REST request to get all Categorias");
-        return categoriaRepository.findAll();//.stream().filter(i -> i.getPai() == null).collect(Collectors.toList());
+        return categoriaRepository.findAll();
     }
 
     /**

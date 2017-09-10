@@ -31,7 +31,7 @@ export default {
             commit(m.LOADED_CATEGORIAS, res.data.filter(c => c.pai == null));
             resolve(state.list);
           }).catch(err => {
-            console.error(err);
+            commit(SNACKS.m.TRATA_ERRO, err);
             reject();
           });
         });
@@ -50,6 +50,7 @@ export default {
             context: 'success'
           });
         }).catch(err => {
+          commit(SNACKS.m.TRATA_ERRO, err);
           reject();
         });
       });

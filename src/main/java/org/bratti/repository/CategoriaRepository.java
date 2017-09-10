@@ -1,6 +1,9 @@
 package org.bratti.repository;
 
+import java.util.List;
+
 import org.bratti.domain.Categoria;
+import org.bratti.domain.Conta;
 import org.springframework.stereotype.Repository;
 
 import org.springframework.data.jpa.repository.*;
@@ -11,6 +14,5 @@ import org.springframework.data.jpa.repository.*;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CategoriaRepository extends JpaRepository<Categoria,Long> {
-    
+public interface CategoriaRepository extends UserOwnedRepository<Categoria, Long> {
 }

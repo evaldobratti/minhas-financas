@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "lancamento")
-public class Lancamento implements Serializable {
+public class Lancamento extends UserOwned<Lancamento> {
 
     private static final long serialVersionUID = 1L;
 

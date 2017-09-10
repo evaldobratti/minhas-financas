@@ -11,9 +11,6 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface ContaRepository extends JpaRepository<Conta,Long> {
+public interface ContaRepository extends UserOwnedRepository<Conta, Long> {
 
-    @Query("select conta from Conta conta where conta.usuario.login = ?#{principal.username}")
-    List<Conta> findByUsuarioIsCurrentUser();
-    
 }

@@ -44,11 +44,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @DiscriminatorColumn(name = "TYPE")
 @DiscriminatorValue("Recorrencia")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
-public class Recorrencia implements Serializable {
+public class Recorrencia extends UserOwned<Recorrencia> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 9038150950722781341L;
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
@@ -70,7 +70,6 @@ public class Recorrencia implements Serializable {
     @Column(name = "partir_de", nullable = false)
     private LocalDate partirDe;
 
-    @ManyToMany
     @ManyToOne(optional = false)
     @NotNull
     private Conta conta;

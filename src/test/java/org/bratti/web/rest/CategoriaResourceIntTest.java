@@ -1,11 +1,24 @@
 package org.bratti.web.rest;
 
-import org.bratti.MinhasfinancasApp;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+
+import org.bratti.MinhasfinancasApp;
 import org.bratti.domain.Categoria;
 import org.bratti.repository.CategoriaRepository;
+import org.bratti.service.UserService;
 import org.bratti.web.rest.errors.ExceptionTranslator;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +32,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the CategoriaResource REST controller.
@@ -54,6 +59,9 @@ public class CategoriaResourceIntTest {
 
     @Autowired
     private EntityManager em;
+    
+    @Autowired
+    private UserService userService;
 
     private MockMvc restCategoriaMockMvc;
 
@@ -62,7 +70,7 @@ public class CategoriaResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        CategoriaResource categoriaResource = new CategoriaResource(categoriaRepository);
+        CategoriaResource categoriaResource = new CategoriaResource(categoriaRepository, userService);
         this.restCategoriaMockMvc = MockMvcBuilders.standaloneSetup(categoriaResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

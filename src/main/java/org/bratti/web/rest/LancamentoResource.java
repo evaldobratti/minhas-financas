@@ -1,26 +1,32 @@
 package org.bratti.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import org.bratti.domain.Categoria;
-import org.bratti.domain.Conta;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
 import org.bratti.domain.Lancamento;
 import org.bratti.domain.Local;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.LocalRepository;
-import org.bratti.web.rest.dto.LancamentoRequestDTO;
+import org.bratti.service.UserService;
 import org.bratti.web.rest.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.codahale.metrics.annotation.Timed;
 
-import java.util.List;
-import java.util.Optional;
+import io.github.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Lancamento.
@@ -37,10 +43,14 @@ public class LancamentoResource {
 
 	private final LocalRepository localRepository;
 
+	private UserService userService;
+
     public LancamentoResource(LancamentoRepository lancamentoRepository,
-        LocalRepository localRepository) {
+        LocalRepository localRepository, 
+        UserService userService) {
         this.lancamentoRepository = lancamentoRepository;
         this.localRepository = localRepository;
+		this.userService = userService;
     }
 
     @PostMapping("/lancamentos")
@@ -53,7 +63,7 @@ public class LancamentoResource {
 
         Local local = localRepository.findOneByNomeIgnoreCase(lancamentoDTO.getLocal().getNome());
         if (local == null) {
-        	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal().getNome()));
+        	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal().getNome()).usuario(userService.getUserWithAuthorities()));
         }
 
         Lancamento lancamento = new Lancamento();
@@ -64,6 +74,7 @@ public class LancamentoResource {
 		lancamento.setLocal(local);
         lancamento.setValor(lancamentoDTO.getValor());
         lancamento.setMotivo(lancamentoDTO.getMotivo());
+        lancamento.usuario(userService.getUserWithAuthorities());
 
         Lancamento result = lancamentoRepository.save(lancamento);
         return ResponseEntity.created(new URI("/api/lancamentos/" + result.getId()))
@@ -78,6 +89,8 @@ public class LancamentoResource {
         if (lancamento.getId() == null) {
             return createLancamento(lancamento);
         }
+        
+        lancamento.usuario(userService.getUserWithAuthorities());
         Lancamento result = lancamentoRepository.save(lancamento);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, lancamento.getId().toString()))
@@ -93,7 +106,7 @@ public class LancamentoResource {
     @Timed
     public List<Lancamento> getAllLancamentos() {
         log.debug("REST request to get all Lancamentos");
-        return lancamentoRepository.findAll();
+        return lancamentoRepository.findByUsuarioIsCurrentUser();
     }
 
     /**

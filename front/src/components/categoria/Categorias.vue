@@ -28,7 +28,7 @@ import DatePicker from '../DatePicker';
 
 export default {
   created() {
-    this.$store.dispatch(d.LOAD_CATEGORIAS);
+    this.$store.dispatch(d.LOAD_CATEGORIAS).catch(()=> {});
   },
   data() {
     return {

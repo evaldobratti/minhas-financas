@@ -12,6 +12,7 @@ import org.bratti.domain.Parcelamento;
 import org.bratti.domain.Recorrencia;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.RecorrenciaRepository;
+import org.bratti.service.UserService;
 import org.bratti.service.dto.ParcelamentoDTO;
 import org.bratti.service.dto.RecorrenciaDTO;
 import org.bratti.web.rest.util.HeaderUtil;
@@ -45,9 +46,12 @@ public class RecorrenciaResource {
     private final RecorrenciaRepository recorrenciaRepository;
     private final LancamentoRepository lancamentoRepository;
 
-    public RecorrenciaResource(RecorrenciaRepository recorrenciaRepository, LancamentoRepository lancamentoRepository) {
+	private UserService userService;
+
+    public RecorrenciaResource(RecorrenciaRepository recorrenciaRepository, LancamentoRepository lancamentoRepository, UserService userService) {
         this.recorrenciaRepository = recorrenciaRepository;
 		this.lancamentoRepository = lancamentoRepository;
+		this.userService = userService;
     }
 
     @PostMapping("/recorrencias")
@@ -60,6 +64,7 @@ public class RecorrenciaResource {
         Lancamento lancamento = recorrencia.getLancamentoInicial();
         
         Recorrencia entity = recorrencia.toEntity();
+        entity.setUsuario(userService.getUserWithAuthorities());
 		entity.efetivaCom(lancamento);
         
         
@@ -75,14 +80,15 @@ public class RecorrenciaResource {
     public ResponseEntity<Recorrencia> createParcelamento(@Valid @RequestBody ParcelamentoDTO parcelamentoDTO) throws URISyntaxException {
     	Lancamento lancamento = parcelamentoDTO.getLancamentoInicial();
 		
-    	Recorrencia parcelamento = Parcelamento.novoMensal()
+    	Parcelamento parcelamento = (Parcelamento) Parcelamento.novoMensal()
 			.iniciandoNaParcela(parcelamentoDTO.getInicioParcelas())
 			.quantidadeParcelas(parcelamentoDTO.getQuantidadeParcelas())
     		.categoria(lancamento.getCategoria())
     		.conta(lancamento.getConta())
     		.local(lancamento.getLocal())
     		.partirDe(lancamento.getData())
-    		.valor(lancamento.getValor());
+    		.valor(lancamento.getValor())
+    		.usuario(userService.getUserWithAuthorities());
 		
     	parcelamento.efetivaCom(lancamento);
     	

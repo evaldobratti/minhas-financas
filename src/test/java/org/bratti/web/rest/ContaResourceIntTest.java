@@ -20,6 +20,7 @@ import org.bratti.domain.Conta;
 import org.bratti.repository.ContaRepository;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.RecorrenciaRepository;
+import org.bratti.service.UserService;
 import org.bratti.web.rest.errors.ExceptionTranslator;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,6 +71,9 @@ public class ContaResourceIntTest {
 
     @Autowired
     private EntityManager em;
+    
+    @Autowired
+    private UserService userService;
 
     private MockMvc restContaMockMvc;
 
@@ -78,7 +82,7 @@ public class ContaResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        ContaResource contaResource = new ContaResource(contaRepository, lancamentoRepository, recorrenciaRepository);
+        ContaResource contaResource = new ContaResource(contaRepository, lancamentoRepository, recorrenciaRepository, userService);
         this.restContaMockMvc = MockMvcBuilders.standaloneSetup(contaResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

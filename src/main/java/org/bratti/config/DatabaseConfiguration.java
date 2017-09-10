@@ -1,9 +1,11 @@
 package org.bratti.config;
 
-import io.github.jhipster.config.JHipsterConstants;
-import io.github.jhipster.config.liquibase.AsyncSpringLiquibase;
+import java.sql.SQLException;
 
-import liquibase.integration.spring.SpringLiquibase;
+import javax.persistence.EntityManager;
+import javax.sql.DataSource;
+
+import org.bratti.repository.factory.RepoFactory;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +18,15 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
+import io.github.jhipster.config.JHipsterConstants;
+import io.github.jhipster.config.liquibase.AsyncSpringLiquibase;
+import liquibase.integration.spring.SpringLiquibase;
 
 @Configuration
-@EnableJpaRepositories("org.bratti.repository")
+@EnableJpaRepositories(basePackages= {"org.bratti.repository"}, repositoryFactoryBeanClass=RepoFactory.class)
 @EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
@@ -66,4 +70,11 @@ public class DatabaseConfiguration {
         }
         return liquibase;
     }
+    
+//    @SuppressWarnings("rawtypes")
+//	@Bean
+//    public JpaRepositoryFactory repositoryFactory(EntityManager em) {
+//    	return new RepoFactory.BaseRepositoryFactory(em);
+//    	
+//    }
 }

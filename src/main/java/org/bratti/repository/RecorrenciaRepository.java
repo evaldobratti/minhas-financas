@@ -10,14 +10,13 @@ import java.util.List;
 /**
  * Spring Data JPA repository for the Recorrencia entity.
  */
-@SuppressWarnings("unused")
 @Repository
-public interface RecorrenciaRepository extends JpaRepository<Recorrencia,Long> {
+public interface RecorrenciaRepository extends UserOwnedRepository<Recorrencia,Long> {
     
-    @Query("select distinct recorrencia from Recorrencia recorrencia left join fetch recorrencia.recorrenciaLancamentos")
+    @Query("select distinct recorrencia from Recorrencia recorrencia left join fetch recorrencia.recorrenciaLancamentos where recorrencia.usuario.login = ?#{principal.username}")
     List<Recorrencia> findAllWithEagerRelationships();
 
-    @Query("select recorrencia from Recorrencia recorrencia left join fetch recorrencia.recorrenciaLancamentos where recorrencia.id =:id")
+    @Query("select recorrencia from Recorrencia recorrencia left join fetch recorrencia.recorrenciaLancamentos where recorrencia.id =:id and recorrencia.usuario.login = ?#{principal.username}")
     Recorrencia findOneWithEagerRelationships(@Param("id") Long id);
     
 }

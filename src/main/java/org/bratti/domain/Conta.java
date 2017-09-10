@@ -11,7 +11,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "conta")
-public class Conta implements Serializable {
+public class Conta extends UserOwned<Conta>{
 
     private static final long serialVersionUID = 1L;
 
@@ -25,9 +25,6 @@ public class Conta implements Serializable {
 
     @Column(name = "saldo_inicial", precision=10, scale=2)
     private BigDecimal saldoInicial;
-
-    @ManyToOne
-    private User usuario;
 
     public Long getId() {
         return id;
@@ -67,19 +64,6 @@ public class Conta implements Serializable {
 
     public void setSaldoInicial(BigDecimal saldoInicial) {
         this.saldoInicial = saldoInicial;
-    }
-
-    public User getUsuario() {
-        return usuario;
-    }
-
-    public Conta usuario(User user) {
-        this.usuario = user;
-        return this;
-    }
-
-    public void setUsuario(User user) {
-        this.usuario = user;
     }
 
     @Override
