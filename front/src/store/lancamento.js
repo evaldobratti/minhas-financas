@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { contas } from './conta';
+import { LOCAIS } from './locais';
 
 const m = {
   LANCAMENTO_SET_DATA: 'lancamentoSetData',
@@ -85,13 +86,12 @@ export default {
           conta: state.form.conta,
           valor: state.form.valor,
           categoria: state.form.categoria,
-          local: {
-            nome: state.form.local
-          },
+          local: state.form.local,
           efetivada: state.form.efetuada
         }).then(res => {
           commit(m.LIMPA_FORMULARIO);
           dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+          dispatch(LOCAIS.d.LOAD_LOCAIS);
           resolve();
         }).catch(err => {
           if (err.response.status === 400) {

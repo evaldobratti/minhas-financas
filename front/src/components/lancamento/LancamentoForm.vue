@@ -23,11 +23,19 @@
           </v-menu>
       </v-flex>
       <v-flex xs5>
-        <v-text-field 
-          ref="localTxt"
+        <v-select
           label="Local"
+          :items="locais"
+          item-text="nome"
+          v-model="local"
           :error-messages="errorMessages('local')"
-          v-model="local"></v-text-field>  
+          autocomplete
+          :search-input.sync="localInputed">
+          <template slot="item" scope="data">
+            {{ data.item.nome }}
+            <small v-if="data.item.id == null">&nbsp;nova</small>
+          </template>
+        </v-select>  
       </v-flex>
       <v-flex xs5>
         <v-select
@@ -36,12 +44,10 @@
           v-model="categoria"
           item-text="nome"
           :error-messages="errorMessages('categoria')"
-          :search-input.sync="inputed"
           autocomplete>
           <template slot="item" scope="data">
             <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">
               <CategoriaIcone :categoria="data.item"></CategoriaIcone>
-              <small v-if="data.item.id == null">Incluir</small>
               {{ data.item.nome }}
             </span>
           </template>
@@ -68,34 +74,32 @@ import axios from 'axios';
 import { d } from '../../store/categorias';
 import { lancamentos } from '../../store/lancamento';
 import CategoriaIcone from '../categoria/CategoriaIcone';
+import { LOCAIS } from '../../store/locais';
 
 export default {
   props: ['conta'],
   created() {
     this.$store.dispatch(d.LOAD_CATEGORIAS);
+    this.$store.dispatch(LOCAIS.d.LOAD_LOCAIS);
   },
   watch: {
     conta(val) {
       this.$store.commit(lancamentos.m.LANCAMENTO_SET_CONTA, this.conta);  
     },
-    inputed(val) {
+    localInputed(val) {
       if (val == null)
         return;
-      //this.$store.state.categorias.list = this.$store.state.categorias.list.filter(c => c.id != null);
       
-      let possible = this.categoriasFlat.find(c => c.nome.toLowerCase().indexOf(val.toLowerCase()) >= 0);
+      let possible = this.locais.find(c => c.nome.toLowerCase().indexOf(val.toLowerCase()) >= 0);
       if (possible == null) {
-        const categoria = this.$store.state.categorias.list.find(c => c.id == null);
+        const categoria = this.$store.state.locais.list.find(c => c.id == null);
         if (categoria) {
           categoria.nome = val;
         } else {
-          this.$store.state.categorias.list.push({
-            nome: val, 
-            filhas: [],
-            pai: null
+          this.$store.state.locais.list.push({
+            nome: val
           })
         }
-        console.info(this.categoriasFlat[this.categoriasFlat.length-1].nome);
       }
     },
     categoria(val) {
@@ -106,7 +110,7 @@ export default {
     return {
       menu: false,
       dataLancamentoFormatada: new Date().toLocaleDateString(),
-      inputed: ''
+      localInputed: ''
     }
   },
   methods: {
@@ -119,7 +123,6 @@ export default {
     },
     submit() {
       this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT).then(() => {
-        this.$refs.localTxt.focus();
       });
     },
     categoriaAsFlat(categoria) {
@@ -150,6 +153,9 @@ export default {
     },
     categorias() {
       return this.$store.state.categorias.list;
+    },
+    locais() {
+      return this.$store.state.locais.list;
     },
     data: {
       get() { return this.$store.state.lancamentos.form.data},

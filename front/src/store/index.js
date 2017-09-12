@@ -9,6 +9,7 @@ import lancamento from './lancamento';
 import recorrencia from './recorrencia';
 import parcelamentos from './parcelamentos';
 import snacks, {SNACKS} from './snacks';
+import { LOCAIS } from './locais';
 
 Vue.use(Vuex);
 
@@ -20,7 +21,8 @@ const store = new Vuex.Store({
       lancamentos: lancamento,
       recorrencias: recorrencia,
       parcelamentos,
-      snacks
+      snacks,
+      locais: LOCAIS.store
     }
 });
 

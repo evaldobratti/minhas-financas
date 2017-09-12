@@ -171,8 +171,8 @@ export default {
         { nome: 'Novembro', ix: 11},
         { nome: 'Dezembro', ix: 12},
       ],
-      mes: 8,
-      ano: 2017,
+      mes: new Date().getMonth() + 1,
+      ano: new Date().getFullYear(),
       recorrenciaDialog: false,
       parcelamentoDialog: false,
       lancamentoAcao: null

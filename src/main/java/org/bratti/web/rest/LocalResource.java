@@ -82,7 +82,7 @@ public class LocalResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of locals in body
      */
-    @GetMapping("/locals")
+    @GetMapping("/locais")
     @Timed
     public List<Local> getAllLocals() {
         log.debug("REST request to get all Locals");
