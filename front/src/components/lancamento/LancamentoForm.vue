@@ -36,10 +36,12 @@
           v-model="categoria"
           item-text="nome"
           :error-messages="errorMessages('categoria')"
+          :search-input.sync="inputed"
           autocomplete>
           <template slot="item" scope="data">
             <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">
               <CategoriaIcone :categoria="data.item"></CategoriaIcone>
+              <small v-if="data.item.id == null">Incluir</small>
               {{ data.item.nome }}
             </span>
           </template>
@@ -75,12 +77,36 @@ export default {
   watch: {
     conta(val) {
       this.$store.commit(lancamentos.m.LANCAMENTO_SET_CONTA, this.conta);  
+    },
+    inputed(val) {
+      if (val == null)
+        return;
+      //this.$store.state.categorias.list = this.$store.state.categorias.list.filter(c => c.id != null);
+      
+      let possible = this.categoriasFlat.find(c => c.nome.toLowerCase().indexOf(val.toLowerCase()) >= 0);
+      if (possible == null) {
+        const categoria = this.$store.state.categorias.list.find(c => c.id == null);
+        if (categoria) {
+          categoria.nome = val;
+        } else {
+          this.$store.state.categorias.list.push({
+            nome: val, 
+            filhas: [],
+            pai: null
+          })
+        }
+        console.info(this.categoriasFlat[this.categoriasFlat.length-1].nome);
+      }
+    },
+    categoria(val) {
+      console.info('atualizado ', val ? val.nome : 'nulo');
     }
   },
   data() {  
     return {
       menu: false,
-      dataLancamentoFormatada: new Date().toLocaleDateString()
+      dataLancamentoFormatada: new Date().toLocaleDateString(),
+      inputed: ''
     }
   },
   methods: {
@@ -112,7 +138,7 @@ export default {
         pai = pai.pai;
       }
       return nivel;
-    }
+    },
   },
   computed: {
     categoriasFlat() {
