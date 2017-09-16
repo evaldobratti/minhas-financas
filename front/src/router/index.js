@@ -5,6 +5,7 @@ import Login from '@/components/Login'
 import Dashboard from '@/components/Dashboard'
 import Conta from '@/components/conta/Conta'
 import Categorias from '@/components/categoria/Categorias'
+import UploadExtrato from '@/components/UploadExtrato';
 
 Vue.use(Router)
 
@@ -34,7 +35,13 @@ export default new Router({
       path: '/categorias',
       name: 'categorias',
       component: Categorias
+    },
+    {
+      path: '/upload',
+      name: 'upload',
+      component: UploadExtrato
     }
+
 
   ]
 })

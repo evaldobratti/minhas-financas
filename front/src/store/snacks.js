@@ -32,15 +32,15 @@ export default {
     },
     [m.TRATA_ERRO](state, err) {
       let msg = "Mensagem de erro não definida"
-
-      if (err && err.response && err.response.data) {
-        msg = err.response.data;
+      
+      if (err && err.response && err.response.data && err.response.data.message) {
+        msg = err.response.data.message;
       }
 
       state.notification = {
         timeout: 0, 
         context: 'error',
-        text: 'Erro: ' + msg
+        text: 'Erro: ' + err.response.status + ' ' + msg
       };
       state.showing = true;
     }
