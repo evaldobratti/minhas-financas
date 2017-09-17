@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import org.bratti.domain.Categoria;
 import org.bratti.domain.Conta;
@@ -111,5 +113,49 @@ public class ExtratoParserServiceTest {
 		assertEquals(linha, motivo.getLinha());
 		assertEquals("10ba93557197d9df6abf71ce0bc8fff4b7c912fd0ea25e1342c4196585b80324", motivo.getHash());
 		assertEquals("SPOLETO MARINGA PARK", motivo.getLocalOriginal());
+	}
+	
+	@Test
+	public void deveGerarLancamentoBaseadoEmPagamentoDeBoleto() {
+		Local local = new Local().nome("Pagamento de Título - BANCO COOPERATIVO SICREDI S.A.");
+		setupMock(local);
+		
+		String linha = "\"08/22/2017\",\"\",\"Pagamento de Título - BANCO COOPERATIVO SICREDI S.A.\",\"\",\"99999\",\"-400.00\",";
+		
+		Lancamento lancamento = subject.parseLinha(linha);
+		
+		assertNotNull(lancamento);
+		assertEquals(LocalDate.of(2017, 8, 22) , lancamento.getData());
+		assertEquals(local, lancamento.getLocal());
+		assertEquals(categoria, lancamento.getCategoria());
+		assertEquals(conta, lancamento.getConta());
+		assertEquals("Pagamento de Título - BANCO COOPERATIVO SICREDI S.A. ", lancamento.getDescricao());
+		assertEquals(new BigDecimal("-400.00"), lancamento.getValor());
+
+		assertTrue(lancamento.getMotivo() instanceof LinhaExtrato);
+		LinhaExtrato motivo = (LinhaExtrato) lancamento.getMotivo();
+		
+		assertEquals(linha, motivo.getLinha());
+		assertEquals("d14cfaf2198324ccb6682074a4a563f22ca40c8e99c9734ae8f7b5a254450d49", motivo.getHash());
+		assertEquals("Pagamento de Título - BANCO COOPERATIVO SICREDI S.A.", motivo.getLocalOriginal());
+	}
+	
+	@Test
+	public void deveIgnorarLinhaDeCabecalhoEDeSaldos() {
+		List<String> linhas = Arrays.asList(
+				"\"Data\",\"Dependencia Origem\",\"Histórico\",\"Data do Balancete\",\"Número do documento\",\"Valor\",", 
+				"\"07/31/2017\",\"\",\"Saldo Anterior\",\"\",\"0\",\"99.99\",", 
+				"\"08/01/2017\",\"\",\"Alguma Compra Qualquer\",\"\",\"999999999999999\",\"-4.00\",",
+				"\"08/31/2017\",\"\",\"S A L D O\",\"\",\"0\",\"99.99\",");
+		
+		Local local = new Local().nome("Alguma Compra Qualquer");
+		setupMock(local);
+		
+		List<Lancamento> lancamentos = new ExtratoParserService(extratoParserProvider)
+			.parseLinhas(linhas);
+		
+		assertEquals(-4, lancamentos.get(0).getValor().intValue());
+		assertEquals(1, lancamentos.size());
+		
 	}
 }

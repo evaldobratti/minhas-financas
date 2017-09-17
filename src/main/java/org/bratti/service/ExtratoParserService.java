@@ -4,17 +4,21 @@ import static java.lang.Integer.parseInt;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.bratti.domain.Categoria;
 import org.bratti.domain.Conta;
 import org.bratti.domain.Lancamento;
 import org.bratti.domain.LinhaExtrato;
 import org.bratti.domain.Local;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ExtratoParserService {
-
 
 	private static final Pattern COMPRA_CARTAO = Pattern.compile("Compra com Cartão - (\\d{2})/(\\d{2}) \\d{2}:\\d{2} (.*)");
 	
@@ -62,6 +66,15 @@ public class ExtratoParserService {
 		lancamento.setValor(valor);
 		lancamento.setMotivo(linhaExtrato);
 		return lancamento;
+	}
+
+	public List<Lancamento> parseLinhas(List<String> linhas) {
+		return linhas.stream()
+			.filter(linha -> !linha.toLowerCase().contains("s a l d o"))
+			.filter(linha -> !linha.toLowerCase().contains("saldo"))
+			.filter(linha -> !linha.toLowerCase().contains("data do balancete"))
+			.map(linha -> parseLinha(linha))
+			.collect(Collectors.toList());
 	}
 
 }

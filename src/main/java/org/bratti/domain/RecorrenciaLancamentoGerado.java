@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @Entity
 public class RecorrenciaLancamentoGerado extends LancamentoMotivo {
 	
-    private static final long serialVersionUID = 1L;
-    
     @Column(name = "data")
     private LocalDate data;
 

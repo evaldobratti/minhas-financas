@@ -23,5 +23,5 @@
     <include file="classpath:config/liquibase/changelog/20170727000002_added_entity_constraints_RecorrenciaLancamentoGerado.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170813000001_added_parcelas_columns.xml" relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170903000001_added_user_owned.xml" relativeToChangelogFile="false"/>
-    
+    <include file="classpath:config/liquibase/changelog/20170917000001_added_linha_extrato.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>
