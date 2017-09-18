@@ -51,7 +51,9 @@ public class ExtratoParserService {
 		}
 		
 		Local local = extratoParserProvider.getLocal(localStr);
-		Categoria categoria = extratoParserProvider.getUltimaCategoriaDoLocal(local);
+		if (local == null)
+			local = new Local().nome(localStr);
+		Categoria categoria = extratoParserProvider.getUltimaCategoriaDoLocal(local.getNome());
 		BigDecimal valor = new BigDecimal(splitted[5]);
 		
 		LinhaExtrato linhaExtrato = new LinhaExtrato();

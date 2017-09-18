@@ -18,11 +18,14 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface CategoriaRepository extends UserOwnedRepository<Categoria, Long> {
 
-	@Query("select l.categoria from Lancamento l where l.local = :local")
-	List<Categoria> getCategoriasDoLocal(@Param("local") Local local);
+	@Query("select l.categoria from Lancamento l where l.local.nome = :nome")
+	List<Categoria> getCategoriasDoLocal(@Param("nome") String nome);
 
-	default Categoria getUltimaCategoriaDoLocal(Local local) {
-		return getCategoriasDoLocal(local).get(0);
+	default Categoria getUltimaCategoriaDoLocal(String nome) {
+		List<Categoria> categoriasDoLocal = getCategoriasDoLocal(nome);
+		if (categoriasDoLocal.isEmpty())
+			return null;
+		return categoriasDoLocal.get(0);
 	}
 	
 	

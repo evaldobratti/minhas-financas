@@ -14,7 +14,7 @@ export default {
       const formData = new FormData();
       console.info(e.target.files[0].name);
       formData.append('extrato', e.target.files[0], e.target.files[0].name);
-      axios.post('/api/upload', formData).then(res => console.info(res)).then(err => console.info(err));
+      axios.post('/api/1001/upload', formData).then(res => console.info(res)).then(err => console.info(err));
     }
   },
   components: {

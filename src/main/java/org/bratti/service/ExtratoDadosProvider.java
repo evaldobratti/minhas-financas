@@ -7,6 +7,6 @@ public interface ExtratoDadosProvider {
 
 	public Local getLocal(String string);
 
-	public Categoria getUltimaCategoriaDoLocal(Local local);
+	public Categoria getUltimaCategoriaDoLocal(String nome);
 
 }

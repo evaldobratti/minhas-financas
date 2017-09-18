@@ -21,8 +21,8 @@ public class ExtratoDadosProviderImpl implements ExtratoDadosProvider {
 		return localRepository.findOneByNomeIgnoreCase(string);
 	}
 
-	public Categoria getUltimaCategoriaDoLocal(Local local) {
-		return categoriaRepository.getUltimaCategoriaDoLocal(local);
+	public Categoria getUltimaCategoriaDoLocal(String nome) {
+		return categoriaRepository.getUltimaCategoriaDoLocal(nome);
 	}
 
 }
