@@ -23,19 +23,7 @@
           </v-menu>
       </v-flex>
       <v-flex xs5>
-        <v-select
-          label="Local"
-          :items="locais"
-          item-text="nome"
-          v-model="local"
-          :error-messages="errorMessages('local')"
-          autocomplete
-          :search-input.sync="localInputed">
-          <template slot="item" scope="data">
-            {{ data.item.nome }}
-            <small v-if="data.item.id == null">&nbsp;nova</small>
-          </template>
-        </v-select>  
+        <LocalAutoComplete :errorMessages="errorMessages('local')" v-model="local" label="Local"/>
       </v-flex>
       <v-flex xs5>
         <v-select
@@ -74,6 +62,7 @@ import axios from 'axios';
 import { d } from '../../store/categorias';
 import { lancamentos } from '../../store/lancamento';
 import CategoriaIcone from '../categoria/CategoriaIcone';
+import LocalAutoComplete from './LocalAutoComplete';
 import { LOCAIS } from '../../store/locais';
 
 export default {
@@ -85,22 +74,6 @@ export default {
   watch: {
     conta(val) {
       this.$store.commit(lancamentos.m.LANCAMENTO_SET_CONTA, this.conta);  
-    },
-    localInputed(val) {
-      if (val == null)
-        return;
-      
-      let possible = this.locais.find(c => c.nome.toLowerCase().indexOf(val.toLowerCase()) >= 0);
-      if (possible == null) {
-        const categoria = this.$store.state.locais.list.find(c => c.id == null);
-        if (categoria) {
-          categoria.nome = val;
-        } else {
-          this.$store.state.locais.list.push({
-            nome: val
-          })
-        }
-      }
     },
     categoria(val) {
       console.info('atualizado ', val ? val.nome : 'nulo');
@@ -154,9 +127,6 @@ export default {
     categorias() {
       return this.$store.state.categorias.list;
     },
-    locais() {
-      return this.$store.state.locais.list;
-    },
     data: {
       get() { return this.$store.state.lancamentos.form.data},
       set(data) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_DATA, data); }
@@ -179,7 +149,8 @@ export default {
     }
   },
   components: {
-    CategoriaIcone
+    CategoriaIcone,
+    LocalAutoComplete
   }
 }
 </script>

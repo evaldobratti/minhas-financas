@@ -63,55 +63,7 @@
                 </tr>
               </template>
               <template slot="items" scope="l">
-                <td xs3>{{ l.item.data | date }}</td>
-                <td>{{ l.item.descricao }}</td>
-                <td>{{ l.item.categoria.nome }}</td>
-                <td class="text-xs-right" :class="css(l.item.valor)">
-                  {{ l.item.valor | currency }}
-                </td>
-                <td><v-checkbox v-if="l.item.efetivada != null" v-model="l.item.efetivada"></v-checkbox></td>
-                <td class="text-xs-right" :class="css(l.item.saldoDiario)">{{ l.item.saldoDiario | currency }}</td>
-                <td>
-                  <v-menu bottom right>
-                    <v-btn icon slot="activator">
-                      <v-icon>more_vert</v-icon>
-                    </v-btn>
-                    <v-list>
-                      <v-list-tile @click="novaRecorrencia(l.item)" :disabled="l.item.motivo != null">
-                        <v-list-tile-title>
-                          <v-btn primary fab small dark class="small-fab-btn">
-                            <v-icon>refresh</v-icon>
-                          </v-btn>
-                          Recorrencia
-                        </v-list-tile-title>
-                      </v-list-tile>
-                      <v-list-tile @click="novoParcelamento(l.item)" :disabled="l.item.motivo != null">
-                        <v-list-tile-title>
-                          <v-btn primary fab small dark class="small-fab-btn">
-                            <v-icon>refresh</v-icon>
-                          </v-btn>
-                          Parcelamento
-                        </v-list-tile-title>
-                      </v-list-tile>
-                      <v-list-tile @click="deleteLancamento(l.item)">
-                        <v-list-tile-title>
-                          <v-btn primary fab small dark class="small-fab-btn red">
-                            <v-icon>remove</v-icon>
-                          </v-btn>
-                          Apagar
-                        </v-list-tile-title>
-                      </v-list-tile>
-                      <v-list-tile @click="efetiva(l.item)" :disabled="l.item.id != null" >
-                        <v-list-tile-title>
-                          <v-btn primary fab small dark class="small-fab-btn green">
-                            <v-icon>add</v-icon>
-                          </v-btn>
-                          Efetivar
-                        </v-list-tile-title>
-                      </v-list-tile>
-                    </v-list>
-                  </v-menu>
-                </td>
+                <LancamentoLinha :lancamento="l.item" />
               </template>
             </v-data-table>
         </v-container>
@@ -148,6 +100,7 @@ import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
 import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
+import LancamentoLinha from '../lancamento/LancamentoLinha';
 
 import axios from 'axios';
 export default {
@@ -201,12 +154,6 @@ export default {
       this.mes -= 1;
       this.filtrar();
     },
-    css(valor) {
-      return {
-        'red--text': valor < 0,
-        'blue--text text--darken-3': valor >= 0
-      }
-    },
     filtrar() {
       if (this.mes > 12) {
         this.mes = 1;
@@ -224,31 +171,14 @@ export default {
         ano: this.ano
       });
       this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
-    },
-    deleteLancamento(lancamento) {
-      this.$store.dispatch(contas.d.REMOVE_LANCAMENTO, lancamento);
-    },
-    novaRecorrencia(lancamento) {
-      this.lancamentoAcao = lancamento;
-      this.recorrenciaDialog = true;
-    },
-    novoParcelamento(lancamento) {
-      this.lancamentoAcao = lancamento;
-      this.parcelamentoDialog = true;
-    },
-    efetiva(lancamento) {
-      axios.put('/api/lancamentos', lancamento).then(res => {
-        console.info('foi lul', res)
-      }).catch(err => {
-        console.error('nheca', err);
-      })
     }
   },
   components: {
     ProtectedRoute,
     LancamentoForm,
     RecorrenciaForm,
-    ParcelamentoForm
+    ParcelamentoForm,
+    LancamentoLinha
   }
 }
 </script>

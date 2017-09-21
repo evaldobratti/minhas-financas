@@ -13,6 +13,11 @@ const store = {
   state: {
     list: []
   },
+  getters: {
+    locais(state) {
+      return state.list;
+    }
+  },
   mutations: {
     [m.SET_LOCAIS](state, locais) {
       state.list = locais;

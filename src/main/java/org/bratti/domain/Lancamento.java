@@ -48,7 +48,7 @@ public class Lancamento extends UserOwned<Lancamento> {
     @NotNull
     private Categoria categoria;
 
-    @OneToOne(cascade= {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade= {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name="motivo_id")
     private LancamentoMotivo motivo;
 

@@ -61,12 +61,22 @@ public class LancamentoResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new lancamento cannot already have an ID")).body(null);
         }
 
-        Local local = localRepository.findOneByNomeIgnoreCase(lancamentoDTO.getLocal().getNome());
+        Lancamento lancamento = parse(lancamentoDTO);
+
+        Lancamento result = lancamentoRepository.save(lancamento);
+        return ResponseEntity.created(new URI("/api/lancamentos/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+            .body(result);
+    }
+
+	private Lancamento parse(Lancamento lancamentoDTO) {
+		Local local = localRepository.findOneByNomeIgnoreCase(lancamentoDTO.getLocal().getNome());
         if (local == null) {
         	local = localRepository.save(new Local().nome(lancamentoDTO.getLocal().getNome()).usuario(userService.getUserWithAuthorities()));
         }
 
         Lancamento lancamento = new Lancamento();
+        lancamento.setId(lancamentoDTO.getId());
         lancamento.setCategoria(lancamentoDTO.getCategoria());
         lancamento.setConta(lancamentoDTO.getConta());
         lancamento.setData(lancamentoDTO.getData());
@@ -75,12 +85,8 @@ public class LancamentoResource {
         lancamento.setValor(lancamentoDTO.getValor());
         lancamento.setMotivo(lancamentoDTO.getMotivo());
         lancamento.usuario(userService.getUserWithAuthorities());
-
-        Lancamento result = lancamentoRepository.save(lancamento);
-        return ResponseEntity.created(new URI("/api/lancamentos/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
-            .body(result);
-    }
+		return lancamento;
+	}
 
     @PutMapping("/lancamentos")
     @Timed
@@ -90,8 +96,7 @@ public class LancamentoResource {
             return createLancamento(lancamento);
         }
         
-        lancamento.usuario(userService.getUserWithAuthorities());
-        Lancamento result = lancamentoRepository.save(lancamento);
+        Lancamento result = lancamentoRepository.save(parse(lancamento));
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, lancamento.getId().toString()))
             .body(result);

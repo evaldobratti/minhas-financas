@@ -62,7 +62,7 @@ public class ExtratoParserServiceTest {
 
 	private void setupMock(Local local) {
 		Mockito.when(extratoParserProvider.getLocal(local.getNome())).thenReturn(local);
-		Mockito.when(extratoParserProvider.getUltimaCategoriaDoLocal(local)).thenReturn(categoria);
+		Mockito.when(extratoParserProvider.getUltimaCategoriaDoLocal(local.getNome())).thenReturn(categoria);
 	}
 	
 	@Test
