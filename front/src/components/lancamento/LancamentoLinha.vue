@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     deleteLancamento(lancamento) {
-      this.$store.dispatch(contas.d.REMOVE_LANCAMENTO, lancamento);
+      this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);
     },
     novaRecorrencia(lancamento) {
       this.lancamentoAcao = lancamento;

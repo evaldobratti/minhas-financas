@@ -13,7 +13,6 @@ export const CARREGA_CONTA = 'carregaConta';
 export const LOAD_CONTAS = 'loadContas';
 
 const m = {
-  CONTA_SET_LANCAMENTOS: 'contaSetLancamentos',
   CONTA_SET_SALDO_INICIO: 'contaSetSaldoInicio',
   CONTA_SET_SALDO_FIM: 'contaSetSaldoFim',
   CONTA_SET_PARAMS: 'contaSetParams'
@@ -29,11 +28,6 @@ export const contas = {
   m, d
 };
 
-function sortLancamentos(lancamentos) {
-  lancamentos.sort((a, b) => {
-    return a.data.valueOf() - b.data.valueOf();
-  });
-} 
 
 function atualizaSaldoDiario(saldoInicio, lancamentos) {
   let ultimaData = null;
@@ -48,7 +42,7 @@ function atualizaSaldoDiario(saldoInicio, lancamentos) {
   }
 }
 
-export default {
+export const store =  {
   state: {
     form: {
       nome: '',
@@ -78,10 +72,6 @@ export default {
     [CONTA_SET_ATUAL](state, conta) {
       state.conta = conta;
     },
-    [m.CONTA_SET_LANCAMENTOS](state, lancamentos) {
-      sortLancamentos(lancamentos);
-      state.lancamentos = lancamentos
-    },
     [m.CONTA_SET_SALDO_INICIO](state, saldo) {
       state.saldoInicio = saldo;
       atualizaSaldoDiario(state.saldoInicio.saldo, state.lancamentos);
@@ -106,6 +96,15 @@ export default {
       state.params = params;
     }
   },
+  getters: {
+    getConta(state) {
+      return contaId => {
+        if (state.conta && state.conta.id == contaId)
+          return state.conta;
+        return state.list.find(c => c.id == contaId);
+      }
+    }
+  },
   actions: {
     contaSubmit({commit, state, dispatch, rootState}) {
       return new Promise((resolve, reject) => {
@@ -127,27 +126,19 @@ export default {
       })
     },
     [LOAD_CONTAS]({commit, state}) {
-      axios.get('/api/contas').then(res => {
-        commit(CONTAS_CARREGADAS, res.data);
-      }).catch(err => {
-        console.error(err);
-      })
+      return new Promise((resolve, reject) => {
+        axios.get('/api/contas').then(res => {
+          commit(CONTAS_CARREGADAS, res.data);
+          resolve();
+        }).catch(err => {
+          console.error(err);
+          reject();
+        })
+      });
     },
     [CARREGA_CONTA]({commit, state}, contaId){
       axios.get('/api/contas/' + contaId).then(res =>{
         commit(CONTA_SET_ATUAL, res.data);
-      }).catch(err => {
-        console.error(err);
-      })
-    },
-    [d.CARREGA_CONTA_LANCAMENTOS]({dispatch, commit, state}) {
-      axios.get('/api/contas/' + state.params.contaId + "/lancamentos?mes=" + state.params.mes + '&ano=' + state.params.ano).then(res =>{
-        res.data.forEach(l => {
-          l.data = moment(l.data);
-        });
-
-        commit(m.CONTA_SET_LANCAMENTOS, res.data);
-        dispatch(d.CONTA_CARREGA_SALDOS);
       }).catch(err => {
         console.error(err);
       })

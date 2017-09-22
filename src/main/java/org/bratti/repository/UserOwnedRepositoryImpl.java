@@ -66,17 +66,20 @@ public class UserOwnedRepositoryImpl<T extends UserOwned<T>, ID extends Serializ
 	}
 
 	@Override
+	@Transactional
 	public void delete(ID id) {
 		T entity = findOne(id);
 		delete(entity);
 	}
 
 	@Override
+	@Transactional
 	public void delete(T entity) {
 		em.remove(em.contains(entity) ? entity : em.merge(entity));		
 	}
 
 	@Override
+	@Transactional
 	public void delete(Iterable<? extends T> entities) {
 		for (T entity : entities) {
 			delete(entity);
@@ -84,6 +87,7 @@ public class UserOwnedRepositoryImpl<T extends UserOwned<T>, ID extends Serializ
 	}
 
 	@Override
+	@Transactional
 	public void deleteAll() {
 		for (T element : findAll()) {
 			delete(element);

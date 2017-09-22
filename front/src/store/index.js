@@ -3,9 +3,9 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import router from '../router'
 import authentication from './authentication';
-import conta from './conta';
+import * as conta from './conta';
 import categorias from './categorias';
-import lancamento from './lancamento';
+import * as lancamento from './lancamento';
 import recorrencia from './recorrencia';
 import parcelamentos from './parcelamentos';
 import snacks, {SNACKS} from './snacks';
@@ -16,9 +16,9 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
     modules: {
       authentication,
-      conta,
+      conta: conta.store,
       categorias,
-      lancamentos: lancamento,
+      lancamentos: lancamento.store,
       recorrencias: recorrencia,
       parcelamentos,
       snacks,
@@ -27,6 +27,9 @@ const store = new Vuex.Store({
 });
 
 store.dispatch('getInitialData');
+store.dispatch(conta.LOAD_CONTAS)
+  .then(() => store.dispatch(lancamento.lancamentos.d.LANCAMENTO_LOAD)
+    .then(() => store.dispatch(lancamento.lancamentos.d.UPDATE_SALDOS)));
 
 export default store;
 

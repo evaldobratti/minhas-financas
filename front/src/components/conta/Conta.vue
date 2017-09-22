@@ -96,6 +96,7 @@
 
 <script>
 import { CARREGA_CONTA, contas } from '../../store/conta';
+import { lancamentos } from '../../store/lancamento';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
@@ -106,7 +107,7 @@ import axios from 'axios';
 export default {
   created() {
     this.$store.dispatch(CARREGA_CONTA, this.$route.params.id);
-    this.filtrar();
+    this.$store.dispatch(lancamentos.d.LANCAMENTO_LOAD);
   },
   data() {
     return {
@@ -136,7 +137,7 @@ export default {
       return this.$store.state.conta.conta;
     },
     lancamentos() {
-      return this.$store.state.conta.lancamentos;
+      return this.$store.getters.lancamentosDe(this.$route.params.id, this.mes, this.ano);
     },
     saldoInicio() {
       return this.$store.state.conta.saldoInicio;
@@ -165,12 +166,6 @@ export default {
         this.ano -= 1;
       }
 
-      this.$store.commit(contas.m.CONTA_SET_PARAMS, {
-        contaId: this.$route.params.id,
-        mes: this.mes,
-        ano: this.ano
-      });
-      this.$store.dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
     }
   },
   components: {
