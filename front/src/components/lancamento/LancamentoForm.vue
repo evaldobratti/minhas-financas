@@ -26,6 +26,7 @@
         <LocalAutoComplete :errorMessages="errorMessages('local')" v-model="local" label="Local"/>
       </v-flex>
       <v-flex xs5>
+        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="categoria" label="Categoria" />
         <v-select
           label="Categoria"
           :items="categoriasFlat"
@@ -64,6 +65,7 @@ import { d } from '../../store/categorias';
 import { lancamentos } from '../../store/lancamento';
 import CategoriaIcone from '../categoria/CategoriaIcone';
 import LocalAutoComplete from './LocalAutoComplete';
+import CategoriaAutoComplete from './CategoriaAutoComplete';
 import { LOCAIS } from '../../store/locais';
 
 export default {
@@ -152,7 +154,8 @@ export default {
   },
   components: {
     CategoriaIcone,
-    LocalAutoComplete
+    LocalAutoComplete,
+    CategoriaAutoComplete
   }
 }
 </script>

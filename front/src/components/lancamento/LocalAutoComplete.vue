@@ -9,7 +9,7 @@
     v-bind="$attrs"
     v-on="$listeners"
     autocomplete
-    :search-input.sync="localInputed">
+    :search-input.sync="maybeNewValue">
       <template slot="item" scope="data">
         {{ data.item.nome }}
         <small v-if="data.item.id == null">&nbsp;nova</small>
@@ -23,7 +23,7 @@ export default {
   props: ['value'],
   data() {
     return {
-      localInputed: ''
+      maybeNewValue: ''
     }
   },
   methods: {
@@ -32,10 +32,7 @@ export default {
     }
   },
   watch: {
-    value(wtf) {
-      console.info(wtf)
-    },
-    localInputed(val) {
+    maybeNewValue(val) {
       if (val == null)
         return;
       
