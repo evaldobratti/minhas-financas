@@ -31,6 +31,7 @@ import org.bratti.domain.RecorrenciaLancamentoGerado;
 import org.bratti.domain.enumeration.TipoFrequencia;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.LocalRepository;
+import org.bratti.repository.RecorrenciaRepository;
 import org.bratti.service.UserService;
 import org.bratti.web.rest.errors.ExceptionTranslator;
 import org.junit.Assert;
@@ -78,6 +79,9 @@ public class LancamentoResourceIntTest {
     private ExceptionTranslator exceptionTranslator;
 
     @Autowired
+    private RecorrenciaRepository recorrenciaRepository;
+    
+    @Autowired
     private EntityManager em;
     
     @Autowired
@@ -93,7 +97,7 @@ public class LancamentoResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        LancamentoResource lancamentoResource = new LancamentoResource(lancamentoRepository, localRepository, userService);
+        LancamentoResource lancamentoResource = new LancamentoResource(lancamentoRepository, localRepository, recorrenciaRepository, userService);
         this.restLancamentoMockMvc = MockMvcBuilders.standaloneSetup(lancamentoResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

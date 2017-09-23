@@ -33,7 +33,7 @@ public abstract class LancamentoMotivo {
 		this.id = id;
 	}
 
-	public String complementoDescricao() {
+	public String getComplementoDescricao() {
 		return "";
 	}
 	

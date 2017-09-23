@@ -21,7 +21,6 @@ const m = {
 const d = {
   CONTA_CARREGA_SALDOS: 'contaCarregaSaldoAnterior',
   CARREGA_CONTA_LANCAMENTOS: 'carregaContaLancamentos',
-  REMOVE_LANCAMENTO: 'contaRemoveLancamento'
 }
 
 export const contas = {
@@ -143,28 +142,5 @@ export const store =  {
         console.error(err);
       })
     },
-    [d.CONTA_CARREGA_SALDOS]({commit, dispatch, state}) {
-      const mesAtual = moment(state.params.ano + '-' + state.params.mes + '-1', 'YYYY-MM-DD')
-      
-      const fimMesAnterior = mesAtual.add(-1, 'day').format('YYYY-MM-DD');
-      const fimMesAtual = mesAtual.add(1, 'month').format('YYYY-MM-DD');
-      
-      axios.all([
-        axios.get('/api/contas/' + state.params.contaId + "/saldo?data=" + fimMesAnterior),
-        axios.get('/api/contas/' + state.params.contaId + "/saldo?data=" + fimMesAtual)
-      ]).then(axios.spread((resSaldoInicio, resSaldoFim) => {
-        commit(m.CONTA_SET_SALDO_INICIO, resSaldoInicio.data);
-        commit(m.CONTA_SET_SALDO_FIM, resSaldoFim.data);
-      }));
-    },
-    [d.REMOVE_LANCAMENTO]({dispatch, commit}, lancamento) {
-      axios.delete('/api/lancamentos', {
-        data: lancamento
-      }).then(() => {
-        dispatch(d.CARREGA_CONTA_LANCAMENTOS);
-      }).catch(err => {
-        commit(SNACKS.m.TRATA_ERRO, err);
-      });
-    }
   }
 };

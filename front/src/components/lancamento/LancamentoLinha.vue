@@ -5,7 +5,7 @@
   </td>
   <td>
     <LocalAutoComplete v-show="isEditando" ref="descricao" v-model="local" @blur="blur('descricao')" class="inlineEdit"></LocalAutoComplete>
-    <span v-show="!isEditando" @click="editando('descricao')">{{ lancamento.local.nome }}</span>
+    <span v-show="!isEditando" @click="editando('descricao')">{{ lancamento.local.nome }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
   </td>
     <td>{{ lancamento.categoria.nome }}</td>
     <td class="text-xs-right" :class="css(lancamento.valor)">
@@ -54,6 +54,26 @@
         </v-list>
         </v-menu>
     </td>
+    <v-dialog v-model="recorrenciaDialog" width="500px">
+      <v-card>
+        <v-card-title>
+          <div class="headline">Nova recorrência</div>
+        </v-card-title>
+        <v-card-text>
+          <RecorrenciaForm :lancamento="lancamento" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="parcelamentoDialog">
+      <v-card>
+        <v-card-title>
+          <div class="headline">Novo Parcelamento</div>
+        </v-card-title>
+        <v-card-text>
+          <ParcelamentoForm :lancamento="lancamento" @cadastrado="parcelamentoDialog = false"></ParcelamentoForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
 </tr>
 </template>
 
@@ -61,11 +81,16 @@
 import { lancamentos } from '../../store/lancamento';
 import mapGetSet from '../../store/mapGetSet';
 import LocalAutoComplete from './LocalAutoComplete';
+import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
+import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
+
 export default {
   props: ['lancamento'],
   data() {
     return {
       isEditando: false,
+      recorrenciaDialog: false,
+      parcelamentoDialog: false
     }
   },
   methods: {
@@ -73,11 +98,10 @@ export default {
       this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);
     },
     novaRecorrencia(lancamento) {
-      this.lancamentoAcao = lancamento;
       this.recorrenciaDialog = true;
     },
     novoParcelamento(lancamento) {
-      this.lancamentoAcao = lancamento;
+      console.info(this.lancamento);
       this.parcelamentoDialog = true;
     },
     efetiva(lancamento) {
@@ -99,18 +123,12 @@ export default {
     },
     blur(campo) {
       this.isEditando = false;
-      //this.$nextTick(()=> );
     }
   }, 
   computed: {
     local: {
       get() {
-        const locais = this.$store.getters.locais;
-        const edicao = this.$store.getters.lancamentoEdicao;
-        if (edicao.local == null)
-          return null;
-
-        return locais.find(l => l.id == edicao.local.id);
+        return this.$store.getters.lancamentoEdicao.local;
       },
       set(local) {
         if (local.id != this.$store.getters.lancamentoEdicao.local.id) {
@@ -121,7 +139,9 @@ export default {
     }
   },
   components: {
-    LocalAutoComplete
+    LocalAutoComplete,
+    RecorrenciaForm,
+    ParcelamentoForm
   }
 }
 </script>

@@ -32,11 +32,15 @@ export const lancamentos = {
   d
 }
 
-function put(dispatch, commit, lancamento) {
+function put({ dispatch, commit, state, getters}, lancamento) {
   new Promise((resolve, reject) => {
     axios.put('/api/lancamentos', lancamento).then(res => {
       commit(m.LIMPA_FORMULARIO);
-      dispatch(LOCAIS.d.LOAD_LOCAIS);
+      commit(LOCAIS.m.MAYBE_NOVO_LOCAL, res.data.local);
+      commit(m.SET_LANCAMENTOS, {
+        lancamentos: [...state.list, res.data],
+        getters
+      });
       resolve();
     }).catch(err => {
       if (err.response.status === 400) {
@@ -81,19 +85,17 @@ export const store = {
     },
     lancamentosDe(state, getters) {
       return (contaId, mes, ano) => {
+        console.info('calculando');
         const conta = getters.getConta(contaId);
         if (conta == null)
           return [];
         
         const lancamentosDaConta = state.list.filter(l => l.conta.id = contaId);
-        
-        
         const lancamentosDoMes = lancamentosDaConta.filter(l => {
           return l.data.month() + 1 == mes && l.data.year() == ano;
         });
         
         const dataBase = moment(ano + '-' + mes + '-' + 1, 'YYYY-MM-DD');
-        
         const saldoDataInicial = dataBase.clone().add(-1, 'days');
         const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
         
@@ -105,8 +107,8 @@ export const store = {
             saldoDiario: getters.saldoEm(conta, saldoDataInicial),
             efetuada: false
           }, 
-          ...lancamentosDoMes
-          , {
+          ...lancamentosDoMes, 
+          {
             data: saldoDataFinal,
             conta: conta,
             local: { nome: 'Saldo final'},
@@ -122,11 +124,14 @@ export const store = {
         const lancamentosDaConta = state.list.filter(l => l.conta.id = conta.id);
         
         const saldoAcumulado = lancamentosDaConta
-          .filter(l => l.data.isSameOrBefore(data))
-          .map(l => l.valor)
-          .reduce((x, y) => x+ y, 0);
-
-        return conta.saldoInicial + saldoAcumulado;
+          .filter(l => l.data.isSameOrBefore(data));
+          /*.map(l => l.valor)
+          .reduce((x, y) => x+ y, 0);*/
+        if (saldoAcumulado.length)
+          return saldoAcumulado[saldoAcumulado.length - 1].saldoDiario;
+        else 
+          return conta.saldoInicial;
+        //return conta.saldoInicial + saldoAcumulado;
       }
     }
   },
@@ -172,22 +177,33 @@ export const store = {
     [m.EDICAO_SET_LOCAL](state, local) {
       state.edicao.local = local;
     },
-    [m.SET_LANCAMENTOS](state, lancamentos) {
+    [m.SET_LANCAMENTOS](state, {lancamentos, getters}) {
       state.list = lancamentos;
+      
+      state.list.forEach(l => {
+        if (typeof l.data === 'string')
+          l.data = moment(l.data);
+        l.local = getters.getLocal(l.local.id);
+      });
+
       state.list.sort((a, b) => {
         return a.data.valueOf() - b.data.valueOf();
       });
+      
+      const saldos = {};
       state.list.forEach(l => {
-        l.data = moment(l.data);
-      })
+        if (saldos[l.conta.id] == null) {
+          saldos[l.conta.id] = getters.getConta(l.conta.id).saldoInicial;
+        }
+        saldos[l.conta.id] += l.valor;
+        Vue.set(l, 'saldoDiario', saldos[l.conta.id]);
+      });
     },
-    [m.LANCAMENTO_UPDATE_SALDO](state, payload) {
-      Vue.set(payload.lancamento, 'saldoDiario', payload.saldo);
-    }
   },
   actions: {
-    [d.LANCAMENTO_SUBMIT]({state, dispatch, commit}) {
-      return put(dispatch, commit, {
+    [d.LANCAMENTO_SUBMIT](context) {
+      const state = context.state;
+      return put(context, {
         data: state.form.data,
         conta: state.form.conta,
         valor: state.form.valor,
@@ -196,36 +212,32 @@ export const store = {
         efetivada: state.form.efetuada
       })
     },
-    [d.LANCAMENTO_EDICAO_SUBMIT]({state, dispatch, commit})  {
-      return put(dispatch, commit, state.edicao)
+    [d.LANCAMENTO_EDICAO_SUBMIT](context)  {
+      return put(context, context.state.edicao)
     },
-    [d.LANCAMENTO_LOAD]({commit, getters}) {
+    [d.LANCAMENTO_LOAD]({dispatch, commit, getters}) {
       return new Promise((resolve, reject) => {
         axios.get('/api/lancamentos').then(res => {
           res.data.forEach(l => l.conta = getters.getConta(l.conta.id))
-          commit(m.SET_LANCAMENTOS, res.data);
+          commit(m.SET_LANCAMENTOS, {
+            lancamentos: res.data,
+            getters
+          });
           resolve();
         })
       });
     },
-    [d.UPDATE_SALDOS]({state, commit, getters}) {
-      const saldos = {};
-      state.list.forEach(l => {
-        if (saldos[l.conta.id] == null) {
-          saldos[l.conta.id] = getters.getConta(l.conta.id).saldoInicial;
-        }
-        saldos[l.conta.id] += l.valor;
-        commit(m.LANCAMENTO_UPDATE_SALDO, {
-          lancamento: l, saldo: saldos[l.conta.id]
-        })
-      });
-    },
-    [d.REMOVE_LANCAMENTO]({state, dispatch, commit}, lancamento) {
+    [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
       axios.delete('/api/lancamentos', {
         data: lancamento
       }).then(() => {
-        commit(m.SET_LANCAMENTOS, state.list.splice(state.list.indexOf(lancamento), 1));
-        dispatch(d.UPDATE_SALDOS);
+        const lancamentosAtuais = [...state.list];
+        const ix = state.list.indexOf(lancamento);
+        lancamentosAtuais.splice(ix, 1);
+        commit(m.SET_LANCAMENTOS, {
+          lancamentos: lancamentosAtuais,
+          getters
+        });
       }).catch(err => {
         commit(SNACKS.m.TRATA_ERRO, err);
       });

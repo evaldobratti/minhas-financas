@@ -43,6 +43,7 @@
       </v-flex>
       <v-flex xs1>
         <v-text-field
+          ref="valor"
           v-model="valor"
           label="Valor"
           type="number"
@@ -95,6 +96,7 @@ export default {
       return new Date(val).toLocaleDateString();
     },
     submit() {
+      this.$refs.valor.blur();
       this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT).then(() => {
       });
     },

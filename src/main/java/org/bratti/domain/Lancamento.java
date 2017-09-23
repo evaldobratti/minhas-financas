@@ -188,6 +188,6 @@ public class Lancamento extends UserOwned<Lancamento> {
 	public String getDescricao() {
 		if (motivo == null)
 			return this.local.getNome();
-		return this.local.getNome() + " " + this.motivo.complementoDescricao();
+		return this.local.getNome() + " " + this.motivo.getComplementoDescricao();
 	}
 }

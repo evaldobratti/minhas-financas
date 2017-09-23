@@ -23,7 +23,7 @@ public class ParcelamentoLancamentoGerado extends RecorrenciaLancamentoGerado {
 	}
 	
 	@Override
-	public String complementoDescricao() {
+	public String getComplementoDescricao() {
 		return "(" + parcelaNumero + "/" + getRecorrencia().getQuantidadeParcelas() + ")"; 
 	}
 	

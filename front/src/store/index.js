@@ -28,8 +28,7 @@ const store = new Vuex.Store({
 
 store.dispatch('getInitialData');
 store.dispatch(conta.LOAD_CONTAS)
-  .then(() => store.dispatch(lancamento.lancamentos.d.LANCAMENTO_LOAD)
-    .then(() => store.dispatch(lancamento.lancamentos.d.UPDATE_SALDOS)));
+  .then(() => store.dispatch(lancamento.lancamentos.d.LANCAMENTO_LOAD));
 
 export default store;
 

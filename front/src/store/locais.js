@@ -2,7 +2,8 @@ import axios from 'axios';
 import { SNACKS } from './snacks';
 
 const m = {
-  SET_LOCAIS: 'locaisSet'
+  SET_LOCAIS: 'locaisSet',
+  MAYBE_NOVO_LOCAL: 'localMaybeNovo'
 }
 
 const d = {
@@ -16,11 +17,21 @@ const store = {
   getters: {
     locais(state) {
       return state.list;
+    },
+    getLocal(state) {
+      return id => {
+        return state.list.find(l => l.id === id);
+      }
     }
   },
   mutations: {
     [m.SET_LOCAIS](state, locais) {
       state.list = locais;
+    },
+    [m.MAYBE_NOVO_LOCAL](state, local) {
+      if (!state.list.find(l => l.id == local.id)) {
+        state.list = [...state.list, local]
+      }
     }
   },
   actions: {

@@ -2,13 +2,18 @@ package org.bratti.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.bratti.domain.Lancamento;
 import org.bratti.domain.Local;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.LocalRepository;
+import org.bratti.repository.RecorrenciaRepository;
 import org.bratti.service.UserService;
 import org.bratti.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
@@ -45,11 +50,15 @@ public class LancamentoResource {
 
 	private UserService userService;
 
+	private RecorrenciaRepository recorrenciaReposiory;
+
     public LancamentoResource(LancamentoRepository lancamentoRepository,
         LocalRepository localRepository, 
+        RecorrenciaRepository recorrenciaReposiory,
         UserService userService) {
         this.lancamentoRepository = lancamentoRepository;
         this.localRepository = localRepository;
+		this.recorrenciaReposiory = recorrenciaReposiory;
 		this.userService = userService;
     }
 
@@ -102,6 +111,12 @@ public class LancamentoResource {
             .body(result);
     }
 
+    private List<Lancamento> projecoesAte(LocalDate ate) {
+    	return recorrenciaReposiory.findAllWithEagerRelationships().stream().map(r -> {
+    		return r.projecaoAte(ate);
+    	}).flatMap(List::stream).collect(Collectors.toList());
+    }
+    
     /**
      * GET  /lancamentos : get all the lancamentos.
      *
@@ -111,7 +126,11 @@ public class LancamentoResource {
     @Timed
     public List<Lancamento> getAllLancamentos() {
         log.debug("REST request to get all Lancamentos");
-        return lancamentoRepository.findByUsuarioIsCurrentUser();
+        List<Lancamento> lancamentos = lancamentoRepository.findAll();
+        
+        lancamentos.addAll(projecoesAte(LocalDate.now().plus(Period.ofYears(3))));
+        
+		return lancamentos;
     }
 
     /**

@@ -47,11 +47,6 @@ export default {
   mounted() {
     this.updateLancamento(this.lancamento);
   },
-  watch: {
-    lancamento(l) {
-      this.updateLancamento(l);
-    }
-  },
   methods: {
     updateLancamento(l) {
       if (!l)
@@ -66,6 +61,7 @@ export default {
       this.lancamentoInicial = l;
     },
     submit() {
+      this.lancamentoInicial = this.lancamento;
       this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM).then(() => {
         this.$emit('cadastrado');
       });

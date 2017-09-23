@@ -19,13 +19,9 @@ import mapGetSet from '../../store/mapGetSet';
 import { PARCELAMENTOS } from '../../store/parcelamentos';
 export default {
   props: ['lancamento'],
-  watch: {
-    lancamento(l) {
-      this.lancamentoInicial = l;
-    }
-  },
   methods: {
     submit() {
+      this.lancamentoInicial = this.lancamento;
       this.$store.dispatch(PARCELAMENTOS.d.SUBMIT_FORM).then(() => {
         this.$emit('cadastrado');
       });
