@@ -63,7 +63,12 @@
                 </tr>
               </template>
               <template slot="items" scope="l">
-                <LancamentoLinha :lancamento="l.item" />
+                <LancamentoLinha :lancamento="l.item" 
+                  @novaRecorrencia="novaRecorrencia(l.item)" 
+                  @novoParcelamento="novoParcelamento(l.item)"
+                  @deleteLancamento="deleteLancamento(l.item)"
+                  @efetiva="efetiva(l.item)"
+                  />
               </template>
             </v-data-table>
         </v-container>
@@ -71,6 +76,26 @@
     </v-card>
       </v-flex>
     </v-layout>
+    <v-dialog v-model="recorrenciaDialog" width="500px">
+      <v-card>
+        <v-card-title>
+          <div class="headline">Nova recorrência</div>
+        </v-card-title>
+        <v-card-text>
+          <RecorrenciaForm ref="recorrenciaForm" :lancamento="lancamentoAcao" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="parcelamentoDialog">
+      <v-card>
+        <v-card-title>
+          <div class="headline">Novo Parcelamento</div>
+        </v-card-title>
+        <v-card-text>
+          <ParcelamentoForm :lancamento="lancamentoAcao" @cadastrado="parcelamentoDialog = false"></ParcelamentoForm>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </ProtectedRoute>
 </template>
 
@@ -80,6 +105,8 @@ import { lancamentos } from '../../store/lancamento';
 import ProtectedRoute from '../ProtectedRoute';
 import LancamentoForm from '../lancamento/LancamentoForm';
 import LancamentoLinha from '../lancamento/LancamentoLinha';
+import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
+import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
 
 import axios from 'axios';
 export default {
@@ -105,6 +132,7 @@ export default {
       ],
       mes: new Date().getMonth() + 1,
       ano: new Date().getFullYear(),
+      lancamentoAcao: null,
       recorrenciaDialog: false,
       parcelamentoDialog: false
     }
@@ -142,13 +170,32 @@ export default {
         this.mes = 12;
         this.ano -= 1;
       }
-
-    }
+    },
+    deleteLancamento(lancamento) {
+      this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);
+    },
+    novaRecorrencia(lancamento) {
+      this.lancamentoAcao = lancamento;
+      this.recorrenciaDialog = true;
+    },
+    novoParcelamento(lancamento) {
+      this.lancamentoAcao = lancamento;
+      this.parcelamentoDialog = true;
+    },
+    efetiva(lancamento) {
+      axios.put('/api/lancamentos', lancamento).then(res => {
+        console.info('foi lul', res)
+      }).catch(err => {
+        console.error('nheca', err);
+      })
+    },
   },
   components: {
     ProtectedRoute,
     LancamentoForm,
-    LancamentoLinha
+    LancamentoLinha,
+    RecorrenciaForm,
+    ParcelamentoForm
   }
 }
 </script>

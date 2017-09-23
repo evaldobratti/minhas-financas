@@ -47,6 +47,11 @@ export default {
   mounted() {
     this.updateLancamento(this.lancamento);
   },
+  watch: {
+    lancamento(lancamento) {
+      this.updateLancamento(lancamento);
+    }
+  },
   methods: {
     updateLancamento(l) {
       if (!l)
