@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { contas } from './conta';
+import { lancamentos } from './lancamento';
 import { SNACKS } from './snacks';
 export const m = {
   UPDATE_FORM_INICIO_PARCELAS: 'parcelamentoFormUpdateInicioParcelas',
@@ -38,7 +38,7 @@ export default {
     [d.SUBMIT_FORM]({state, commit, dispatch}) {
       return new Promise((resolve, reject) => {
         axios.post('/api/parcelamentos', state.form).then(res => {
-          dispatch(contas.d.CARREGA_CONTA_LANCAMENTOS);
+          dispatch(lancamentos.d.LANCAMENTO_LOAD);
           commit(SNACKS.m.UPDATE_SNACK, {
             text: 'Recorrência cadastrada!',
             timeout: 1500,

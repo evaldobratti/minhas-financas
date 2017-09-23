@@ -17,6 +17,7 @@ export default {
       text: '',
       timeout: 3000
     },
+    ultimoErroMostrado: null,
     notifications: []
   },
   mutations: {
@@ -43,6 +44,7 @@ export default {
         text: 'Erro: ' + err.response.status + ' ' + msg
       };
       state.showing = true;
+      state.ultimoErroMostrado = err;
     }
   }
 }

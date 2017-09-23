@@ -28,7 +28,7 @@ public class UserOwnedRepositoryImpl<T extends UserOwned<T>, ID extends Serializ
 	@Override
 	@Transactional
 	public <S extends T> S save(S entity) {
-		entity.setUsuario(getLoggedUser());
+		setaUsuario(entity);
 		
 		if (entityInformation.isNew(entity)) {
 			em.persist(entity);
@@ -36,6 +36,10 @@ public class UserOwnedRepositoryImpl<T extends UserOwned<T>, ID extends Serializ
 		} else {
 			return em.merge(entity);
 		}
+	}
+
+	private <S extends T> void setaUsuario(S entity) {
+		entity.setUsuario(getLoggedUser());
 	}
 
 	private User getLoggedUser() {
@@ -75,6 +79,7 @@ public class UserOwnedRepositoryImpl<T extends UserOwned<T>, ID extends Serializ
 	@Override
 	@Transactional
 	public void delete(T entity) {
+		setaUsuario(entity);
 		em.remove(em.contains(entity) ? entity : em.merge(entity));		
 	}
 

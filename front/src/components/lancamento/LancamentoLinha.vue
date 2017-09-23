@@ -60,7 +60,7 @@
           <div class="headline">Nova recorrência</div>
         </v-card-title>
         <v-card-text>
-          <RecorrenciaForm :lancamento="lancamento" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
+          <RecorrenciaForm ref="recorrenciaForm" :lancamento="lancamento" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -98,6 +98,7 @@ export default {
       this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);
     },
     novaRecorrencia(lancamento) {
+      this.$refs.recorrenciaForm.updateLancamento(lancamento);
       this.recorrenciaDialog = true;
     },
     novoParcelamento(lancamento) {

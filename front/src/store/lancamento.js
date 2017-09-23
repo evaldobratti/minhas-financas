@@ -3,6 +3,7 @@ import { contas } from './conta';
 import { LOCAIS } from './locais';
 import moment from 'moment';
 import Vue from 'vue';
+import { SNACKS } from './snacks';
 
 const m = {
   LANCAMENTO_SET_DATA: 'lancamentoSetData',
@@ -85,7 +86,6 @@ export const store = {
     },
     lancamentosDe(state, getters) {
       return (contaId, mes, ano) => {
-        console.info('calculando');
         const conta = getters.getConta(contaId);
         if (conta == null)
           return [];
@@ -98,8 +98,7 @@ export const store = {
         const dataBase = moment(ano + '-' + mes + '-' + 1, 'YYYY-MM-DD');
         const saldoDataInicial = dataBase.clone().add(-1, 'days');
         const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
-        
-        return [ {
+        const resultado = [ {
             data: saldoDataInicial,
             conta: conta,
             local: { nome: 'Saldo inicial'},
@@ -116,7 +115,8 @@ export const store = {
             saldoDiario: getters.saldoEm(conta, saldoDataFinal),
             efetuada: false
           }
-        ]
+        ];
+        return resultado;
       }
     },
     saldoEm(state) {
@@ -125,13 +125,11 @@ export const store = {
         
         const saldoAcumulado = lancamentosDaConta
           .filter(l => l.data.isSameOrBefore(data));
-          /*.map(l => l.valor)
-          .reduce((x, y) => x+ y, 0);*/
+
         if (saldoAcumulado.length)
           return saldoAcumulado[saldoAcumulado.length - 1].saldoDiario;
         else 
           return conta.saldoInicial;
-        //return conta.saldoInicial + saldoAcumulado;
       }
     }
   },

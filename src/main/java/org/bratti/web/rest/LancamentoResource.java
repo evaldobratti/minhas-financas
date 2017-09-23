@@ -40,7 +40,9 @@ import io.github.jhipster.web.util.ResponseUtil;
 @RequestMapping("/api")
 public class LancamentoResource {
 
-    private final Logger log = LoggerFactory.getLogger(LancamentoResource.class);
+    private static final int ANOS_PROJECAO = 3;
+
+	private final Logger log = LoggerFactory.getLogger(LancamentoResource.class);
 
     private static final String ENTITY_NAME = "lancamento";
 
@@ -128,7 +130,7 @@ public class LancamentoResource {
         log.debug("REST request to get all Lancamentos");
         List<Lancamento> lancamentos = lancamentoRepository.findAll();
         
-        lancamentos.addAll(projecoesAte(LocalDate.now().plus(Period.ofYears(3))));
+        lancamentos.addAll(projecoesAte(LocalDate.now().plus(Period.ofYears(ANOS_PROJECAO))));
         
 		return lancamentos;
     }

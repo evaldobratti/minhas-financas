@@ -61,7 +61,6 @@ export default {
       this.lancamentoInicial = l;
     },
     submit() {
-      this.lancamentoInicial = this.lancamento;
       this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM).then(() => {
         this.$emit('cadastrado');
       });
