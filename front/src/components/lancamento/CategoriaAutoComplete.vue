@@ -5,7 +5,7 @@
     item-text="nome"
     v-bind="$attrs"
     v-on="$listeners"
-    @input="emit('input', $event)"
+    @input="$emit('input', $event)"
     autocomplete>
     <template slot="item" scope="data">
       <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">

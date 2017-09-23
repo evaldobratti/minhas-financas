@@ -30,6 +30,7 @@ const store = {
     },
     [m.MAYBE_NOVO_LOCAL](state, local) {
       if (!state.list.find(l => l.id == local.id)) {
+        console.info("novo local ", local);
         state.list = [...state.list, local]
       }
     }

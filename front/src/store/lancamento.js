@@ -90,7 +90,9 @@ export const store = {
         if (conta == null)
           return [];
         
-        const lancamentosDaConta = state.list.filter(l => l.conta.id = contaId);
+        const lancamentosDaConta = state.list.filter(l => {
+          return l.conta.id == contaId
+        });
         const lancamentosDoMes = lancamentosDaConta.filter(l => {
           return l.data.month() + 1 == mes && l.data.year() == ano;
         });
@@ -121,7 +123,7 @@ export const store = {
     },
     saldoEm(state) {
       return (conta, data) => {
-        const lancamentosDaConta = state.list.filter(l => l.conta.id = conta.id);
+        const lancamentosDaConta = state.list.filter(l => l.conta.id == conta.id);
         
         const saldoAcumulado = lancamentosDaConta
           .filter(l => l.data.isSameOrBefore(data));
@@ -216,7 +218,9 @@ export const store = {
     [d.LANCAMENTO_LOAD]({dispatch, commit, getters}) {
       return new Promise((resolve, reject) => {
         axios.get('/api/lancamentos').then(res => {
-          res.data.forEach(l => l.conta = getters.getConta(l.conta.id))
+          res.data.forEach(l => {
+            return l.conta = getters.getConta(l.conta.id)
+          });
           commit(m.SET_LANCAMENTOS, {
             lancamentos: res.data,
             getters

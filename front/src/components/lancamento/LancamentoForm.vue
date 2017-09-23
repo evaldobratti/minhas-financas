@@ -27,20 +27,6 @@
       </v-flex>
       <v-flex xs5>
         <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="categoria" label="Categoria" />
-        <v-select
-          label="Categoria"
-          :items="categoriasFlat"
-          v-model="categoria"
-          item-text="nome"
-          :error-messages="errorMessages('categoria')"
-          autocomplete>
-          <template slot="item" scope="data">
-            <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">
-              <CategoriaIcone :categoria="data.item"></CategoriaIcone>
-              {{ data.item.nome }}
-            </span>
-          </template>
-        </v-select>
       </v-flex>
       <v-flex xs1>
         <v-text-field
