@@ -67,7 +67,6 @@ export default {
   props: ['lancamento'],
   data() {
     return {
-      isEditando: false,
       recorrenciaDialog: false,
       parcelamentoDialog: false
     }
@@ -81,21 +80,30 @@ export default {
     },
     editando(campo) {
       this.$store.commit(lancamentos.m.SET_EDICAO, this.lancamento);
-      this.isEditando = true;
     },
     blur(campo) {
-      this.isEditando = false;
+      
     }
   }, 
   computed: {
+    isEditando() {
+      const edicao = this.$store.getters.lancamentoEdicao ;
+      return edicao && this.lancamento.id && edicao.id == this.lancamento.id;
+    },
     local: {
       get() {
+        if (!this.isEditando)
+          return null;
         return this.$store.getters.lancamentoEdicao.local;
       },
       set(local) {
+        if (!this.isEditando)
+          return;
+
         if (local.id != this.$store.getters.lancamentoEdicao.local.id) {
           this.$store.commit(lancamentos.m.EDICAO_SET_LOCAL, local);
-          this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT)
+          this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT);
+          this.$store.commit(lancamentos.m.SET_EDICAO, null);
         }
       }
     }

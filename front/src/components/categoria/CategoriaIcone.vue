@@ -1,8 +1,8 @@
 <template>
   <span>
-    <v-icon @click="$emit('abreFecha')" v-if="categoria && categoria.filhas && categoria.filhas.length === 0">insert_drive_file</v-icon>
-    <v-icon @click="$emit('abreFecha')" v-else-if="!aberto">folder</v-icon>
-    <v-icon @click="$emit('abreFecha')" v-else>folder_open</v-icon>
+    <v-icon @click="$emit('abreFecha')" v-if="categoria && categoria.filhas && categoria.filhas.length === 0">remove</v-icon>
+    <v-icon @click="$emit('abreFecha')" v-else-if="!aberto">keyboard_arrow_right</v-icon>
+    <v-icon @click="$emit('abreFecha')" v-else>expand_more</v-icon>
   </span>
 </template>
 

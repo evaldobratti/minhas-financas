@@ -38,8 +38,15 @@ function put({ dispatch, commit, state, getters}, lancamento) {
     axios.put('/api/lancamentos', lancamento).then(res => {
       commit(m.LIMPA_FORMULARIO);
       commit(LOCAIS.m.MAYBE_NOVO_LOCAL, res.data.local);
+      const lancamentos = state.list;
+      if (lancamento.id == null) {
+        lancamentos.push(res.data);
+      } else {
+        const ix = lancamentos.indexOf(lancamento)
+        lancamentos[ix] = res.data;
+      }
       commit(m.SET_LANCAMENTOS, {
-        lancamentos: [...state.list, res.data],
+        lancamentos: lancamentos,
         getters
       });
       resolve();
@@ -187,7 +194,11 @@ export const store = {
       });
 
       state.list.sort((a, b) => {
-        return a.data.valueOf() - b.data.valueOf();
+        const porData = a.data.valueOf() - b.data.valueOf();
+        if (porData != 0)
+          return porData;
+        
+        return a.id - b.id;
       });
       
       const saldos = {};
