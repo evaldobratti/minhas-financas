@@ -17,14 +17,17 @@ export default {
   },
   methods: {
     showing() {
-      //console.info(this.$refs.nome.focus())
+      this.$nextTick(this.$refs.nome.focus);
+    },
+    reset() {
+      this.nome = '';
     },
     submit () {
       this.$store.dispatch(d.SAVE_CATEGORIA, {
         pai: this.categoriaPai ? this.categoriaPai.id : null,
         nome: this.nome
       }).then(() => {
-        this.nome = '';
+        this.reset();
         this.$emit('cadastrado');
       }).catch(() => {});
     }

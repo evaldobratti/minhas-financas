@@ -39,6 +39,8 @@ export default {
     dialogRaiz(val) {
       if (val) {
         this.$refs.formRaiz.showing();
+      } else {
+        this.$refs.filhaForm.reset();
       }
     }
   },

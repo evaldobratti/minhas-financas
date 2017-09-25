@@ -30,9 +30,6 @@
               <v-flex xs1>
                 <v-btn class="small-btn" @click="mesAvanca()"><v-icon>chevron_right</v-icon></v-btn>
               </v-flex>
-              <v-flex xs2>
-                <v-btn @click="filtrar">filtrar</v-btn>
-              </v-flex>
             </v-layout>
             <LancamentoForm :conta="conta"></LancamentoForm>
             <v-data-table
@@ -50,16 +47,14 @@
                   <th style="width: 130px">
                     Categoria
                   </th>
-                  <th style="text-align: right; width: 120px">
+                  <th style="text-align: right; width: 140px">
                     Valor
                   </th>
-                  <th style="width: 10px">
-                    Efetuada
-                  </th>
-                  <th style="text-align: right; width: 120px">
+                  <th style="text-align: right; width: 140px">
                     Saldo
                   </th>
-                  <th style="width: 70px"></th>
+                  <th  style="width: 40px" ></th>
+                  <th  style="width: 40px" ></th>
                 </tr>
               </template>
               <template slot="items" scope="l">
@@ -112,7 +107,6 @@ import axios from 'axios';
 export default {
   created() {
     this.$store.dispatch(CARREGA_CONTA, this.$route.params.id);
-    this.$store.dispatch(lancamentos.d.LANCAMENTO_LOAD);
   },
   data() {
     return {

@@ -11,10 +11,13 @@
     <td class="text-xs-right" :class="css(lancamento.valor)">
         {{ lancamento.valor | currency }}
     </td>
-    <td><v-checkbox v-if="lancamento.efetivada != null" v-model="lancamento.efetivada"></v-checkbox></td>
     <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
     <td>
-        <v-menu bottom right>
+      <v-checkbox style="width: 40px" v-if="lancamento.efetivada != null" v-model="lancamento.efetivada"></v-checkbox>
+    </td>
+    <td>
+      
+        <v-menu  style="width: 40px"  bottom right>
         <v-btn icon slot="activator">
             <v-icon>more_vert</v-icon>
         </v-btn>

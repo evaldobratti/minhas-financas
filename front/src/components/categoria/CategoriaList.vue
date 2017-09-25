@@ -4,7 +4,7 @@
       <CategoriaIcone :aberto="aberto" :categoria="categoria" @abreFecha="abre"></CategoriaIcone>
       <span @click="abre">{{ categoria.nome }}</span>
       <transition name="fade">
-        <v-btn v-if="showActions" @click.native.stop="showModalAdd" primary fab small dark class="small-fab-btn">
+        <v-btn v-if="showActions" @click.native.stop="dialog = true" primary fab small dark class="small-fab-btn">
           <v-icon>add</v-icon>
         </v-btn>
       </transition>
@@ -19,7 +19,7 @@
               <div class="headline">Nova sub-categoria de {{ categoria.nome }}</div>
             </v-card-title>
             <v-card-text>
-              <CategoriaForm :categoriaPai="categoria" @cadastrado="dialog = false"></CategoriaForm>
+              <CategoriaForm ref="filhaForm" :categoriaPai="categoria" @cadastrado="dialog = false"></CategoriaForm>
             </v-card-text>
           </v-card>
       </v-dialog>
@@ -44,6 +44,15 @@ export default {
       showActions: false
     }
   },
+  watch: {
+    dialog(val) {
+      if (val) {
+        this.$refs.filhaForm.showing();
+      } else {
+        this.$refs.filhaForm.reset();
+      }
+    }
+  },
   methods: {
     abre() {
       this.aberto = !this.aberto;
@@ -54,9 +63,6 @@ export default {
     },
     unhovered() {
       this.showActions = false;
-    },
-    showModalAdd() {
-      this.dialog = true;
     },
     showModalRemove() {
       alert("não implementado ainda :D")

@@ -16,9 +16,23 @@
               </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-divider></v-divider>
+          <v-list-tile v-for="conta in contas" :key="conta.id">
+            <v-list-tile-action>
+              <v-icon>attach_money</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>
+                <router-link :to="{ name: 'detalhe-conta', params: { id: conta.id } }">
+                  {{ conta.nome }}
+                </router-link>
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-divider></v-divider>
           <v-list-tile>
             <v-list-tile-action>
-              <v-icon>dashboard</v-icon>
+              <v-icon>filter_list</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>
@@ -28,9 +42,10 @@
               </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-divider></v-divider>
           <v-list-tile>
             <v-list-tile-action>
-              <v-icon>dashboard</v-icon>
+              <v-icon>file_upload</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>
@@ -40,6 +55,7 @@
               </v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-divider></v-divider>
         </v-list>
       </v-navigation-drawer>
       <v-toolbar class="teal" dark fixed>
@@ -79,6 +95,9 @@ export default {
   computed: {
     isAuthenticated() {
       return this.$store.state.authentication.isAuthenticated;
+    },
+    contas() {
+      return this.$store.state.conta.list;
     }
   },
   components: {
