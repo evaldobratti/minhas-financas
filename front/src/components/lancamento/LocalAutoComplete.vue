@@ -29,6 +29,7 @@ export default {
   methods: {
     focus() {
       this.$refs.autoComplete.focus();  
+      this.$refs.autoComplete.$refs.input.focus();
     }
   },
   watch: {

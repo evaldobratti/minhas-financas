@@ -1,5 +1,6 @@
 <template>
   <v-select
+    ref="autoComplete"
     :items="categoriasFlat"
     :value="value"
     item-text="nome"
@@ -18,7 +19,6 @@
 
 <script>
 import CategoriaIcone from '../categoria/CategoriaIcone'
-
 export default {
   props: ['value'],
   methods: {
@@ -39,6 +39,11 @@ export default {
       }
       return flat;
     },
+    focus() {
+      
+      this.$refs.autoComplete.focus();  
+      this.$refs.autoComplete.$refs.input.focus();
+    }
   },
   computed: {
     categoriasFlat() {

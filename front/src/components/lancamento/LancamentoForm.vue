@@ -18,27 +18,27 @@
               prepend-icon="event"
               readonly
             ></v-text-field>
-            <v-date-picker v-model="data" :date-format="formatDate"
+            <v-date-picker v-model="lancamento.data" :date-format="formatDate"
               :formatted-value.sync="dataLancamentoFormatada" no-title scrollable actions></v-date-picker>
           </v-menu>
       </v-flex>
       <v-flex xs5>
-        <LocalAutoComplete :errorMessages="errorMessages('local')" v-model="local" label="Local"/>
+        <LocalAutoComplete :errorMessages="errorMessages('local')" v-model="lancamento.local" label="Local"/>
       </v-flex>
       <v-flex xs5>
-        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="categoria" label="Categoria" />
+        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="lancamento.categoria" label="Categoria" />
       </v-flex>
       <v-flex xs1>
         <v-text-field
           ref="valor"
-          v-model="valor"
+          v-model="lancamento.valor"
           label="Valor"
           type="number"
           class="number-input">
         </v-text-field>
       </v-flex>
       <v-flex xs2>
-        <v-checkbox label="Efetuada" v-model="efetuada"></v-checkbox>
+        <v-checkbox label="Efetuada" v-model="lancamento.efetuada"></v-checkbox>
       </v-flex>
       <v-btn type="submit" v-show="false">wtf</v-btn>
     </v-layout>
@@ -62,30 +62,34 @@ export default {
   },
   watch: {
     conta(val) {
-      this.$store.commit(lancamentos.m.LANCAMENTO_SET_CONTA, this.conta);  
-    },
-    categoria(val) {
-      console.info('atualizado ', val ? val.nome : 'nulo');
+      this.lancamento.conta = this.conta;
     }
   },
   data() {  
     return {
       menu: false,
       dataLancamentoFormatada: new Date().toLocaleDateString(),
-      localInputed: ''
+      lancamento: {
+        data: new Date(),
+        conta: null,
+        valor: null,
+        categoria: null,
+        local: null,
+        efetuada: null
+      }
     }
   },
   methods: {
     errorMessages(field) {
-      return this.$store.state.lancamentos.formErrors[field];
+      return [];
     },
     formatDate(val) {
-      this.data = new Date(val);
+      this.lancamento.data = new Date(val);
       return new Date(val).toLocaleDateString();
     },
     submit() {
       this.$refs.valor.blur();
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT).then(() => {
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
       });
     },
     categoriaAsFlat(categoria) {
@@ -117,26 +121,6 @@ export default {
     categorias() {
       return this.$store.state.categorias.list;
     },
-    data: {
-      get() { return this.$store.state.lancamentos.form.data},
-      set(data) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_DATA, data); }
-    },
-    valor: {
-      get() { return this.$store.state.lancamentos.form.valor},
-      set(valor) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_VALOR, valor); }
-    },
-    categoria: {
-      get() { return this.$store.state.lancamentos.form.categoria},
-      set(categoria) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_CATEGORIA, categoria); }
-    },
-    local: {
-      get() { return this.$store.state.lancamentos.form.local},
-      set(local) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_LOCAL, local); }
-    },
-    efetuada: {
-      get() { return this.$store.state.lancamentos.form.efetuada},
-      set(efetuada) { this.$store.commit(lancamentos.m.LANCAMENTO_SET_EFETUADA, efetuada); }
-    }
   },
   components: {
     CategoriaIcone,

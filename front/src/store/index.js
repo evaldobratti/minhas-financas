@@ -4,7 +4,7 @@ import axios from 'axios';
 import router from '../router'
 import authentication from './authentication';
 import * as conta from './conta';
-import categorias from './categorias';
+import { CATEGORIAS } from './categorias';
 import * as lancamento from './lancamento';
 import recorrencia from './recorrencia';
 import parcelamentos from './parcelamentos';
@@ -17,7 +17,7 @@ const store = new Vuex.Store({
     modules: {
       authentication,
       conta: conta.store,
-      categorias,
+      categorias: CATEGORIAS.store,
       lancamentos: lancamento.store,
       recorrencias: recorrencia,
       parcelamentos,
@@ -28,7 +28,8 @@ const store = new Vuex.Store({
 
 store.dispatch('getInitialData');
 store.dispatch(conta.LOAD_CONTAS)
-  .then(() => store.dispatch(lancamento.lancamentos.d.LANCAMENTO_LOAD));
+  .then(() => store.dispatch(CATEGORIAS.d.LOAD_CATEGORIAS, true)
+    .then(() => store.dispatch(lancamento.lancamentos.d.LANCAMENTO_LOAD)));
 
 export default store;
 

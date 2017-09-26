@@ -11,13 +11,22 @@ export const m = {
 }
 
 
-export default {
+export const store = {
   state: {
-    list: []
+    list: [],
+    flat: []
   },
   mutations: {
-    [m.LOADED_CATEGORIAS](state, categorias) {
+    [m.LOADED_CATEGORIAS](state, {categorias, categoriasFlat}) {
       state.list = categorias;
+      state.flat = categoriasFlat;
+    }
+  },
+  getters: {
+    getCategoria(state) {
+      return id => {
+        return state.flat.find(c => c.id == id);
+      }
     }
   },
   actions: {
@@ -28,7 +37,10 @@ export default {
             res.data.forEach(c => {
               c.filhas = res.data.filter(f => f.pai && f.pai.id == c.id);
             });
-            commit(m.LOADED_CATEGORIAS, res.data.filter(c => c.pai == null));
+            commit(m.LOADED_CATEGORIAS, {
+               categorias: res.data.filter(c => c.pai == null), 
+              categoriasFlat: res.data
+            });
             resolve(state.list);
           }).catch(err => {
             commit(SNACKS.m.TRATA_ERRO, err);
@@ -56,4 +68,8 @@ export default {
       });
     }
   }
+}
+
+export const CATEGORIAS = {
+  m, d, store
 }

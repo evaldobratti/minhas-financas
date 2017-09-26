@@ -4,10 +4,13 @@
     {{ lancamento.data | date }}
   </td>
   <td>
-    <LocalAutoComplete v-show="isEditando" ref="descricao" v-model="local" @blur="blur('descricao')" class="inlineEdit"></LocalAutoComplete>
     <span v-show="!isEditando" @click="editando('descricao')">{{ lancamento.local.nome }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
+    <LocalAutoComplete v-show="isEditando" ref="descricao" v-model="lancamento.local" @blur="blur('descricao')" class="inlineEdit"></LocalAutoComplete>
   </td>
-    <td>{{ lancamento.categoria.nome }}</td>
+    <td>
+      <CategoriaAutoComplete v-show="isEditando" ref="categoria" v-model="lancamento.categoria" @blur="blur('categoria')" class="inlineEdit"></CategoriaAutoComplete>
+      <span v-show="!isEditando" @click="editando('categoria')">{{ lancamento.categoria.nome }}</span>
+    </td>
     <td class="text-xs-right" :class="css(lancamento.valor)">
         {{ lancamento.valor | currency }}
     </td>
@@ -65,13 +68,21 @@
 import { lancamentos } from '../../store/lancamento';
 import mapGetSet from '../../store/mapGetSet';
 import LocalAutoComplete from './LocalAutoComplete';
+import CategoriaAutoComplete from './CategoriaAutoComplete'
 
 export default {
   props: ['lancamento'],
   data() {
     return {
-      recorrenciaDialog: false,
-      parcelamentoDialog: false
+      isEditando: false
+    }
+  },
+  watch: {
+    'lancamento.local'(val) {
+      if (this.isEditando) {
+        this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT, this.lancamento);
+        this.isEditando = false;
+      }
     }
   },
   methods: {
@@ -82,38 +93,16 @@ export default {
       }
     },
     editando(campo) {
-      this.$store.commit(lancamentos.m.SET_EDICAO, this.lancamento);
+      this.isEditando = true;
+      setTimeout(() => this.$refs[campo].focus(), 10);
     },
     blur(campo) {
-      
-    }
-  }, 
-  computed: {
-    isEditando() {
-      const edicao = this.$store.getters.lancamentoEdicao ;
-      return edicao && this.lancamento.id && edicao.id == this.lancamento.id;
-    },
-    local: {
-      get() {
-        if (!this.isEditando)
-          return null;
-        return this.$store.getters.lancamentoEdicao.local;
-      },
-      set(local) {
-        if (!this.isEditando)
-          return;
-
-        if (local.id != this.$store.getters.lancamentoEdicao.local.id) {
-          this.$store.commit(lancamentos.m.EDICAO_SET_LOCAL, local);
-          this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT);
-          this.$store.commit(lancamentos.m.SET_EDICAO, null);
-        }
-      }
+      console.info('blur');
     }
   },
   components: {
     LocalAutoComplete,
-
+    CategoriaAutoComplete
   }
 }
 </script>

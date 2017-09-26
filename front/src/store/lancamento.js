@@ -36,19 +36,19 @@ export const lancamentos = {
 function put({ dispatch, commit, state, getters}, lancamento) {
   new Promise((resolve, reject) => {
     axios.put('/api/lancamentos', lancamento).then(res => {
-      commit(m.LIMPA_FORMULARIO);
       commit(LOCAIS.m.MAYBE_NOVO_LOCAL, res.data.local);
       const lancamentos = state.list;
       if (lancamento.id == null) {
         lancamentos.push(res.data);
-      } else {
+        commit(m.SET_LANCAMENTOS, {
+          lancamentos: lancamentos,
+          getters
+        });
+      } /*else {
         const ix = lancamentos.indexOf(lancamento)
         lancamentos[ix] = res.data;
-      }
-      commit(m.SET_LANCAMENTOS, {
-        lancamentos: lancamentos,
-        getters
-      });
+      }*/
+      
       resolve();
     }).catch(err => {
       if (err.response.status === 400) {
@@ -61,31 +61,7 @@ function put({ dispatch, commit, state, getters}, lancamento) {
 
 export const store = {
   state: {
-    list: [],
-    form: {
-      data: new Date(),
-      conta: null,
-      local: null,
-      categoria: null,
-      valor: null,
-      efetuada: false
-    },
-    formErrors: {
-      data: [],
-      conta: [],
-      local: [],
-      categoria: [],
-      valor: [],
-      efetuada: []
-    },
-    edicao: {
-      data: new Date(),
-      conta: null,
-      local: null,
-      categoria: null,
-      valor: null,
-      efetuada: false
-    },
+    list: []
   },
   getters: {
     lancamentoEdicao(state) {
@@ -143,47 +119,6 @@ export const store = {
     }
   },
   mutations: {
-    [m.LANCAMENTO_SET_DATA](state, data) {
-      state.form.data = data;
-    },
-    [m.LANCAMENTO_SET_LOCAL](state, local) {
-      state.formErrors.local = [];
-      state.form.local = local;
-    },
-    [m.LANCAMENTO_SET_CATEGORIA](state, categoria) {
-      state.formErrors.categoria = [];
-      state.form.categoria = categoria;
-    },
-    [m.LANCAMENTO_SET_VALOR](state, valor) {
-      state.form.valor = valor;
-    },
-    [m.LANCAMENTO_SET_EFETUADA](state, efetuada) {
-      state.form.efetuada = efetuada;
-    },
-    [m.LANCAMENTO_SET_CONTA](state, conta) {
-      state.form.conta = conta;
-    },
-    [m.LIMPA_FORMULARIO](state) {
-      state.form.local= null;
-      state.form.categoria= null;
-      state.form.valor= null;
-      state.form.efetuada= false;
-    },
-    [m.SET_BACKEND_ERRORS](state, errors) {
-      function getError(field) {
-        const error = errors.find(e => e.field === field);
-        return error ? [ error.message ] : [];
-      }
-
-      state.formErrors.local = getError('local.nome');
-      state.formErrors.categoria = getError('categoria');
-    },
-    [m.SET_EDICAO](state, lancamento) {
-      state.edicao = lancamento;
-    },
-    [m.EDICAO_SET_LOCAL](state, local) {
-      state.edicao.local = local;
-    },
     [m.SET_LANCAMENTOS](state, {lancamentos, getters}) {
       state.list = lancamentos;
       
@@ -191,6 +126,7 @@ export const store = {
         if (typeof l.data === 'string')
           l.data = moment(l.data);
         l.local = getters.getLocal(l.local.id);
+        l.categoria = getters.getCategoria(l.categoria.id);
       });
 
       state.list.sort((a, b) => {
@@ -212,19 +148,12 @@ export const store = {
     },
   },
   actions: {
-    [d.LANCAMENTO_SUBMIT](context) {
+    [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
-      return put(context, {
-        data: state.form.data,
-        conta: state.form.conta,
-        valor: state.form.valor,
-        categoria: state.form.categoria,
-        local: state.form.local,
-        efetivada: state.form.efetuada
-      })
+      return put(context, lancamento)
     },
-    [d.LANCAMENTO_EDICAO_SUBMIT](context)  {
-      return put(context, context.state.edicao)
+    [d.LANCAMENTO_EDICAO_SUBMIT](context, lancamento)  {
+      return put(context, lancamento)
     },
     [d.LANCAMENTO_LOAD]({dispatch, commit, getters}) {
       return new Promise((resolve, reject) => {
