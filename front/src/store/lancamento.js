@@ -84,19 +84,21 @@ export const store = {
         const saldoDataInicial = dataBase.clone().add(-1, 'days');
         const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
         const resultado = [ {
+            id: -1,
             data: saldoDataInicial,
             conta: conta,
-            local: { nome: 'Saldo inicial'},
-            categoria: {},
+            local: { id: -1, nome: 'Saldo inicial'},
+            categoria: { id: -1},
             saldoDiario: getters.saldoEm(conta, saldoDataInicial),
             efetuada: false
           }, 
           ...lancamentosDoMes, 
           {
+            id: -2,
             data: saldoDataFinal,
             conta: conta,
-            local: { nome: 'Saldo final'},
-            categoria: {},
+            local: { id: -2, nome: 'Saldo final'},
+            categoria: { id: -2 },
             saldoDiario: getters.saldoEm(conta, saldoDataFinal),
             efetuada: false
           }

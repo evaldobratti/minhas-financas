@@ -74,18 +74,33 @@ export default {
   props: ['lancamento'],
   data() {
     return {
-      isEditando: false
+      isEditando: false,
+      backup: null
     }
   },
   watch: {
-    'lancamento.local'(val) {
-      if (this.isEditando) {
-        this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT, this.lancamento);
-        this.isEditando = false;
-      }
+    lancamento(val) {
+      this.backup = Object.assign({}, this.lancamento);
+    },
+    'lancamento.local'(atual, antigo) {
+      this.validoParaSubmissao(atual, antigo);
+    },
+    'lancamento.categoria'(atual, antigo) {
+      this.validoParaSubmissao(atual, antigo);
     }
   },
   methods: {
+    validoParaSubmissao(atual, antigo) {
+      if (this.lancamento && this.lancamento.id < 0)
+        return;
+
+      console.info(atual, antigo);
+      if ('id' in atual && 'id' in antigo && (atual.id == antigo.id || antigo.id < 0))
+        return;
+      
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT, this.lancamento);
+      this.isEditando = false;
+    },
     css(valor) {
       return {
         'red--text': valor < 0,
@@ -98,6 +113,7 @@ export default {
     },
     blur(campo) {
       console.info('blur');
+      this.isEditando = false;
     }
   },
   components: {

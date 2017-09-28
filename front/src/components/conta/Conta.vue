@@ -58,7 +58,7 @@
                 </tr>
               </template>
               <template slot="items" scope="l">
-                <LancamentoLinha :lancamento="l.item" 
+                <LancamentoLinha :lancamento="l.item"
                   @novaRecorrencia="novaRecorrencia(l.item)" 
                   @novoParcelamento="novoParcelamento(l.item)"
                   @deleteLancamento="deleteLancamento(l.item)"
