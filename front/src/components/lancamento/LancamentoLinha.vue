@@ -96,12 +96,6 @@ export default {
     lancamento(val) {
       this.backup = Object.assign({}, this.lancamento);
     }
-    /*'lancamento.local'(atual, antigo) {
-      this.validoParaSubmissao(atual, antigo);
-    },
-    'lancamento.categoria'(atual, antigo) {
-      this.validoParaSubmissao(atual, antigo);
-    }*/
   },
   methods: {
     validoParaSubmissao(atual, antigo) {
@@ -122,7 +116,6 @@ export default {
     },
     editando(campo) {
       this.isEditando = true;
-      //setTimeout(() => this.$refs[campo].focus(), 10);
     }
   },
   components: {

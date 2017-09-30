@@ -1,8 +1,5 @@
 - Editar nome de categoria
 - Criar componente para R$
-- Alinhar saldo inicial da conta a direita e ser number
-- Melhorar card de conta na listagem de contas
 - Autocomplete funcionar com acento e associar com caracteres sem acento
-- form de lançamento não aceita casa decimal xD
 - transferência
 - limpar form de cadastro de conta após cadastro/fechar

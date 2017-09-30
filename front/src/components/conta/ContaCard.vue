@@ -4,7 +4,7 @@
       <router-link :to="{ name: 'detalhe-conta', params: { id: conta.id } }">
         {{ conta.nome }}
       </router-link>
-      Saldo atual: {{ conta.saldoAtual | currency}}
+      <span style="float: right">Saldo atual: {{ conta.saldoAtual | currency}}</span>
     </v-card-text>
   </v-card>
 </template>

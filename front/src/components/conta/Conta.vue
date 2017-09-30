@@ -117,9 +117,6 @@ import TrocaConta from './TrocaConta';
 
 import axios from 'axios';
 export default {
-  created() {
-    this.$store.dispatch(CARREGA_CONTA, this.$route.params.id);
-  },
   data() {
     return {
       meses: [
@@ -146,7 +143,7 @@ export default {
   },
   computed: {
     conta() {
-      return this.$store.state.conta.conta;
+      return this.$store.getters.getConta(this.$route.params.id);
     },
     lancamentos() {
       return this.$store.getters.lancamentosDe(this.$route.params.id, this.mes, this.ano);
@@ -213,10 +210,6 @@ export default {
 </script>
 
 <style>
-.number-input input {
-  text-align: right;
-}
-
 .small-btn {
   min-width: auto;
 }

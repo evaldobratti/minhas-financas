@@ -115,5 +115,8 @@ export default {
   box-shadow: none;
 }
 
+.number-input input {
+  text-align: right;
+}
 
 </style>

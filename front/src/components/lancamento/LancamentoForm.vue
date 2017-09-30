@@ -16,6 +16,7 @@
           v-model="lancamento.valor"
           label="Valor"
           type="number"
+          step="0.01"
           class="number-input">
         </v-text-field>
       </v-flex>
@@ -55,9 +56,13 @@ export default {
       }
     }
   },
+  created() {
+    this.lancamento.conta = this.conta;
+  },
   watch: {
     conta(val) {
-      this.lancamento.conta = this.conta;
+      console.info('alterando con tapara', val.nome);
+      this.lancamento.conta = val;
     },
     'lancamento.valor'(val) {
       this.lancamento.valor = Number(val);
