@@ -32,9 +32,15 @@
         aberto: false
       }
     },
-    watch: {
-      value() {
+    created() {
+      if (this.value) {
         this.data = this.value.toDate();
+        this.dataFormatada = this.data.toLocaleDateString();
+      }
+    },
+    watch: {
+      value(val) {
+        this.data = val.toDate();
         this.dataFormatada = this.data.toLocaleDateString();
       }
     },

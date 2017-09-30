@@ -4,15 +4,13 @@
     {{ lancamento.data | date }}
   </td>
   <td>
-    <span v-show="!isEditando" @click="editando('descricao')">{{ lancamento.local.nome }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
-    <LocalAutoComplete v-show="isEditando" ref="descricao" v-model="lancamento.local" @blur="blur('descricao')" class="inlineEdit"></LocalAutoComplete>
+    <span @click.stop="editando('descricao')">{{ lancamento.local.nome }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
   </td>
     <td>
-      <CategoriaAutoComplete v-show="isEditando" ref="categoria" v-model="lancamento.categoria" @blur="blur('categoria')" class="inlineEdit"></CategoriaAutoComplete>
-      <span v-show="!isEditando" @click="editando('categoria')">{{ lancamento.categoria.nome }}</span>
+      <span @click.stop="editando('categoria')">{{ lancamento.categoria.nome }}</span>
     </td>
     <td class="text-xs-right" :class="css(lancamento.valor)">
-        {{ lancamento.valor | currency }}
+        <span @click.stop="editando('valor')">{{ lancamento.valor | currency }}</span>
     </td>
     <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
     <td>
@@ -60,7 +58,14 @@
         </v-list>
         </v-menu>
     </td>
-
+    <v-dialog v-model="isEditando"  width="80%">
+      <v-card>
+          <LancamentoForm :conta="lancamento.conta" 
+            :lancamento="lancamento"
+            @submetido="isEditando=false"
+            ></LancamentoForm>
+      </v-card>
+    </v-dialog>
 </tr>
 </template>
 
@@ -69,6 +74,7 @@ import { lancamentos } from '../../store/lancamento';
 import mapGetSet from '../../store/mapGetSet';
 import LocalAutoComplete from './LocalAutoComplete';
 import CategoriaAutoComplete from './CategoriaAutoComplete'
+import LancamentoForm from './LancamentoForm';
 
 export default {
   props: ['lancamento'],
@@ -81,25 +87,24 @@ export default {
   watch: {
     lancamento(val) {
       this.backup = Object.assign({}, this.lancamento);
-    },
-    'lancamento.local'(atual, antigo) {
+    }
+    /*'lancamento.local'(atual, antigo) {
       this.validoParaSubmissao(atual, antigo);
     },
     'lancamento.categoria'(atual, antigo) {
       this.validoParaSubmissao(atual, antigo);
-    }
+    }*/
   },
   methods: {
     validoParaSubmissao(atual, antigo) {
       if (this.lancamento && this.lancamento.id < 0)
         return;
 
-      console.info(atual, antigo);
       if ('id' in atual && 'id' in antigo && (atual.id == antigo.id || antigo.id < 0))
         return;
       
       this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT, this.lancamento);
-      this.isEditando = false;
+      
     },
     css(valor) {
       return {
@@ -109,16 +114,13 @@ export default {
     },
     editando(campo) {
       this.isEditando = true;
-      setTimeout(() => this.$refs[campo].focus(), 10);
-    },
-    blur(campo) {
-      console.info('blur');
-      this.isEditando = false;
+      //setTimeout(() => this.$refs[campo].focus(), 10);
     }
   },
   components: {
     LocalAutoComplete,
-    CategoriaAutoComplete
+    CategoriaAutoComplete,
+    LancamentoForm
   }
 }
 </script>
@@ -128,4 +130,9 @@ export default {
   color: red;
   font-size: 13px;
 }
+
+.inlineEdit .input-group--select__autocomplete {
+  font-size: 13px;
+}
+
 </style>

@@ -2,25 +2,7 @@
   <form @submit.prevent="submit">
     <v-layout row>
       <v-flex xs2>
-        <v-menu
-            lazy
-            :close-on-content-click="true"
-            v-model="menu"
-            offset-y
-            full-width
-            :nudge-left="40"
-            max-width="290px"
-          >
-            <v-text-field
-              slot="activator"
-              label="Data"
-              v-model="dataLancamentoFormatada"
-              prepend-icon="event"
-              readonly
-            ></v-text-field>
-            <v-date-picker v-model="lancamento.data" :date-format="formatDate"
-              :formatted-value.sync="dataLancamentoFormatada" no-title scrollable actions></v-date-picker>
-          </v-menu>
+        <DatePicker v-model="lancamento.data"></DatePicker>
       </v-flex>
       <v-flex xs5>
         <LocalAutoComplete :errorMessages="errorMessages('local')" v-model="lancamento.local" label="Local"/>
@@ -53,44 +35,47 @@ import CategoriaIcone from '../categoria/CategoriaIcone';
 import LocalAutoComplete from './LocalAutoComplete';
 import CategoriaAutoComplete from './CategoriaAutoComplete';
 import { LOCAIS } from '../../store/locais';
+import DatePicker from '../DatePicker';
+import moment from 'moment';
 
 export default {
-  props: ['conta'],
-  created() {
-    this.$store.dispatch(d.LOAD_CATEGORIAS);
-    this.$store.dispatch(LOCAIS.d.LOAD_LOCAIS);
+  props: {
+    conta: Object,
+    lancamento: {
+      type: Object,
+      default() {
+        return {
+          data: moment(),
+          conta: null,
+          valor: null,
+          categoria: null,
+          local: null,
+          efetuada: null
+        }
+      }
+    }
   },
   watch: {
     conta(val) {
       this.lancamento.conta = this.conta;
+    },
+    'lancamento.valor'(val) {
+      this.lancamento.valor = Number(val);
     }
   },
   data() {  
     return {
       menu: false,
-      dataLancamentoFormatada: new Date().toLocaleDateString(),
-      lancamento: {
-        data: new Date(),
-        conta: null,
-        valor: null,
-        categoria: null,
-        local: null,
-        efetuada: null
-      }
     }
   },
   methods: {
     errorMessages(field) {
       return [];
     },
-    formatDate(val) {
-      this.lancamento.data = new Date(val);
-      return new Date(val).toLocaleDateString();
-    },
     submit() {
       this.$refs.valor.blur();
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
-      });
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
+      this.$emit('submetido')
     },
     categoriaAsFlat(categoria) {
       let flat = [ categoria ];
@@ -125,7 +110,8 @@ export default {
   components: {
     CategoriaIcone,
     LocalAutoComplete,
-    CategoriaAutoComplete
+    CategoriaAutoComplete,
+    DatePicker
   }
 }
 </script>
