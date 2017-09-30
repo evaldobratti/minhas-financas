@@ -48,12 +48,20 @@
             </v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="$emit('efetiva', lancamento)" :disabled="lancamento.id != null" >
-            <v-list-tile-title>
-                <v-btn primary fab small dark class="small-fab-btn green">
-                <v-icon>add</v-icon>
-                </v-btn>
-                Efetivar
-            </v-list-tile-title>
+              <v-list-tile-title>
+                  <v-btn primary fab small dark class="small-fab-btn green">
+                  <v-icon>add</v-icon>
+                  </v-btn>
+                  Efetivar
+              </v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="$emit('trocaConta', lancamento)">
+              <v-list-tile-title>
+                  <v-btn primary fab small dark class="small-fab-btn green">
+                  <v-icon>swap_horiz</v-icon>
+                  </v-btn>
+                  Trocar de conta
+              </v-list-tile-title>
             </v-list-tile>
         </v-list>
         </v-menu>

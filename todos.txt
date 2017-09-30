@@ -4,7 +4,5 @@
 - Melhorar card de conta na listagem de contas
 - Autocomplete funcionar com acento e associar com caracteres sem acento
 - form de lançamento não aceita casa decimal xD
-- funcionalidade para trocar lançamento de conta
 - transferência
 - limpar form de cadastro de conta após cadastro/fechar
-- blur da edição inline de lançamento

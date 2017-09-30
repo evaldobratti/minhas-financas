@@ -102,6 +102,9 @@ export const store =  {
           return state.conta;
         return state.list.find(c => c.id == contaId);
       }
+    },
+    getContas(state) {
+      return state.list;
     }
   },
   actions: {

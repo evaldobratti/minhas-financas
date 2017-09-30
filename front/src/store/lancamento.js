@@ -127,6 +127,7 @@ export const store = {
       state.list.forEach(l => {
         if (typeof l.data === 'string')
           l.data = moment(l.data);
+        l.conta = getters.getConta(l.conta.id);
         l.local = getters.getLocal(l.local.id);
         l.categoria = getters.getCategoria(l.categoria.id);
       });

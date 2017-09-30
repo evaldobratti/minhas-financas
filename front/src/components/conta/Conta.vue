@@ -63,6 +63,7 @@
                   @novoParcelamento="novoParcelamento(l.item)"
                   @deleteLancamento="deleteLancamento(l.item)"
                   @efetiva="efetiva(l.item)"
+                  @trocaConta="trocaConta(l.item)"
                   />
               </template>
             </v-data-table>
@@ -91,6 +92,16 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="trocaContaDialog">
+      <v-card>
+        <v-card-title>
+          <div class="headline">Troca de conta</div>
+        </v-card-title>
+        <v-card-text>
+          <TrocaConta :lancamento="lancamentoAcao" @cadastrado="trocaContaDialog = false"></TrocaConta>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </ProtectedRoute>
 </template>
 
@@ -102,6 +113,7 @@ import LancamentoForm from '../lancamento/LancamentoForm';
 import LancamentoLinha from '../lancamento/LancamentoLinha';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
 import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
+import TrocaConta from './TrocaConta';
 
 import axios from 'axios';
 export default {
@@ -128,7 +140,8 @@ export default {
       ano: new Date().getFullYear(),
       lancamentoAcao: null,
       recorrenciaDialog: false,
-      parcelamentoDialog: false
+      parcelamentoDialog: false,
+      trocaContaDialog: false
     }
   },
   computed: {
@@ -176,6 +189,10 @@ export default {
       this.lancamentoAcao = lancamento;
       this.parcelamentoDialog = true;
     },
+    trocaConta(lancamento) {
+      this.lancamentoAcao = lancamento;
+      this.trocaContaDialog = true;
+    },
     efetiva(lancamento) {
       axios.put('/api/lancamentos', lancamento).then(res => {
         console.info('foi lul', res)
@@ -189,7 +206,8 @@ export default {
     LancamentoForm,
     LancamentoLinha,
     RecorrenciaForm,
-    ParcelamentoForm
+    ParcelamentoForm,
+    TrocaConta
   }
 }
 </script>
