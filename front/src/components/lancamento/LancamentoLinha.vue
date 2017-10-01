@@ -7,7 +7,7 @@
     <span @click.stop="editando('descricao')">{{ lancamento.local.nome }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
   </td>
     <td>
-      <span @click.stop="editando('categoria')">{{ lancamento.categoria.nome }}</span>
+      <span @click.stop="editando('categoria')">{{ lancamento.categoria && lancamento.categoria.nome }}</span>
     </td>
     <td class="text-xs-right" :class="css(lancamento.valor)">
         <span @click.stop="editando('valor')">{{ lancamento.valor | currency }}</span>
@@ -68,7 +68,7 @@
     </td>
     <v-dialog v-model="isEditando"  width="80%">
       <v-card>
-          <LancamentoForm :conta="lancamento.conta" 
+          <LancamentoForm ref="form" :conta="lancamento.conta" 
             :lancamento="lancamento"
             @submetido="isEditando=false"
             ></LancamentoForm>
@@ -116,6 +116,7 @@ export default {
     },
     editando(campo) {
       this.isEditando = true;
+      this.$refs.form.refresh();
     }
   },
   components: {

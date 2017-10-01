@@ -5,7 +5,7 @@
         <DatePicker v-model="lancamento.data"></DatePicker>
       </v-flex>
       <v-flex xs5>
-        <LocalAutoComplete :errorMessages="errorMessages('local')" v-model="lancamento.local" label="Local"/>
+        <LocalAutoComplete ref="localAutoComplete" :errorMessages="errorMessages('local')" v-model="lancamento.local" label="Local"/>
       </v-flex>
       <v-flex xs5>
         <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="lancamento.categoria" label="Categoria" />
@@ -61,7 +61,6 @@ export default {
   },
   watch: {
     conta(val) {
-      console.info('alterando con tapara', val.nome);
       this.lancamento.conta = val;
     },
     'lancamento.valor'(val) {
@@ -98,6 +97,9 @@ export default {
         pai = pai.pai;
       }
       return nivel;
+    },
+    refresh() {
+      this.$refs.localAutoComplete.refresh();
     },
   },
   computed: {

@@ -33,6 +33,30 @@ export const lancamentos = {
   d
 }
 
+export function normalizeLancamentos(lancamentos, getters) {
+  lancamentos.forEach(l => {
+    if (typeof l.data === 'string')
+      l.data = moment(l.data);
+    l.conta = getters.getConta(l.conta.id);
+    
+    const local = getters.getLocal(l.local.id)
+    if (local != null)
+      l.local = local;
+
+    const categoria = l.categoria ? getters.getCategoria(l.categoria.id) : null;
+    if (categoria != null)
+      l.categoria = categoria;
+  });
+
+  lancamentos.sort((a, b) => {
+    const porData = a.data.valueOf() - b.data.valueOf();
+    if (porData != 0)
+      return porData;
+    
+    return a.id - b.id;
+  });
+}
+
 function put({ dispatch, commit, state, getters}, lancamento) {
   new Promise((resolve, reject) => {
     axios.put('/api/lancamentos', lancamento).then(res => {
@@ -40,14 +64,12 @@ function put({ dispatch, commit, state, getters}, lancamento) {
       const lancamentos = state.list;
       if (lancamento.id == null) {
         lancamentos.push(res.data);
-        commit(m.SET_LANCAMENTOS, {
-          lancamentos: lancamentos,
-          getters
-        });
-      } /*else {
-        const ix = lancamentos.indexOf(lancamento)
-        lancamentos[ix] = res.data;
-      }*/
+      }
+      
+      commit(m.SET_LANCAMENTOS, {
+        lancamentos: lancamentos,
+        getters
+      });
       
       resolve();
     }).catch(err => {
@@ -124,21 +146,7 @@ export const store = {
     [m.SET_LANCAMENTOS](state, {lancamentos, getters}) {
       state.list = lancamentos;
       
-      state.list.forEach(l => {
-        if (typeof l.data === 'string')
-          l.data = moment(l.data);
-        l.conta = getters.getConta(l.conta.id);
-        l.local = getters.getLocal(l.local.id);
-        l.categoria = getters.getCategoria(l.categoria.id);
-      });
-
-      state.list.sort((a, b) => {
-        const porData = a.data.valueOf() - b.data.valueOf();
-        if (porData != 0)
-          return porData;
-        
-        return a.id - b.id;
-      });
+      normalizeLancamentos(state.list, getters);
       
       const saldos = {};
       state.list.forEach(l => {

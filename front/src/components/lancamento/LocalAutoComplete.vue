@@ -33,7 +33,15 @@ export default {
     }
   },
   watch: {
+    value(val) {
+      this.maybeNewValue(val.nome);
+    },
     maybeNewValue(val) {
+      this.maybeNewLocal(val);
+    },
+  },
+  methods: {
+    maybeNewLocal(val) {
       if (val == null)
         return;
       
@@ -49,6 +57,11 @@ export default {
         }
       }
     },
+    refresh() {
+      if (this.value.id == null) {
+        this.$nextTick(() => this.$store.state.locais.list.push(this.value));
+      }
+    }
   },
   computed: {
     locais() {
