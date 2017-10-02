@@ -2,13 +2,11 @@
 <div>
   <v-select
     ref="autoComplete"
-    :value="value"
-    @input="$emit('input', $event)"
+    v-model="internal"
     :items="locais"
     item-text="nome"
-    v-bind="$attrs"
-    v-on="$listeners"
     autocomplete
+    @input="$emit('input', $event)"
     :search-input.sync="maybeNewValue">
       <template slot="item" scope="data">
         {{ data.item.nome }}
@@ -23,13 +21,8 @@ export default {
   props: ['value'],
   data() {
     return {
-      maybeNewValue: ''
-    }
-  },
-  methods: {
-    focus() {
-      this.$refs.autoComplete.focus();  
-      this.$refs.autoComplete.$refs.input.focus();
+      maybeNewValue: '',
+      internal: null
     }
   },
   watch: {
@@ -59,14 +52,24 @@ export default {
     },
     refresh() {
       if (this.value.id == null) {
-        this.$nextTick(() => this.$store.state.locais.list.push(this.value));
+        console.info('affe');
+        this.$store.state.locais.list = this.$store.state.locais.list.filter(c => c.id != null)
+        
+        this.$store.state.locais.list = [...this.$store.state.locais.list, this.value ];
+        
       }
-    }
+      this.internal = this.value;
+    },
+    focus() {
+      this.$refs.autoComplete.focus();  
+      this.$refs.autoComplete.$refs.input.focus();
+    },
+
   },
   computed: {
     locais() {
       return this.$store.state.locais.list;
-    },
+    }
   }
 }
 </script>
