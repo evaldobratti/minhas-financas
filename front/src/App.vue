@@ -17,6 +17,19 @@
             </v-list-tile-content>
           </v-list-tile>
           <v-divider></v-divider>
+          <v-list-tile>
+            <v-list-tile-action>
+              <v-icon>compare_arrows</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>
+                <router-link :to="{ name: 'analise' }">
+                  Análise conjunta
+                </router-link>
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-divider></v-divider>
           <v-list-tile v-for="conta in contas" :key="conta.id">
             <v-list-tile-action>
               <v-icon>attach_money</v-icon>

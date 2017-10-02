@@ -146,7 +146,7 @@ export default {
       return this.$store.getters.getConta(this.$route.params.id);
     },
     lancamentos() {
-      return this.$store.getters.lancamentosDe(this.$route.params.id, this.mes, this.ano);
+      return this.$store.getters.lancamentosDe([ this.$route.params.id ], this.mes, this.ano);
     },
     saldoInicio() {
       return this.$store.state.conta.saldoInicio;

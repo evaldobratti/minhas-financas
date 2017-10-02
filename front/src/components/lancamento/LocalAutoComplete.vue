@@ -7,6 +7,7 @@
     item-text="nome"
     autocomplete
     @input="$emit('input', $event)"
+    :label="label"
     :search-input.sync="maybeNewValue">
       <template slot="item" scope="data">
         {{ data.item.nome }}
@@ -18,7 +19,7 @@
 
 <script>
 export default {
-  props: ['value'],
+  props: ['value', 'label'],
   data() {
     return {
       maybeNewValue: '',
@@ -27,7 +28,7 @@ export default {
   },
   watch: {
     value(val) {
-      this.maybeNewValue(val.nome);
+      this.maybeNewLocal(val.nome);
     },
     maybeNewValue(val) {
       this.maybeNewLocal(val);

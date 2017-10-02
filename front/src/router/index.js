@@ -6,7 +6,7 @@ import Dashboard from '@/components/Dashboard'
 import Conta from '@/components/conta/Conta'
 import Categorias from '@/components/categoria/Categorias'
 import UploadExtrato from '@/components/UploadExtrato';
-
+import AnaliseConjunta from '@/components/conta/AnaliseConjunta';
 Vue.use(Router)
 
 export default new Router({
@@ -40,8 +40,12 @@ export default new Router({
       path: '/upload',
       name: 'upload',
       component: UploadExtrato
-    }
-
+    },
+    {
+      path: '/analise',
+      name: 'analise',
+      component: AnaliseConjunta
+    },
 
   ]
 })

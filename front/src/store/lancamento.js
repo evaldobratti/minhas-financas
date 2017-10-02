@@ -90,13 +90,12 @@ export const store = {
       return state.edicao;
     },
     lancamentosDe(state, getters) {
-      return (contaId, mes, ano) => {
-        const conta = getters.getConta(contaId);
-        if (conta == null)
+      return (contasIds, mes, ano) => {
+        if (getters.getContas.length == 0)
           return [];
         
         const lancamentosDaConta = state.list.filter(l => {
-          return l.conta.id == contaId
+          return contasIds.indexOf(l.conta.id) >= 0;
         });
         const lancamentosDoMes = lancamentosDaConta.filter(l => {
           return l.data.month() + 1 == mes && l.data.year() == ano;
@@ -105,23 +104,40 @@ export const store = {
         const dataBase = moment(ano + '-' + mes + '-' + 1, 'YYYY-MM-DD');
         const saldoDataInicial = dataBase.clone().add(-1, 'days');
         const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
+
+        let saldoInicial = 0;
+        contasIds.forEach(contaId => {
+          saldoInicial += getters.saldoEm(getters.getConta(contaId), saldoDataInicial);
+        });
+
+        let saldoFinal = 0;
+        contasIds.forEach(contaId => {
+          saldoFinal += getters.saldoEm(getters.getConta(contaId), saldoDataFinal);
+        });
+
+        lancamentosDoMes.reduce((x, y) => {
+          const saldo = x + y.valor;
+          Vue.set(y, 'saldoDiario', saldo);
+          return saldo;
+        }, saldoInicial);
+
         const resultado = [ {
             id: -1,
             data: saldoDataInicial,
-            conta: conta,
+            conta: null,
             local: { id: -1, nome: 'Saldo inicial'},
             categoria: { id: -1},
-            saldoDiario: getters.saldoEm(conta, saldoDataInicial),
+            saldoDiario: saldoInicial,
             efetuada: false
           }, 
           ...lancamentosDoMes, 
           {
             id: -2,
             data: saldoDataFinal,
-            conta: conta,
+            conta: null,
             local: { id: -2, nome: 'Saldo final'},
             categoria: { id: -2 },
-            saldoDiario: getters.saldoEm(conta, saldoDataFinal),
+            saldoDiario: saldoFinal,
             efetuada: false
           }
         ];
@@ -135,10 +151,7 @@ export const store = {
         const saldoAcumulado = lancamentosDaConta
           .filter(l => l.data.isSameOrBefore(data));
 
-        if (saldoAcumulado.length)
-          return saldoAcumulado[saldoAcumulado.length - 1].saldoDiario;
-        else 
-          return conta.saldoInicial;
+        return conta.saldoInicial + saldoAcumulado.map(l => l.valor).reduce((x, y) => x+y, 0);
       }
     }
   },
@@ -148,14 +161,14 @@ export const store = {
       
       normalizeLancamentos(state.list, getters);
       
-      const saldos = {};
+      /*const saldos = {};
       state.list.forEach(l => {
         if (saldos[l.conta.id] == null) {
           saldos[l.conta.id] = getters.getConta(l.conta.id).saldoInicial;
         }
         saldos[l.conta.id] += l.valor;
         Vue.set(l, 'saldoDiario', saldos[l.conta.id]);
-      });
+      });*/
     },
   },
   actions: {
