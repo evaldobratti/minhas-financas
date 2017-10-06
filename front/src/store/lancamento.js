@@ -98,10 +98,10 @@ export const store = {
           return contasIds.indexOf(l.conta.id) >= 0;
         });
         const lancamentosDoMes = lancamentosDaConta.filter(l => {
-          return l.data.month() + 1 == mes && l.data.year() == ano;
+          return l.data.month() == mes && l.data.year() == ano;
         });
         
-        const dataBase = moment(ano + '-' + mes + '-' + 1, 'YYYY-MM-DD');
+        const dataBase = moment(ano + '-' + (mes + 1) + '-' + 1, 'YYYY-MM-DD');
         const saldoDataInicial = dataBase.clone().add(-1, 'days');
         const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
 

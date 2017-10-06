@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     
-    <v-app standalone>
-      <v-navigation-drawer permanent clipped light v-if="isAuthenticated">
+    <v-app>
+      <v-navigation-drawer app permanent clipped light v-if="isAuthenticated">
         <v-list dense class="pt-0">
           <v-list-tile>
             <v-list-tile-action>
@@ -71,7 +71,7 @@
           <v-divider></v-divider>
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar class="teal" dark fixed>
+      <v-toolbar app clipped-left class="teal" dark fixed>
         <v-toolbar-title>Minhas finanças</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-menu bottom right v-if="isAuthenticated">
@@ -86,10 +86,10 @@
         </v-menu>
       </v-toolbar>
       <main>
-        <v-container fluid>
+        <v-content>
           <Snackbar></Snackbar>
           <router-view></router-view>
-        </v-container>
+        </v-content>
       </main>
     </v-app>
   </div>

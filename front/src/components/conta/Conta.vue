@@ -11,24 +11,8 @@
                   {{ conta.nome }}
                 </h3>
               </v-flex>
-              <v-flex xs1>
-                <v-btn class="small-btn" @click="mesRetrocede()"><v-icon>chevron_left</v-icon></v-btn>
-              </v-flex>
-              <v-flex xs1>
-                <v-select
-                        label="Mês"
-                        v-bind:items="meses"
-                        v-model="mes"
-                        item-text="nome"
-                        item-value="ix"
-                        max-height="auto">
-                </v-select>
-              </v-flex>
-              <v-flex xs1>
-                <v-text-field v-model="ano" label="Ano"></v-text-field>
-              </v-flex>
-              <v-flex xs1>
-                <v-btn class="small-btn" @click="mesAvanca()"><v-icon>chevron_right</v-icon></v-btn>
+              <v-flex xs4>
+              <DatePicker v-model="dataFiltro" type="month"></DatePicker>
               </v-flex>
             </v-layout>
             <LancamentoForm :conta="conta"></LancamentoForm>
@@ -114,27 +98,14 @@ import LancamentoLinha from '../lancamento/LancamentoLinha';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
 import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
 import TrocaConta from './TrocaConta';
+import moment from 'moment';
+import DatePicker from '../DatePicker';
 
 import axios from 'axios';
 export default {
   data() {
     return {
-      meses: [
-        { nome: 'Janeiro', ix: 1},
-        { nome: 'Fevereiro', ix: 2},
-        { nome: 'Março', ix: 3},
-        { nome: 'Abril', ix: 4},
-        { nome: 'Maio', ix: 5},
-        { nome: 'Junho', ix: 6},
-        { nome: 'Julho', ix: 7},
-        { nome: 'Agosto', ix: 8},
-        { nome: 'Setembro', ix: 9},
-        { nome: 'Outubro', ix: 10},
-        { nome: 'Novembro', ix: 11},
-        { nome: 'Dezembro', ix: 12},
-      ],
-      mes: new Date().getMonth() + 1,
-      ano: new Date().getFullYear(),
+      dataFiltro: moment(),
       lancamentoAcao: null,
       recorrenciaDialog: false,
       parcelamentoDialog: false,
@@ -146,7 +117,12 @@ export default {
       return this.$store.getters.getConta(this.$route.params.id);
     },
     lancamentos() {
-      return this.$store.getters.lancamentosDe([ this.$route.params.id ], this.mes, this.ano);
+      var mes = this.dataFiltro.month();
+      var ano = this.dataFiltro.year();
+      if (this.conta)
+        return this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano);
+      else
+        return []
     },
     saldoInicio() {
       return this.$store.state.conta.saldoInicio;
@@ -156,25 +132,6 @@ export default {
     }
   },
   methods: {
-    mesAvanca() {
-      this.mes += 1;
-      this.filtrar();
-    },
-    mesRetrocede() {
-      this.mes -= 1;
-      this.filtrar();
-    },
-    filtrar() {
-      if (this.mes > 12) {
-        this.mes = 1;
-        this.ano += 1;
-      }
-
-      if (this.mes < 1) {
-        this.mes = 12;
-        this.ano -= 1;
-      }
-    },
     deleteLancamento(lancamento) {
       this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);
     },
@@ -204,7 +161,8 @@ export default {
     LancamentoLinha,
     RecorrenciaForm,
     ParcelamentoForm,
-    TrocaConta
+    TrocaConta,
+    DatePicker
   }
 }
 </script>

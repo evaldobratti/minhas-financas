@@ -16,7 +16,7 @@
       readonly
     ></v-text-field>
     <v-date-picker v-model="data" :date-format="formatDate"
-                   :formatted-value.sync="dataFormatada" no-title scrollable actions></v-date-picker>
+                   :formatted-value.sync="dataFormatada" :type="type" no-title scrollable actions></v-date-picker>
   </v-menu>
 </template>
 
@@ -24,7 +24,15 @@
   import moment from 'moment';
 
   export default {
-    props: ['value'],
+    props: {
+      value: {
+        type: Object
+      },
+      type: {
+        type: String,
+        default: 'date'
+      }
+    },
     data () {
       return {
         dataFormatada: null,
