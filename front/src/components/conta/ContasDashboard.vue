@@ -6,7 +6,7 @@
           <ContaCard :conta="conta"></ContaCard>
         </div>
         <v-dialog v-model="novaConta" lazy absolute>
-          <v-btn primary dark slot="activator">nova conta</v-btn>
+          <v-btn color="primary" dark slot="activator">nova conta</v-btn>
           <ContaForm @cadastrado="novaConta = false"></ContaForm>
         </v-dialog>
       </v-flex>

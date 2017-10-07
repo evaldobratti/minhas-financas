@@ -25,7 +25,7 @@
         <v-list>
             <v-list-tile @click="$emit('novaRecorrencia', lancamento)" :disabled="lancamento.motivo != null">
             <v-list-tile-title>
-                <v-btn primary fab small dark class="small-fab-btn">
+                <v-btn color="primary" fab small dark class="small-fab-btn">
                 <v-icon>refresh</v-icon>
                 </v-btn>
                 Recorrencia
@@ -33,7 +33,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('novoParcelamento', lancamento)" :disabled="lancamento.motivo != null">
             <v-list-tile-title>
-                <v-btn primary fab small dark class="small-fab-btn">
+                <v-btn color="primary" fab small dark class="small-fab-btn">
                 <v-icon>refresh</v-icon>
                 </v-btn>
                 Parcelamento
@@ -41,7 +41,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('deleteLancamento', lancamento)">
             <v-list-tile-title>
-                <v-btn primary fab small dark class="small-fab-btn red">
+                <v-btn color="primary" fab small dark class="small-fab-btn red">
                 <v-icon>remove</v-icon>
                 </v-btn>
                 Apagar
@@ -49,7 +49,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('efetiva', lancamento)" :disabled="lancamento.id != null" >
               <v-list-tile-title>
-                  <v-btn primary fab small dark class="small-fab-btn green">
+                  <v-btn color="primary" fab small dark class="small-fab-btn green">
                   <v-icon>add</v-icon>
                   </v-btn>
                   Efetivar
@@ -57,7 +57,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('trocaConta', lancamento)">
               <v-list-tile-title>
-                  <v-btn primary fab small dark class="small-fab-btn green">
+                  <v-btn color="primary" fab small dark class="small-fab-btn green">
                   <v-icon>swap_horiz</v-icon>
                   </v-btn>
                   Trocar de conta

@@ -1,23 +1,28 @@
 <template>
-  <v-menu
-    lazy
-    :close-on-content-click="true"
-    v-model="aberto"
-    offset-y
-    full-width
-    :nudge-left="40"
-    max-width="290px"
-  >
-    <v-text-field
-      slot="activator"
-      label="Data"
-      v-model="dataFormatada"
-      prepend-icon="event"
-      readonly
-    ></v-text-field>
-    <v-date-picker v-model="data" :date-format="formatDate"
-                   :formatted-value.sync="dataFormatada" :type="type" no-title scrollable actions></v-date-picker>
-  </v-menu>
+  <div>
+    <v-btn v-if="type == 'month'" flat icon @click="subtractMonth()">
+      <v-icon>chevron_left</v-icon>
+    </v-btn>
+    <v-menu
+      lazy
+      :close-on-content-click="true"
+      v-model="aberto"
+      style="width: 140px"
+    >
+      <v-text-field
+        slot="activator"
+        label="Data"
+        v-model="dataFormatada"
+        prepend-icon="event"
+        readonly
+      ></v-text-field>
+      <v-date-picker v-model="data" :date-format="formatDate"
+                    :formatted-value.sync="dataFormatada" :type="type" no-title scrollable actions></v-date-picker>
+    </v-menu>
+    <v-btn v-if="type == 'month'" flat icon @click="addMonth()">
+      <v-icon>chevron_right</v-icon>
+    </v-btn>
+  </div>
 </template>
 
 <script>
@@ -57,6 +62,12 @@
         this.data = new Date(val);
         this.$emit('input', moment(this.data));
         return this.data.toLocaleDateString();
+      },
+      addMonth() {
+        this.formatDate(moment(this.data).add(1, 'month').toDate())
+      },
+      subtractMonth() {
+        this.formatDate(moment(this.data).add(-1, 'month').toDate())
       }
     }
   }

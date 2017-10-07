@@ -2,7 +2,14 @@
   <div>
   <v-card>
     <v-card-text>
-      <v-checkbox v-for="conta in contas" :key="conta.id" :label="conta.nome" v-model="contasSelecionadas" :value="conta.id" />
+      <v-layout row wrap>
+        <v-flex xs8>
+          <v-checkbox v-for="conta in contas" :key="conta.id" :label="conta.nome" v-model="contasSelecionadas" :value="conta.id" />
+        </v-flex>
+        <v-flex xs4>
+          <DatePicker v-model="dataFiltro" type="month"></DatePicker>
+        </v-flex>
+      </v-layout>
     </v-card-text>
   </v-card>
   <v-card>
@@ -43,26 +50,39 @@
 
 <script>
 import LancamentoLinha from '../lancamento/LancamentoLinha';
-
+import moment from 'moment';
+import DatePicker from '../DatePicker';
 export default {
   data() {
     return {
+      dataFiltro: moment(),
       contasSelecionadas: [],
       lancamentos: []
     }
   },
-  watch: {
-    contasSelecionadas(val) {
-      this.lancamentos = this.$store.getters.lancamentosDe(this.contasSelecionadas, 10, 2017);
+  methods: {
+    refreshLancamentos() {
+      var mes = this.dataFiltro.month();
+      var ano = this.dataFiltro.year();
+      this.lancamentos = this.$store.getters.lancamentosDe(this.contasSelecionadas, mes, ano);
     }
   },
+  watch: {
+    contasSelecionadas() {
+      this.refreshLancamentos();
+    },
+    dataFiltro() {
+      this.refreshLancamentos();
+    }
+  }, 
   computed: {
     contas() {
       return this.$store.state.conta.list;
     }
   },
   components: {
-    LancamentoLinha
+    LancamentoLinha,
+    DatePicker
   }
 
 }

@@ -10,7 +10,7 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-      <v-btn @click.native.stop="dialogRaiz = true" primary small dark>
+      <v-btn @click.native.stop="dialogRaiz = true" color="primary" small dark>
         NOVA RAIZ
       </v-btn>
 

@@ -87,8 +87,10 @@
       </v-toolbar>
       <main>
         <v-content>
-          <Snackbar></Snackbar>
-          <router-view></router-view>
+          <v-container>
+            <Snackbar></Snackbar>
+            <router-view></router-view>
+          </v-container>
         </v-content>
       </main>
     </v-app>

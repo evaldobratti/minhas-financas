@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-snackbar
-          :success="context == 'success'"
-          :primary="context == 'primary'"
-          :error="context == 'error'"
+          :color="context"
           :timeout="timeout"
           :bottom="true"
           :left="true"

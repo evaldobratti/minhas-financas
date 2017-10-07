@@ -16,7 +16,7 @@
                 </v-flex>
               </v-layout>
               <v-layout row justify-space-around>
-                  <v-btn type="submit" primary>Entrar</v-btn>
+                  <v-btn type="submit" color="primary">Entrar</v-btn>
               </v-layout>
             </v-container>
           </v-card-text>

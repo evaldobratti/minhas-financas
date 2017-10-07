@@ -4,12 +4,12 @@
       <CategoriaIcone :aberto="aberto" :categoria="categoria" @abreFecha="abre"></CategoriaIcone>
       <span @click="abre">{{ categoria.nome }}</span>
       <transition name="fade">
-        <v-btn v-if="showActions" @click.native.stop="dialog = true" primary fab small dark class="small-fab-btn">
+        <v-btn v-if="showActions" @click.native.stop="dialog = true" color="primary" fab small dark class="small-fab-btn">
           <v-icon>add</v-icon>
         </v-btn>
       </transition>
       <transition name="fade">
-        <v-btn v-if="showActions" @click.native.stop="showModalRemove" primary fab small dark class="small-fab-btn red">
+        <v-btn v-if="showActions" @click.native.stop="showModalRemove" color="primary" fab small dark class="small-fab-btn red">
           <v-icon>remove</v-icon>
         </v-btn>
       </transition>
