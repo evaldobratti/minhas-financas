@@ -76,10 +76,22 @@ export default {
     errorMessages(field) {
       return [];
     },
+    lancamentoVazio() {
+      return {
+        data: moment(),
+        conta: null,
+        valor: null,
+        categoria: null,
+        local: null,
+        efetivada: null
+      };
+    },
     submit() {
       this.$refs.valor.blur();
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
-      this.$emit('submetido')
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
+        this.$emit('submetido');
+      });
+      
     },
     categoriaAsFlat(categoria) {
       let flat = [ categoria ];

@@ -14,7 +14,7 @@
     </td>
     <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
     <td>
-      <v-checkbox style="width: 40px" v-if="lancamento.efetivada != null" v-model="lancamento.efetivada"></v-checkbox>
+      <v-checkbox style="width: 40px" v-if="lancamento.id > 0" v-model="lancamento.efetivada"></v-checkbox>
     </td>
     <td>
       

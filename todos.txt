@@ -6,3 +6,4 @@
 - editar data de lançamento parece estar errado
 
 - Editar nome de categoria
+- limpar form de lançamento após submit
