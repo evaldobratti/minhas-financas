@@ -6,4 +6,3 @@
 - editar data de lançamento parece estar errado
 
 - Editar nome de categoria
-- efetivação de lancamento

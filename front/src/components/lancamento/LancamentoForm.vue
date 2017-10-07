@@ -21,7 +21,7 @@
         </v-text-field>
       </v-flex>
       <v-flex xs2>
-        <v-checkbox label="Efetuada" v-model="lancamento.efetuada"></v-checkbox>
+        <v-checkbox label="Efetivada" v-model="lancamento.efetivada"></v-checkbox>
       </v-flex>
       <v-btn type="submit" v-show="false">wtf</v-btn>
     </v-layout>
@@ -51,7 +51,7 @@ export default {
           valor: null,
           categoria: null,
           local: null,
-          efetuada: null
+          efetivada: null
         }
       }
     }

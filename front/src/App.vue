@@ -89,7 +89,7 @@
         <v-content>
           <v-container>
             <Snackbar></Snackbar>
-            <router-view></router-view>
+            <router-view :key="$route.path"></router-view>
           </v-container>
         </v-content>
       </main>

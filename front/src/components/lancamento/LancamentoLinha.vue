@@ -95,6 +95,11 @@ export default {
   watch: {
     lancamento(val) {
       this.backup = Object.assign({}, this.lancamento);
+    },
+    'lancamento.efetivada'(atual, antigo) {
+      if (this.lancamento.id > 0) {
+        this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
+      }
     }
   },
   methods: {
