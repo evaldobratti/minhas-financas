@@ -1,8 +1,9 @@
-- Editar nome de categoria
 - Criar componente para R$
 - Autocomplete funcionar com acento e associar com caracteres sem acento
 - transferência
 - limpar form de cadastro de conta após cadastro/fechar
 
 - editar data de lançamento parece estar errado
-- analisar contas conjuntas
+
+- Editar nome de categoria
+- efetivação de lancamento
