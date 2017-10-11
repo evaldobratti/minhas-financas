@@ -53,7 +53,7 @@ export const store = {
     },
     [d.SAVE_CATEGORIA]({dispatch, commit}, categoria) {
       return new Promise((resolve, reject) => {
-        axios.post('/api/categorias', categoria).then(res => {
+        axios.put('/api/categorias', categoria).then(res => {
           dispatch(d.LOAD_CATEGORIAS, true);
           resolve();
           commit(SNACKS.m.UPDATE_SNACK, {

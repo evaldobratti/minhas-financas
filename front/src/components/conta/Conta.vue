@@ -100,9 +100,10 @@ import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
 import TrocaConta from './TrocaConta';
 import moment from 'moment';
 import DatePicker from '../DatePicker';
-
+import Vue from 'vue';
 import axios from 'axios';
-export default {
+
+export default Vue.extend({
   data() {
     return {
       dataFiltro: moment(),
@@ -133,7 +134,7 @@ export default {
   },
   methods: {
     deleteLancamento(lancamento) {
-      this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);
+      this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);      
     },
     novaRecorrencia(lancamento) {
       this.lancamentoAcao = lancamento;
@@ -164,7 +165,7 @@ export default {
     TrocaConta,
     DatePicker
   }
-}
+});
 </script>
 
 <style>

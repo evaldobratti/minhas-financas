@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="submit">
-    <v-text-field ref="nome" v-model="nome" label="Nome"></v-text-field>
+    <v-text-field ref="nome" v-model="categoriaEdit.nome" label="Nome"></v-text-field>
     <v-btn type="submit">salvar</v-btn>
   </form>
 </template>
@@ -9,24 +9,30 @@
 import {d} from '../../store/categorias';
 
 export default {
-  props: ['categoriaPai'],
+  props: {
+    categoria: {
+      type: Object,
+      default() {
+        return { nome: '' }
+      }
+    }
+  },
   data() {
     return {
-      nome: ''
+      categoriaEdit: null
     }
+  },
+  created() {
+    this.categoriaEdit = Object.assign({}, this.categoria);
   },
   methods: {
     showing() {
       this.$nextTick(this.$refs.nome.focus);
     },
     reset() {
-      this.nome = '';
     },
     submit () {
-      this.$store.dispatch(d.SAVE_CATEGORIA, {
-        pai: this.categoriaPai ? this.categoriaPai.id : null,
-        nome: this.nome
-      }).then(() => {
+      this.$store.dispatch(d.SAVE_CATEGORIA, this.categoriaEdit).then(() => {
         this.reset();
         this.$emit('cadastrado');
       }).catch(() => {});

@@ -2,7 +2,7 @@
   <div>
     <div @mouseover="hovered" @mouseleave="unhovered" class="categoria">
       <CategoriaIcone :aberto="aberto" :categoria="categoria" @abreFecha="abre"></CategoriaIcone>
-      <span @click="abre">{{ categoria.nome }}</span>
+      <span @click="dialogEdit = true">{{ categoria.nome }}</span>
       <transition name="fade">
         <v-btn v-if="showActions" @click.native.stop="dialog = true" color="primary" fab small dark class="small-fab-btn">
           <v-icon>add</v-icon>
@@ -19,7 +19,17 @@
               <div class="headline">Nova sub-categoria de {{ categoria.nome }}</div>
             </v-card-title>
             <v-card-text>
-              <CategoriaForm ref="filhaForm" :categoriaPai="categoria" @cadastrado="dialog = false"></CategoriaForm>
+              <CategoriaForm ref="filhaForm" :categoria="{ nome: '', pai: categoria.id}" @cadastrado="dialog = false"></CategoriaForm>
+            </v-card-text>
+          </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogEdit">
+          <v-card >
+            <v-card-title>
+              <div class="headline">Editando categoria {{ categoria.nome }}</div>
+            </v-card-title>
+            <v-card-text>
+              <CategoriaForm ref="filhaForm" :categoria="categoria" @cadastrado="dialogEdit = false"></CategoriaForm>
             </v-card-text>
           </v-card>
       </v-dialog>
@@ -40,6 +50,7 @@ export default {
   data() {
     return {
       dialog: false,
+      dialogEdit: false,
       aberto: true,
       showActions: false
     }
