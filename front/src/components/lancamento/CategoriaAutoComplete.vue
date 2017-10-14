@@ -8,7 +8,7 @@
     v-on="$listeners"
     @input="$emit('input', $event)"
     autocomplete>
-    <template slot="item" scope="data">
+    <template slot="item" slot-scope="data">
       <span :style="{'padding-left': 25 * categoriaDistanciaAteRaiz(data.item) + 'px'}">
           <CategoriaIcone :categoria="data.item"></CategoriaIcone>
           {{ data.item.nome }}

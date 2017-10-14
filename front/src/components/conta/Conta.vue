@@ -20,7 +20,7 @@
               :items="lancamentos"
               hide-actions
               class="elevation-5 lancamentos">
-              <template slot="headers" scope="props">
+              <template slot="headers" slot-scope="props">
                 <tr>
                   <th style="width: 10px">
                     Data
@@ -41,7 +41,7 @@
                   <th  style="width: 40px" ></th>
                 </tr>
               </template>
-              <template slot="items" scope="l">
+              <template slot="items" slot-scope="l">
                 <LancamentoLinha :lancamento="l.item"
                   @novaRecorrencia="novaRecorrencia(l.item)" 
                   @novoParcelamento="novoParcelamento(l.item)"
@@ -56,7 +56,7 @@
     </v-card>
       </v-flex>
     </v-layout>
-    <v-dialog v-model="recorrenciaDialog" width="500px">
+    <v-dialog v-model="recorrenciaDialog" max-width="500px">
       <v-card>
         <v-card-title>
           <div class="headline">Nova recorrência</div>

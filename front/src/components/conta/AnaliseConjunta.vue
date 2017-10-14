@@ -18,7 +18,7 @@
               :items="lancamentos"
               hide-actions
               class="elevation-5 lancamentos">
-              <template slot="headers" scope="props">
+              <template slot="headers" slot-scope="props">
                 <tr>
                   <th style="width: 10px">
                     Data
@@ -39,7 +39,7 @@
                   <th  style="width: 40px" ></th>
                 </tr>
               </template>
-              <template slot="items" scope="l">
+              <template slot="items" slot-scope="l">
                 <LancamentoLinha :lancamento="l.item" />
               </template>
             </v-data-table>

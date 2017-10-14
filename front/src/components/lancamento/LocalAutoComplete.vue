@@ -9,7 +9,7 @@
     @input="$emit('input', $event)"
     :label="label"
     :search-input.sync="maybeNewValue">
-      <template slot="item" scope="data">
+      <template slot="item" slot-scope="data">
         {{ data.item.nome }}
         <small v-if="data.item.id == null">&nbsp;nova</small>
       </template>

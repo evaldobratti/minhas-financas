@@ -66,7 +66,7 @@
         </v-list>
         </v-menu>
     </td>
-    <v-dialog v-model="isEditando"  width="80%">
+    <v-dialog v-model="isEditando"  max-width="80%">
       <v-card>
           <LancamentoForm ref="form" :conta="lancamento.conta" 
             :lancamento="lancamento"
