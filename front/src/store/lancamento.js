@@ -72,7 +72,10 @@ function put({ dispatch, commit, state, getters}, lancamento) {
     axios.put('/api/lancamentos', lancamento).then(res => {
       commit(LOCAIS.m.MAYBE_NOVO_LOCAL, res.data.local);
       const lancamentos = state.list;
-      if (lancamento.id == null) {
+      
+      if (lancamentos.indexOf(lancamento) >= 0) {
+        Object.assign(lancamento, res.data);
+      } else {
         lancamentos.push(res.data);
       }
       

@@ -149,11 +149,9 @@ export default Vue.extend({
       this.trocaContaDialog = true;
     },
     efetiva(lancamento) {
-      axios.put('/api/lancamentos', lancamento).then(res => {
-        console.info('foi lul', res)
-      }).catch(err => {
-        console.error('nheca', err);
-      })
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, lancamento).then(() => {
+        this.$emit('submetido');
+      });
     },
   },
   components: {

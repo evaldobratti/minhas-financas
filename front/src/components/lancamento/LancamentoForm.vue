@@ -13,7 +13,7 @@
       <v-flex xs1>
         <v-text-field
           ref="valor"
-          v-model="lancamento.valor"
+          v-model.number="lancamento.valor"
           label="Valor"
           type="number"
           step="0.01"
@@ -62,9 +62,6 @@ export default {
   watch: {
     conta(val) {
       this.lancamento.conta = val;
-    },
-    'lancamento.valor'(val) {
-      this.lancamento.valor = Number(val);
     }
   },
   data() {  
