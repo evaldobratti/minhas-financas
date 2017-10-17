@@ -23,7 +23,7 @@
             <v-icon>more_vert</v-icon>
         </v-btn>
         <v-list>
-            <v-list-tile @click="$emit('novaRecorrencia', lancamento)" :disabled="lancamento.motivo != null">
+            <v-list-tile @click="$emit('novaRecorrencia', lancamento)">
             <v-list-tile-title>
                 <v-btn color="primary" fab small dark class="small-fab-btn">
                 <v-icon>refresh</v-icon>

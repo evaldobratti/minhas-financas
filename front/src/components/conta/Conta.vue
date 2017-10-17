@@ -62,7 +62,7 @@
           <div class="headline">Nova recorrência</div>
         </v-card-title>
         <v-card-text>
-          <RecorrenciaForm ref="recorrenciaForm" :lancamento="lancamentoAcao" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
+          <RecorrenciaForm :lancamento="lancamentoAcao" ref="recorrenciaForm" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
         </v-card-text>
       </v-card>
     </v-dialog>

@@ -1,19 +1,27 @@
 <template>
   <form @submit.prevent="submit">
-        <v-text-field
+        <v-text-field :disabled="recorrencia.id != null"
           label="A cada"
-          v-model="aCada"></v-text-field>
+          v-model="recorrencia.aCada"></v-text-field>
         <v-select
+          :disabled="recorrencia.id != null"
           label="Frequência"
           :items="frequencias"
           item-text="text"
           item-value="value"
-          v-model="tipoFrequencia"></v-select>
+          v-model="recorrencia.tipoFrequencia"></v-select>
         <v-text-field
+          :disabled="recorrencia.id != null"
           label="Valor"
-          v-model="valor"></v-text-field>
-
-        <DatePicker v-model="partirDe"></DatePicker>
+          v-model="recorrencia.valor"></v-text-field>
+      <v-layout>
+        <v-flex xs6>
+          <DatePicker label="Inicio" :disabled="recorrencia.id != null" v-model="recorrencia.partirDe"></DatePicker>
+        </v-flex>
+        <v-flex xs6>
+          <DatePicker label="Fim" :disabled="(recorrencia.id != null && recorrencia.dataFim != null) && submetido" v-model="recorrencia.dataFim"></DatePicker>
+        </v-flex>
+      </v-layout>
       <v-layout justify-space-around>
         <v-btn type="submit">Salvar</v-btn>
       </v-layout>
@@ -24,12 +32,15 @@
 import { RECORRENCIA } from '../../store/recorrencia';
 import mapGetSet from '../../store/mapGetSet';
 import DatePicker from '../DatePicker';
+import { lancamentos } from '../../store/lancamento';
+import { SNACKS } from '../../store/snacks';
+import axios from 'axios';
 
 export default {
-  props: ['lancamento'],
   components: {
     DatePicker
   },
+  props: ['lancamento'],
   data() {
     return {
       frequencias: [{
@@ -41,7 +52,19 @@ export default {
       }, {
         value: 'ANO',
         text: 'Ano'
-      }]
+      }],
+      recorrencia: {
+        id: null,
+        valor: null,
+        partirDe: null,
+        conta: null,
+        local: null,
+        categoria: null,
+        dia: null,
+        lancamentoInicial: null,
+        dataFim: null
+      },
+      submetido: false
     }
   },
   mounted() {
@@ -57,32 +80,39 @@ export default {
       if (!l)
         return;
 
-      this.valor = l.valor;
-      this.partirDe = l.data;
-      this.conta = l.conta;
-      this.local = l.local;
-      this.categoria = l.categoria;
-      this.dia = l.data.date();
-      this.lancamentoInicial = l;
+      this.submetido = false;
+
+      if (l.motivo && l.motivo['@class'].endsWith('RecorrenciaLancamentoGerado')) {
+        this.recorrencia = Object.assign({}, l.motivo.recorrencia);  
+      }
+      else {
+        this.$set(this.recorrencia, 'id', null);
+        this.$set(this.recorrencia, 'valor', l.valor);
+        this.$set(this.recorrencia, 'partirDe', l.data);
+        this.$set(this.recorrencia, 'conta', l.conta);
+        this.$set(this.recorrencia, 'tipoFrequencia', 'MES');
+        this.$set(this.recorrencia, 'aCada', 1);
+        this.$set(this.recorrencia, 'local', l.local);
+        this.$set(this.recorrencia, 'categoria', l.categoria);
+        this.$set(this.recorrencia, 'dia', l.dia);
+        this.$set(this.recorrencia, 'lancamentoInicial', l);
+        this.$set(this.recorrencia, 'dataFim', null);
+      }
     },
     submit() {
-      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM).then(() => {
+      axios.put('/api/recorrencias', this.recorrencia).then(() => {
+        this.submetido = true;
+        this.$store.dispatch(lancamentos.d.LANCAMENTO_LOAD);
+        this.$store.commit(SNACKS.m.UPDATE_SNACK, {
+          text: 'Recorrência cadastrada!',
+          timeout: 1500,
+          context: 'success'
+        });
         this.$emit('cadastrado');
+      }).catch(err => {
+        this.$store.commit(SNACKS.m.TRATA_ERRO, err);
       });
     }
-  },
-  computed: {
-    ...mapGetSet({
-      tipoFrequencia: ['recorrencias.form.tipoFrequencia', RECORRENCIA.m.UPDATE_FORM_TIPO_FREQUENCIA],
-      valor: ['recorrencias.form.valor', RECORRENCIA.m.UPDATE_FORM_VALOR],
-      aCada: ['recorrencias.form.aCada', RECORRENCIA.m.UPDATE_FORM_A_CADA],
-      dia: ['recorrencias.form.dia', RECORRENCIA.m.UPDATE_FORM_DIA],
-      partirDe: ['recorrencias.form.partirDe', RECORRENCIA.m.UPDATE_FORM_PARTIR_DE],
-      conta: ['recorrencias.form.conta', RECORRENCIA.m.UPDATE_FORM_CONTA],
-      categoria: ['recorrencias.form.categoria', RECORRENCIA.m.UPDATE_FORM_CATEGORIA],
-      local: ['recorrencia.form.local', RECORRENCIA.m.UPDATE_FORM_LOCAL],
-      lancamentoInicial: ['recorrencia.form.lancamentoInicial', RECORRENCIA.m.UPDATE_FORM_LANCAMENTO_INICIAL]
-    }),
   }
 }
 </script>

@@ -70,6 +70,9 @@ public class Recorrencia extends UserOwned<Recorrencia> {
     @Column(name = "partir_de", nullable = false)
     private LocalDate partirDe;
 
+    @Column(name = "data_fim")
+    private LocalDate dataFim;
+
     @ManyToOne(optional = false)
     @NotNull
     private Conta conta;
@@ -171,6 +174,19 @@ public class Recorrencia extends UserOwned<Recorrencia> {
         return conta;
     }
 
+    public LocalDate getDataFim() {
+        return dataFim;
+    }
+
+    public void setDataFim(LocalDate dataFim) {
+        this.dataFim = dataFim;
+    }
+
+    public Recorrencia dataFim(LocalDate dataFim) {
+        setDataFim(dataFim);
+        return this;
+    }
+
     public Recorrencia conta(Conta conta) {
         this.conta = conta;
         return this;
@@ -227,7 +243,13 @@ public class Recorrencia extends UserOwned<Recorrencia> {
 	public List<Lancamento> projecaoAte(LocalDate ate) {
 		if (ate.isBefore(partirDe))
 			return new ArrayList<>();
-		
+        
+        final LocalDate menorAte;
+        if (dataFim == null)
+            menorAte = ate;
+        else
+            menorAte = dataFim.isBefore(ate) ? dataFim : ate;
+
 		LocalDate dataBase = LocalDate.of(partirDe.getYear(), partirDe.getMonth(), partirDe.getDayOfMonth());
 		int cada = aCada;
 		List<Lancamento> retorno = new ArrayList<>();
@@ -240,7 +262,7 @@ public class Recorrencia extends UserOwned<Recorrencia> {
                         .efetivada(false)
 						.motivo(novoMotivo(dataBase, true, retorno.size() + 1)));
 		
-		while ((dataBase.isBefore(ate) || dataBase.equals(ate)) && !deveParar(true, retorno)) {
+		while ((dataBase.isBefore(menorAte) || dataBase.equals(menorAte)) && !deveParar(true, retorno)) {
 			cada -= 1;
 			dataBase = dataBase.plus(1, tipoFrequencia.unit());
 			
@@ -261,7 +283,7 @@ public class Recorrencia extends UserOwned<Recorrencia> {
 		List<LocalDate> datasGeradas = recorrenciaLancamentos.stream().map(i -> i.getData()).collect(Collectors.toList());
 		
 		return retorno.stream().filter(l -> 
-			(l.getData().isBefore(ate) || l.getData().equals(ate))
+			(l.getData().isBefore(menorAte) || l.getData().equals(menorAte))
 			&& !datasGeradas.contains(l.getData())).collect(Collectors.toList());
 	}
 

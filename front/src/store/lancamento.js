@@ -46,6 +46,16 @@ export function normalizeLancamentos(lancamentos, getters) {
     const categoria = l.categoria ? getters.getCategoria(l.categoria.id) : null;
     if (categoria != null)
       l.categoria = categoria;
+
+    if (l.motivo != null)  {
+      if (l.motivo['@class'].endsWith("RecorrenciaLancamentoGerado")) {
+        l.motivo.data = moment(l.motivo.data);
+        l.motivo.recorrencia.partirDe = moment(l.motivo.recorrencia.partirDe);
+        l.motivo.recorrencia.dataFim = l.motivo.recorrencia.dataFim != null ?
+          moment(l.motivo.recorrencia.dataFim) :
+          null;
+      }
+    }
   });
 
   lancamentos.sort((a, b) => {

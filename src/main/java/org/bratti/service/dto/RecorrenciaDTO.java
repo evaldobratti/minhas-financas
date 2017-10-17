@@ -33,7 +33,9 @@ public class RecorrenciaDTO {
     
     private Local local;
     
-    private Lancamento lancamentoInicial;
+	private Lancamento lancamentoInicial;
+	
+	private LocalDate dataFim;
 
 	public Long getId() {
 		return id;
@@ -73,6 +75,14 @@ public class RecorrenciaDTO {
 
 	public void setPartirDe(LocalDate partirDe) {
 		this.partirDe = partirDe;
+	}
+
+	public LocalDate getDataFim() {
+		return dataFim;
+	}
+
+	public void setDataFim(LocalDate dataFim) {
+		this.dataFim = dataFim;
 	}
 
 	public Conta getConta() {
@@ -119,6 +129,7 @@ public class RecorrenciaDTO {
 		this.setPartirDe(recorrencia.getPartirDe());
 		this.setTipoFrequencia(recorrencia.getTipoFrequencia());
 		this.setValor(recorrencia.getValor());
+		this.setDataFim(recorrencia.getDataFim());
 	}
 	
 	public Recorrencia toEntity() {
@@ -131,6 +142,7 @@ public class RecorrenciaDTO {
 		recorrencia.setPartirDe(partirDe);
 		recorrencia.setTipoFrequencia(tipoFrequencia);
 		recorrencia.setValor(valor);
+		recorrencia.setDataFim(dataFim);
 		return recorrencia;
 	}
 

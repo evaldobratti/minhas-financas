@@ -5,13 +5,15 @@
     </v-btn>
     <v-menu
       lazy
+      :disabled="disabled"
       :close-on-content-click="true"
       v-model="aberto"
       style="width: 140px"
     >
       <v-text-field
+        :disabled="disabled"
         slot="activator"
-        label="Data"
+        :label="label"
         v-model="dataFormatada"
         prepend-icon="event"
         readonly
@@ -36,6 +38,14 @@
       type: {
         type: String,
         default: 'date'
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      label: {
+        type: String,
+        default: 'Data'
       }
     },
     data () {
@@ -53,8 +63,10 @@
     },
     watch: {
       value(val) {
-        this.data = val.toDate();
-        this.dataFormatada = this.data.toLocaleDateString();
+        if (val) {
+          this.data = val.toDate();
+          this.dataFormatada = this.data.toLocaleDateString();
+        }
       }
     },
     methods: {
