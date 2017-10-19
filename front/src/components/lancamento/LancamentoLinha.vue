@@ -23,7 +23,7 @@
             <v-icon>more_vert</v-icon>
         </v-btn>
         <v-list>
-            <v-list-tile @click="$emit('novaRecorrencia', lancamento)">
+            <v-list-tile @click="$emit('novaRecorrencia', lancamento)" :disabled="!(lancamento.motivo == null || lancamento.motivo['@class'].endsWith('RecorrenciaLancamentoGerado'))">
             <v-list-tile-title>
                 <v-btn color="primary" fab small dark class="small-fab-btn">
                 <v-icon>refresh</v-icon>
@@ -66,7 +66,7 @@
         </v-list>
         </v-menu>
     </td>
-    <v-dialog v-model="isEditando"  max-width="80%">
+    <v-dialog v-model="isEditando" max-width="80%">
       <v-card>
           <LancamentoForm ref="form" :conta="lancamento.conta" 
             :lancamento="lancamento"

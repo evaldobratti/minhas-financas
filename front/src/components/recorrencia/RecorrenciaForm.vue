@@ -10,6 +10,13 @@
           item-text="text"
           item-value="value"
           v-model="recorrencia.tipoFrequencia"></v-select>
+        <v-select
+          :disabled="recorrencia.id != null"
+          label="Conta"
+          :items="contas"
+          item-text="nome"
+          item-value="value"
+          v-model="recorrencia.conta"></v-select>
         <v-text-field
           :disabled="recorrencia.id != null"
           label="Valor"
@@ -73,6 +80,11 @@ export default {
   watch: {
     lancamento(lancamento) {
       this.updateLancamento(lancamento);
+    }
+  },
+  computed: {
+    contas() {
+      return this.$store.state.conta.list;
     }
   },
   methods: {
