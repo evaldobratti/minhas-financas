@@ -75,17 +75,22 @@ export default {
     },
     lancamentoVazio() {
       return {
-        data: moment(),
-        conta: null,
-        valor: null,
-        categoria: null,
-        local: null,
-        efetivada: null
-      };
+          data: moment(),
+          valor: null,
+          categoria: null,
+          local: null,
+          efetivada: null
+        }
     },
     submit() {
       this.$refs.valor.blur();
       this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
+        if (this.lancamento.id == null) {
+          Object.assign(this.lancamento, this.lancamentoVazio());
+          setTimeout(()  => {
+            this.$refs.localAutoComplete.focus()
+          }, 100);
+        }
         this.$emit('submetido');
       });
       

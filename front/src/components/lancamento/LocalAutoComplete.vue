@@ -26,9 +26,15 @@ export default {
       internal: null
     }
   },
+  created() {
+    this.internal = this.value;
+  },
   watch: {
     value(val) {
-      this.maybeNewLocal(val.nome);
+      if (val != null) {
+        this.maybeNewLocal(val.nome);
+      }
+      this.internal = val;
     },
     maybeNewValue(val) {
       this.maybeNewLocal(val);
