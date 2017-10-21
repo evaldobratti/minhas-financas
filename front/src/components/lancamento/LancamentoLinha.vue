@@ -18,7 +18,7 @@
     </td>
     <td>
       
-        <v-menu  style="width: 40px"  bottom right>
+        <v-menu lazy style="width: 40px"  bottom right>
         <v-btn icon slot="activator">
             <v-icon>more_vert</v-icon>
         </v-btn>
