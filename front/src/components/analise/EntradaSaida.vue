@@ -1,12 +1,17 @@
 <template>
-  <div>
-    <date-picker type="month" v-model="mes"/>
-    <line-chart
-      :chart-data="saldos"
-      :options="options"
-      :width="900"
-      ></line-chart>
-  </div>
+  <v-layout row>
+      <v-flex xs6>
+        <v-card class="conta-card">
+          <date-picker type="month" v-model="mes"/>
+          <line-chart
+            :chart-data="saldos"
+            :options="options"
+            :height="300"
+            chart-id="canvas2"
+            ></line-chart>
+        </v-card>
+      </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -16,6 +21,7 @@ import LineChart from '../charts/LineChart';
 import DatePicker from '../DatePicker';
 import moment from 'moment';
 import currency from '../../filters/currency';
+import date from '../../filters/date';
 
 export default {
   data() {
@@ -23,18 +29,29 @@ export default {
     return {
       mes: moment(),
       options: {
-        responsive: false, 
+        responsive: true,
+        legend: {
+          display: false
+        },
         tooltips: { 
           mode: 'index', 
           intersect: false,
-          custom: function(model) {
-            return model;
-          },
           callbacks: {
+            title: function([item], data) {
+              let lancamento = vm.saldos.lancamentos[item.index];
+
+              return lancamento.local.nome + ' em ' + date(lancamento.data);
+            },
             label: function(item, data) {
               let lancamento = vm.saldos.lancamentos[item.index];
-              return lancamento.local.nome + " " + currency(lancamento.valor) + " " + currency(lancamento.saldoDiario);
-            }
+
+              return currency(lancamento.valor)
+            },
+            footer: function([item], data) {
+              let lancamento = vm.saldos.lancamentos[item.index];
+
+              return 'Saldo: ' + currency(lancamento.saldoDiario)
+            },
           }
         }
       }
