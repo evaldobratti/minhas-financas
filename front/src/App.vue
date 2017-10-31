@@ -2,7 +2,8 @@
   <div id="app">
     
     <v-app>
-      <v-navigation-drawer app permanent clipped light v-if="isAuthenticated">
+      <main>
+      <v-navigation-drawer app permanent clipped v-if="isAuthenticated">
         <v-list dense class="pt-0">
           <v-list-tile>
             <v-list-tile-action>
@@ -85,7 +86,7 @@
           </v-list>
         </v-menu>
       </v-toolbar>
-      <main>
+      
         <v-content>
           <v-container>
             <Snackbar></Snackbar>
