@@ -5,4 +5,8 @@
 
 - editar data de lançamento parece estar errado
 
-- limpar form de lançamento após submit
+
+
+- manter data após submeter data de lançamento
+- reordenar lançamentos
+- somente trocar lançamento de conta após clicar em salvar

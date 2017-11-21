@@ -4,6 +4,11 @@ const LOGGED_IN = 'loggedIn';
 const SET_USER_DATA = 'setUserData';
 const LOGIN_FORM_RESET = 'loginFormReset';
 
+import { LOAD_CONTAS } from './conta';
+import { CATEGORIAS } from './categorias';
+import { LOCAIS } from './locais';
+import { lancamentos } from './lancamento';
+
 export default {
   state: {
     form: {
@@ -49,8 +54,9 @@ export default {
     getInitialData({commit, dispatch}) {
       if (localStorage.getItem('token')) {
         commit(LOGGED_IN, localStorage.getItem('token'));
-        dispatch('getUserData');
+        return dispatch('getUserData');
       }
+      return null;
     },
     login({commit, state, dispatch, rootState}) {
       axios.post('api/authenticate', {
@@ -68,8 +74,17 @@ export default {
         commit('loggedFail', err);
       });
     },
-    getUserData({commit}) {
-      axios.get('api/account').then(res => commit(SET_USER_DATA, res.data));
+    getUserData({commit, dispatch}) {
+      return new Promise((resolve, reject) => {
+        axios.get('api/account').then(res => {
+          commit(SET_USER_DATA, res.data)
+          dispatch(LOAD_CONTAS)
+          .then(() => dispatch(CATEGORIAS.d.LOAD_CATEGORIAS, true)
+            .then(() => dispatch(LOCAIS.d.LOAD_LOCAIS)
+              .then(() => dispatch(lancamentos.d.LANCAMENTO_LOAD))));
+          resolve();
+        }).catch(() => reject());
+      });
     }
   }
 }

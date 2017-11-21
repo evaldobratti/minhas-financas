@@ -27,10 +27,7 @@ const store = new Vuex.Store({
 });
 
 store.dispatch('getInitialData');
-store.dispatch(conta.LOAD_CONTAS)
-  .then(() => store.dispatch(CATEGORIAS.d.LOAD_CATEGORIAS, true)
-    .then(() => store.dispatch(LOCAIS.d.LOAD_LOCAIS)
-      .then(() => store.dispatch(lancamento.lancamentos.d.LANCAMENTO_LOAD))));
+
 
 export default store;
 
