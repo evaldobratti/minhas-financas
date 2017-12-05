@@ -2,15 +2,23 @@ package org.bratti.web.rest;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.bratti.domain.Lancamento;
 import org.bratti.domain.Local;
+import org.bratti.domain.User;
 import org.bratti.repository.LancamentoRepository;
 import org.bratti.repository.LocalRepository;
 import org.bratti.repository.RecorrenciaRepository;
@@ -19,6 +27,12 @@ import org.bratti.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.UserProfile;
+import org.springframework.social.connect.web.HttpSessionSessionStrategy;
+import org.springframework.social.connect.web.ProviderSignInAttempt;
+import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +42,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -52,16 +69,51 @@ public class LancamentoResource {
 
 	private UserService userService;
 
-	private RecorrenciaRepository recorrenciaReposiory;
+    private RecorrenciaRepository recorrenciaReposiory;
+    
+    private ProviderSignInUtils providerSignInUtils;
+
+    private SignInAdapter signInAdapter;
 
     public LancamentoResource(LancamentoRepository lancamentoRepository,
         LocalRepository localRepository, 
         RecorrenciaRepository recorrenciaReposiory,
-        UserService userService) {
+        UserService userService,
+        ProviderSignInUtils providerSignInUtils, 
+        SignInAdapter signInAdapter) {
         this.lancamentoRepository = lancamentoRepository;
         this.localRepository = localRepository;
 		this.recorrenciaReposiory = recorrenciaReposiory;
-		this.userService = userService;
+        this.userService = userService;
+        this.providerSignInUtils = providerSignInUtils;
+        this.signInAdapter = signInAdapter;
+    }
+
+    @GetMapping("/socialAuth")
+    public Map<String, String> getSocialAuthData(HttpServletRequest request) {
+        Map<String, String> res = new HashMap<>();
+        
+        ProviderSignInAttempt att = (ProviderSignInAttempt) request.getSession().getAttribute(ProviderSignInAttempt.SESSION_ATTRIBUTE);
+        if (att != null) {
+            res.put("wtf", att.toString());
+
+        }
+        return res;
+    }
+
+    @PostMapping("/signup")
+    public void login(ServletWebRequest request) {
+        Connection<?> conn = providerSignInUtils.getConnectionFromSession(request);
+        if (conn != null) {
+            UserProfile profile = conn.fetchUserProfile();
+            User user = userService.createUser(profile.getEmail(), "asdf##$@231", profile.getFirstName(), profile.getLastName(), profile.getEmail(), 
+            conn.getImageUrl(), "pt");
+            userService.activateRegistration(user.getActivationKey());
+            signInAdapter.signIn(profile.getEmail(), conn, request);
+            providerSignInUtils.doPostSignUp(profile.getEmail(), request);
+        }
+
+        
     }
 
     @PostMapping("/lancamentos")
