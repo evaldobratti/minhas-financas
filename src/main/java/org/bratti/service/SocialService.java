@@ -66,7 +66,8 @@ public class SocialService {
         String imageUrl = connection.getImageUrl();
         User user = createUserIfNotExist(userProfile, langKey, providerId, imageUrl);
         createSocialConnection(user.getLogin(), connection);
-        mailService.sendSocialRegistrationValidationEmail(user, providerId);
+        user.setActivated(true);
+        user.setActivationKey(null);
     }
 
     private User createUserIfNotExist(UserProfile userProfile, String langKey, String providerId, String imageUrl) {

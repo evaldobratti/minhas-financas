@@ -110,7 +110,7 @@ jhipster:
         license:
         license-url:
     social:
-        redirect-after-sign-in: "/#/social-auth"
+        redirect-after-sign-in: "/#/social-login"
     ribbon:
         display-on-active-profiles: dev
 

@@ -1,9 +1,13 @@
 package org.bratti.config.social;
 
 import org.bratti.repository.SocialUserConnectionRepository;
+import org.bratti.repository.UserRepository;
+import org.bratti.repository.AuthorityRepository;
 import org.bratti.repository.CustomSocialUsersConnectionRepository;
 import org.bratti.security.jwt.TokenProvider;
 import org.bratti.security.social.CustomSignInAdapter;
+import org.bratti.service.SocialService;
+import org.bratti.service.UserService;
 
 import io.github.jhipster.config.JHipsterProperties;
 
@@ -47,11 +51,16 @@ public class SocialConfiguration implements SocialConfigurer {
 
     private final Environment environment;
 
-    public SocialConfiguration(SocialUserConnectionRepository socialUserConnectionRepository,
-            Environment environment) {
+    private final UserRepository userRepository;
 
+    private final AuthorityRepository authorityRepository;
+
+    public SocialConfiguration(SocialUserConnectionRepository socialUserConnectionRepository,
+            Environment environment, UserRepository userRepository,  AuthorityRepository authorityRepository) {
         this.socialUserConnectionRepository = socialUserConnectionRepository;
         this.environment = environment;
+        this.userRepository = userRepository;
+        this.authorityRepository = authorityRepository;
     }
 
     @Bean
@@ -120,7 +129,8 @@ public class SocialConfiguration implements SocialConfigurer {
 
     @Override
     public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
-        return new CustomSocialUsersConnectionRepository(socialUserConnectionRepository, connectionFactoryLocator);
+        CustomSocialUsersConnectionRepository repo = new CustomSocialUsersConnectionRepository(socialUserConnectionRepository, connectionFactoryLocator, userRepository, authorityRepository);
+        return repo;
     }
 
     @Bean

@@ -2,7 +2,6 @@ package org.bratti.config;
 
 import java.sql.SQLException;
 
-import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import org.bratti.repository.factory.RepoFactory;
@@ -18,7 +17,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import io.github.jhipster.config.JHipsterConstants;

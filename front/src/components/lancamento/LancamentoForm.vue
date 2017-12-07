@@ -75,7 +75,6 @@ export default {
     },
     lancamentoVazio() {
       return {
-          data: moment(),
           valor: null,
           categoria: null,
           local: null,

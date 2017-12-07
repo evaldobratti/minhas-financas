@@ -7,6 +7,7 @@ import Conta from '@/components/conta/Conta'
 import Categorias from '@/components/categoria/Categorias'
 import UploadExtrato from '@/components/UploadExtrato';
 import AnaliseConjunta from '@/components/conta/AnaliseConjunta';
+import SocialLogin from '@/components/SocialLogin';
 Vue.use(Router)
 
 export default new Router({
@@ -20,6 +21,11 @@ export default new Router({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/social-login',
+      name: 'SocialLogin',
+      component: SocialLogin
     },
     {
       path: '/dashboard',

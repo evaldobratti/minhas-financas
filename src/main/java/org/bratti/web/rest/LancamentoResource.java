@@ -70,10 +70,6 @@ public class LancamentoResource {
 	private UserService userService;
 
     private RecorrenciaRepository recorrenciaReposiory;
-    
-    private ProviderSignInUtils providerSignInUtils;
-
-    private SignInAdapter signInAdapter;
 
     public LancamentoResource(LancamentoRepository lancamentoRepository,
         LocalRepository localRepository, 
@@ -85,35 +81,6 @@ public class LancamentoResource {
         this.localRepository = localRepository;
 		this.recorrenciaReposiory = recorrenciaReposiory;
         this.userService = userService;
-        this.providerSignInUtils = providerSignInUtils;
-        this.signInAdapter = signInAdapter;
-    }
-
-    @GetMapping("/socialAuth")
-    public Map<String, String> getSocialAuthData(HttpServletRequest request) {
-        Map<String, String> res = new HashMap<>();
-        
-        ProviderSignInAttempt att = (ProviderSignInAttempt) request.getSession().getAttribute(ProviderSignInAttempt.SESSION_ATTRIBUTE);
-        if (att != null) {
-            res.put("wtf", att.toString());
-
-        }
-        return res;
-    }
-
-    @PostMapping("/signup")
-    public void login(ServletWebRequest request) {
-        Connection<?> conn = providerSignInUtils.getConnectionFromSession(request);
-        if (conn != null) {
-            UserProfile profile = conn.fetchUserProfile();
-            User user = userService.createUser(profile.getEmail(), "asdf##$@231", profile.getFirstName(), profile.getLastName(), profile.getEmail(), 
-            conn.getImageUrl(), "pt");
-            userService.activateRegistration(user.getActivationKey());
-            signInAdapter.signIn(profile.getEmail(), conn, request);
-            providerSignInUtils.doPostSignUp(profile.getEmail(), request);
-        }
-
-        
     }
 
     @PostMapping("/lancamentos")
