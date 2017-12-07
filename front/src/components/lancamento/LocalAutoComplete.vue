@@ -45,7 +45,7 @@ export default {
       if (val == null)
         return;
       
-      let possible = this.locais.find(c => c.nome.toLowerCase().indexOf(val.toLowerCase()) >= 0);
+      let possible = this.locais.find(c => c.nome.toLowerCase().startsWith(val.toLowerCase()));
       if (possible == null) {
         const categoria = this.$store.state.locais.list.find(c => c.id == null);
         if (categoria) {

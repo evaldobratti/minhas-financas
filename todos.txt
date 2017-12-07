@@ -2,11 +2,13 @@
 - Autocomplete funcionar com acento e associar com caracteres sem acento
 - transferência
 - limpar form de cadastro de conta após cadastro/fechar
-
 - editar data de lançamento parece estar errado
 
 
-
-- manter data após submeter data de lançamento
+- atualizar vue
+- atualizar vuetify
+- atualizar negócio que github tá embaçando
+- manter data após submeter data de lançamento - talvez
+- filtro global de data
 - reordenar lançamentos
 - somente trocar lançamento de conta após clicar em salvar
