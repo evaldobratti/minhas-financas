@@ -1,9 +1,6 @@
 <template>
-  <div id="app">
-    
     <v-app>
-      <main>
-      <v-navigation-drawer app permanent clipped v-if="isAuthenticated">
+      <v-navigation-drawer app clipped fixed v-if="isAuthenticated">
         <v-list dense class="pt-0">
           <v-list-tile>
             <v-list-tile-action>
@@ -86,16 +83,13 @@
           </v-list>
         </v-menu>
       </v-toolbar>
-      
-        <v-content>
-          <v-container>
-            <Snackbar></Snackbar>
-            <router-view :key="$route.path"></router-view>
-          </v-container>
-        </v-content>
-      </main>
+      <v-content>
+        <v-container fluid>
+          <Snackbar></Snackbar>
+          <router-view :key="$route.path"></router-view>
+        </v-container>
+      </v-content>
     </v-app>
-  </div>
 </template>
 
 <script>

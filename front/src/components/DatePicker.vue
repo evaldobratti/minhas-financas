@@ -4,23 +4,24 @@
       <v-icon>chevron_left</v-icon>
     </v-btn>
     <v-menu
-      lazy
-      :disabled="disabled"
-      :close-on-content-click="true"
-      v-model="aberto"
-      style="width: 140px"
-    >
-      <v-text-field
+        lazy
         :disabled="disabled"
-        slot="activator"
-        :label="label"
-        v-model="dataFormatada"
-        prepend-icon="event"
-        readonly
-      ></v-text-field>
-      <v-date-picker v-model="data" :date-format="formatDate"
-                    :formatted-value.sync="dataFormatada" :type="type" no-title scrollable actions></v-date-picker>
-    </v-menu>
+        :close-on-content-click="true"
+        v-model="aberto"
+        transition="scale-transition"
+        offset-y
+        style="width: 140px"
+      >
+        <v-text-field
+          :disabled="disabled"
+          slot="activator"
+          :label="label"
+          v-model="dataFormatada"
+          prepend-icon="event"
+          readonly
+        ></v-text-field>
+        <v-date-picker v-model="data" :type="type" no-title scrollable actions></v-date-picker>
+      </v-menu>
     <v-btn v-if="type == 'month'" flat icon @click="addMonth()">
       <v-icon>chevron_right</v-icon>
     </v-btn>
@@ -57,30 +58,26 @@
     },
     created() {
       if (this.value) {
-        this.data = this.value.toDate();
-        this.dataFormatada = this.data.toLocaleDateString();
+        this.data = this.value.format('YYYY-MM-DD');
       }
     },
     watch: {
-      value(val) {
-        if (val) {
-          this.data = val.toDate();
-          this.dataFormatada = this.data.toLocaleDateString();
+      data(val) {
+        if (val != null) {
+          const asMoment = moment(this.data);
+          this.dataFormatada = asMoment.format('DD/MM/YYYY')
+          this.$emit('input', asMoment); 
         }
       }
     },
     methods: {
-      formatDate(val) {
-        this.data = new Date(val);
-        this.$emit('input', moment(this.data));
-        return this.data.toLocaleDateString();
-      },
-      addMonth() {
-        this.formatDate(moment(this.data).add(1, 'month').toDate())
-      },
-      subtractMonth() {
-        this.formatDate(moment(this.data).add(-1, 'month').toDate())
-      }
+      addMonth() { 
+        this.data = moment(this.data).add(1, 'month').format('YYYY-MM-DD');
+      }, 
+      subtractMonth() { 
+        this.data = moment(this.data).add(-1, 'month').format('YYYY-MM-DD');
+      } 
     }
   }
 </script>
+
