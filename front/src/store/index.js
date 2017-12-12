@@ -10,8 +10,18 @@ import recorrencia from './recorrencia';
 import parcelamentos from './parcelamentos';
 import snacks, {SNACKS} from './snacks';
 import { LOCAIS } from './locais';
+import { initializeApp } from 'firebase';
 
 Vue.use(Vuex);
+
+initializeApp({
+  apiKey: "AIzaSyB5mLWc-ry7gdmx8H8UeBIfmlWfqNRkBa4",
+  authDomain: "eb-minhas-financas.firebaseapp.com",
+  databaseURL: "https://eb-minhas-financas.firebaseio.com",
+  projectId: "eb-minhas-financas",
+  storageBucket: "eb-minhas-financas.appspot.com",
+  messagingSenderId: "761623811227"
+});
 
 const store = new Vuex.Store({
     modules: {
