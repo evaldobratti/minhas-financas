@@ -29,10 +29,10 @@ export default {
   },
   computed: {
     usuario() {
-      return this.$store.state.authentication.usuario;
+      return this.$store.state.auth.usuario;
     },
     isAuthenticated() {
-      return this.$store.state.authentication.isAuthenticated;
+      return this.$store.state.auth.isAuthenticated;
     }
   }
 }

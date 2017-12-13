@@ -93,18 +93,19 @@
 </template>
 
 <script>
-import Snackbar from './components/Snackbar'
+import Snackbar from './components/Snackbar';
+import AUTH from './store/auth';
+
 export default {
   name: 'app',
   methods: {
     logout() {
-      this.$store.commit('loggedOut');
-      this.$root.$emit('snack', { text: 'vc foi desconectado :)' })
+      this.$store.dispatch(AUTH.d.LOGOUT);
     }
   },
   computed: {
     isAuthenticated() {
-      return this.$store.state.authentication.isAuthenticated;
+      return this.$store.state.auth.isAuthenticated;
     },
     contas() {
       return this.$store.state.conta.list;

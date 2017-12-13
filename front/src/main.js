@@ -9,6 +9,7 @@ import store from './store'
 import { sync } from 'vuex-router-sync';
 import currency from './filters/currency';
 import date from './filters/date';
+import firebase from 'firebase';
 
 sync(store, router);
 
