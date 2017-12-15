@@ -4,6 +4,7 @@ import { LOCAIS } from './locais';
 import moment from 'moment';
 import Vue from 'vue';
 import { SNACKS } from './snacks';
+import firebase from 'firebase';
 
 const m = {
   LANCAMENTO_SET_DATA: 'lancamentoSetData',
@@ -39,10 +40,6 @@ export function normalizeLancamentos(lancamentos, getters) {
       l.data = moment(l.data);
     l.conta = getters.getConta(l.conta.id);
     
-    const local = getters.getLocal(l.local.id)
-    if (local != null)
-      l.local = local;
-
     const categoria = l.categoria ? getters.getCategoria(l.categoria.id) : null;
     if (categoria != null)
       l.categoria = categoria;
@@ -68,7 +65,13 @@ export function normalizeLancamentos(lancamentos, getters) {
 }
 
 function put({ dispatch, commit, state, getters}, lancamento) {
-  new Promise((resolve, reject) => {
+  lancamento.data = lancamento.data.toISOString();
+  lancamento.idConta = lancamento.conta.id;
+  delete lancamento.conta;
+
+  firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta).push(lancamento);
+
+  /*new Promise((resolve, reject) => {
     axios.put('/api/lancamentos', lancamento).then(res => {
       commit(LOCAIS.m.MAYBE_NOVO_LOCAL, res.data.local);
       const lancamentos = state.list;
@@ -91,7 +94,7 @@ function put({ dispatch, commit, state, getters}, lancamento) {
       }
       reject();
     });
-  });
+  });*/
 }
 
 export const store = {
@@ -138,7 +141,7 @@ export const store = {
             id: -1,
             data: saldoDataInicial,
             conta: null,
-            local: { id: -1, nome: 'Saldo inicial'},
+            local: 'Saldo inicial',
             categoria: { id: -1},
             saldoDiario: saldoInicial,
             efetuada: false
@@ -148,7 +151,7 @@ export const store = {
             id: -2,
             data: saldoDataFinal,
             conta: null,
-            local: { id: -2, nome: 'Saldo final'},
+            local: 'Saldo final',
             categoria: { id: -2 },
             saldoDiario: saldoFinal,
             efetuada: false
@@ -174,14 +177,14 @@ export const store = {
       
       normalizeLancamentos(state.list, getters);
       
-      /*const saldos = {};
+      const saldos = {};
       state.list.forEach(l => {
         if (saldos[l.conta.id] == null) {
           saldos[l.conta.id] = getters.getConta(l.conta.id).saldoInicial;
         }
         saldos[l.conta.id] += l.valor;
         Vue.set(l, 'saldoDiario', saldos[l.conta.id]);
-      });*/
+      });
     },
   },
   actions: {
@@ -192,8 +195,21 @@ export const store = {
     [d.LANCAMENTO_EDICAO_SUBMIT](context, lancamento)  {
       return put(context, lancamento)
     },
-    [d.LANCAMENTO_LOAD]({dispatch, commit, getters}) {
-      return new Promise((resolve, reject) => {
+    [d.LANCAMENTO_LOAD]({state, dispatch, commit, getters}, contaId) {
+      console.info('request');
+      firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_added', (snap) => {
+        const lancamento = snap.val();
+        lancamento.id = snap.key;
+        lancamento.conta = getters.getConta(lancamento.idConta);
+        lancamento.data = moment(lancamento.data);
+        commit(LOCAIS.m.ADD_LOCAL, lancamento.local);
+        commit(m.SET_LANCAMENTOS, {
+          lancamentos: [...state.list, lancamento],
+          getters
+        });
+      });
+
+      /*return new Promise((resolve, reject) => {
         axios.get('/api/lancamentos').then(res => {
           res.data.forEach(l => {
             return l.conta = getters.getConta(l.conta.id)
@@ -204,7 +220,7 @@ export const store = {
           });
           resolve();
         })
-      });
+      });*/
     },
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
       axios.delete('/api/lancamentos', {

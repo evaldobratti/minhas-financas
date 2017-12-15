@@ -1,13 +1,12 @@
-import axios from 'axios';
-import { SNACKS } from './snacks';
+import firebase from 'firebase';
+import eventBus from '../EventBus';
 
 const m = {
-  SET_LOCAIS: 'locaisSet',
-  MAYBE_NOVO_LOCAL: 'localMaybeNovo'
+  ADD_LOCAL: 'localAdd'
 }
 
 const d = {
-  LOAD_LOCAIS: 'locaisLoad'
+  INITIALIZE: 'localInitialize'
 }
 
 const store = {
@@ -25,27 +24,14 @@ const store = {
     }
   },
   mutations: {
-    [m.SET_LOCAIS](state, locais) {
-      state.list = locais;
+    [m.ADD_LOCAL](state, local) {
+      if (state.list.indexOf(local) < 0)
+        state.list = [ ...state.list, local];
     },
-    [m.MAYBE_NOVO_LOCAL](state, local) {
-      if (!state.list.find(l => l.id == local.id)) {
-        state.list = [...state.list, local]
-      }
-      state.list = state.list.filter(l => l.id != null);
-    }
   },
   actions: {
-    [d.LOAD_LOCAIS]({commit}) {
-      return new Promise((resolve, reject) => {
-        axios.get('/api/locais').then(res => {
-          commit(m.SET_LOCAIS, res.data);
-          resolve(res.data);
-        }).catch(err => {
-          commit(SNACKS.m.TRATA_ERRO, err);
-          reject();
-        })
-      });
+    [d.INITIALIZE]({commit, getters}) {
+      
     }
   }
 }

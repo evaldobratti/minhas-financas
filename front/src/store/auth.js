@@ -1,5 +1,6 @@
 import axios from 'axios';
 import firebase from 'firebase';
+import {bus, events} from '../EventBus';
 
 firebase.initializeApp({
   apiKey: "AIzaSyB5mLWc-ry7gdmx8H8UeBIfmlWfqNRkBa4",
@@ -22,13 +23,19 @@ export const m = {
 
 export const store = {
   state: {
-    isAuthenticated: false,
+    isAuthenticated: null,
     usuario: {}
   },
   mutations: {
     [m.LOGGED_IN]: (state, usuario) => {
       state.isAuthenticated = usuario != null;
-      state.usuario = usuario;
+      state.usuario = usuario || {};
+      bus.$emit(state.isAuthenticated ? events.SIGN_IN : events.SIGN_IN, usuario);
+    }
+  },
+  getters: {
+    uid(state) {
+      return state.usuario.uid;
     }
   },
   actions: {
@@ -39,7 +46,6 @@ export const store = {
       return new Promise((resolve, reject) => {
         firebase.auth().signInWithPopup(provider).then((res) => {
           commit(m.LOGGED_IN, res.user);
-          console.info('res');
           resolve();
         }).catch(() => {
           commit(m.LOGGED_OUT);
@@ -52,6 +58,7 @@ export const store = {
     },
     [d.INITIALIZE]({commit}) {
       firebase.auth().onAuthStateChanged(user => {
+        console.info('login');
         commit(m.LOGGED_IN, user);
       })
     }

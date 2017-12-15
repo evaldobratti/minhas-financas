@@ -4,7 +4,7 @@
     {{ lancamento.data | date }}
   </td>
   <td>
-    <span @click.stop="editando('descricao')">{{ lancamento.local.nome }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
+    <span @click.stop="editando('descricao')">{{ lancamento.local }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
   </td>
     <td>
       <span @click.stop="editando('categoria')">{{ lancamento.categoria && lancamento.categoria.nome }}</span>
@@ -122,6 +122,9 @@ export default {
     editando(campo) {
       this.isEditando = true;
       this.$refs.form.refresh();
+    },
+    getLocal(idLocal) {
+      return this.$store.getters.getLocal(idLocal);
     }
   },
   components: {

@@ -4,14 +4,19 @@
       <router-link :to="{ name: 'detalhe-conta', params: { id: conta.id } }">
         {{ conta.nome }}
       </router-link>
-      <span style="float: right">Saldo atual: {{ conta.saldoAtual | currency}}</span>
+      <span style="float: right">Saldo atual: {{ saldoAtual | currency}}</span>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
 export default {
-  props: [ 'conta' ]
+  props: [ 'conta' ],
+  computed: {
+    saldoAtual() {
+      return this.conta.saldoInicial;
+    }
+  }
 
 }
 </script>

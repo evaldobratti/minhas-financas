@@ -23,34 +23,26 @@
 </template>
 
 <script>
-import { CONTA_SET_NOME, CONTA_SET_SALDO_INICIAL } from '../../store/conta';
+import CONTA from '../../store/conta';
 
 export default {
+  data() {
+    return {
+      nome: '',
+      saldoInicial: 0
+    }
+  },
   methods: {
     submit() {
-      this.$store.dispatch('contaSubmit').then(() => {
+      
+      this.$store.dispatch(CONTA.d.CONTA_SUBMIT, {
+        nome: this.nome,
+        saldoInicial: this.saldoInicial
+      }).then(() => {
         this.$emit('cadastrado');
       });
     }
   },
-  computed: {
-    nome: {
-      get() {
-        return this.$store.state.conta.form.nome;
-      },
-      set(nome) {
-        this.$store.commit(CONTA_SET_NOME, nome);
-      }
-    },
-    saldoInicial: {
-      get() {
-        return this.$store.state.conta.form.saldoInicial;
-      },
-      set(saldoInicial) {
-        this.$store.commit(CONTA_SET_SALDO_INICIAL, saldoInicial);
-      }
-    }
-  }
 }
 </script>
 

@@ -113,6 +113,9 @@ export default Vue.extend({
       trocaContaDialog: false
     }
   },
+  created() {
+    this.$store.dispatch(lancamentos.d.LANCAMENTO_LOAD, this.$route.params.id);
+  },
   computed: {
     conta() {
       return this.$store.getters.getConta(this.$route.params.id);

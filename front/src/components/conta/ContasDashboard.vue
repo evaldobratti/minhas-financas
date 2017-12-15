@@ -17,12 +17,8 @@
 import ContaNenhuma from './ContaNenhuma';
 import ContaCard from './ContaCard';
 import ContaForm from './ContaForm';
-import { LOAD_CONTAS } from '../../store/conta';
 
 export default {
-  created() {
-    this.$store.dispatch(LOAD_CONTAS);
-  },
   data() {
     return {
       novaConta: false
@@ -30,7 +26,7 @@ export default {
   },
   computed: {
     contas() {
-      return this.$store.state.conta.list;
+      return this.$store.getters.getContas;
     }
   },
   components: {

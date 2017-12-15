@@ -4,14 +4,12 @@
     ref="autoComplete"
     v-model="internal"
     :items="locais"
-    item-text="nome"
     autocomplete
     @input="$emit('input', $event)"
     :label="label"
     :search-input.sync="maybeNewValue">
       <template slot="item" slot-scope="data">
-        {{ data.item.nome }}
-        <small v-if="data.item.id == null">&nbsp;nova</small>
+        {{ data.item }}
       </template>
   </v-select>
 </div>
@@ -23,7 +21,8 @@ export default {
   data() {
     return {
       maybeNewValue: '',
-      internal: null
+      internal: null,
+      locais: []
     }
   },
   created() {
@@ -39,27 +38,27 @@ export default {
     maybeNewValue(val) {
       this.maybeNewLocal(val);
     },
+    locaisExistentes() {
+      if (this.locais.length == 0)
+        this.locais = this.locaisExistentes
+    }
   },
   methods: {
     maybeNewLocal(val) {
       if (val == null)
         return;
       
-      let possible = this.locais.find(c => c.nome.toLowerCase().startsWith(val.toLowerCase()));
-      if (possible == null) {
-        const categoria = this.$store.state.locais.list.find(c => c.id == null);
-        if (categoria) {
-          categoria.nome = val;
-        } else {
-          this.$store.state.locais.list.push({
-            nome: val
-          })
+      if (val != null && val.length > 0) {
+        let possible = this.locaisExistentes.find(c => c.toLowerCase().startsWith(val.toLowerCase()));
+        if (possible == null) {
+            this.locais = [...this.locaisExistentes, val];
         }
+      } else {
+        this.locais = this.locaisExistentes;
       }
     },
     refresh() {
       if (this.value.id == null) {
-        console.info('affe');
         this.$store.state.locais.list = this.$store.state.locais.list.filter(c => c.id != null)
         
         this.$store.state.locais.list = [...this.$store.state.locais.list, this.value ];
@@ -74,7 +73,7 @@ export default {
 
   },
   computed: {
-    locais() {
+    locaisExistentes() {
       return this.$store.state.locais.list;
     }
   }

@@ -3,12 +3,12 @@
       <v-flex xs6>
         <v-card class="conta-card">
           <date-picker type="month" v-model="mes"/>
-          <line-chart
+          <!--line-chart
             :chart-data="saldos"
             :options="options"
             :height="300"
             chart-id="canvas2"
-            ></line-chart>
+            ></line-chart-->
         </v-card>
       </v-flex>
   </v-layout>
@@ -40,7 +40,7 @@ export default {
             title: function([item], data) {
               let lancamento = vm.saldos.lancamentos[item.index];
 
-              return lancamento.local.nome + ' em ' + date(lancamento.data);
+              return lancamento.local + ' em ' + date(lancamento.data);
             },
             label: function(item, data) {
               let lancamento = vm.saldos.lancamentos[item.index];

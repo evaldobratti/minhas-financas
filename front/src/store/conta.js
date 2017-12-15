@@ -1,32 +1,18 @@
 import Vuex from 'vuex';
-import axios from 'axios';
 import Vue from 'vue';
 import moment from 'moment';
+import eventBus from '../EventBus';
+import firebase from 'firebase'
 import { SNACKS } from './snacks';
 
-export const CONTA_SET_NOME = 'contaSetNome';
-export const CONTA_SET_SALDO_INICIAL = 'contaSetSaldoInicial';
-export const CONTA_SET_ATUAL = 'contaSetAtual';
-export const CONTAS_CARREGADAS = 'contasCarregadas';
-export const CONTA_CARREGADA = 'contaCarregada';
-export const CARREGA_CONTA = 'carregaConta';
-export const LOAD_CONTAS = 'loadContas';
-
-const m = {
-  CONTA_SET_SALDO_INICIO: 'contaSetSaldoInicio',
-  CONTA_SET_SALDO_FIM: 'contaSetSaldoFim',
-  CONTA_SET_PARAMS: 'contaSetParams'
-};
-
-const d = {
-  CONTA_CARREGA_SALDOS: 'contaCarregaSaldoAnterior',
-  CARREGA_CONTA_LANCAMENTOS: 'carregaContaLancamentos',
+export const d = {
+  INITIALIZE: 'contaInitialize',
+  CONTA_SUBMIT: 'contaSubmit'
 }
 
-export const contas = {
-  m, d
-};
-
+export const m = {
+  ADD_CONTA: 'contaAdiciona'
+}
 
 function atualizaSaldoDiario(saldoInicio, lancamentos) {
   let ultimaData = null;
@@ -43,107 +29,43 @@ function atualizaSaldoDiario(saldoInicio, lancamentos) {
 
 export const store =  {
   state: {
-    form: {
-      nome: '',
-      saldoInicial: 0
-    },
-    params: {
-      contaId: null,
-      mes: null,
-      ano: null
-    },
-    list: [],
-    conta: {},
-    saldoInicio: {},
-    saldoFim: {},
-    lancamentos: []
+    asMap: {},
+    asList: []
   },
   mutations: {
-    [CONTA_SET_NOME](state, nome) {
-      state.form.nome = nome;
-    },
-    [CONTA_SET_SALDO_INICIAL](state, saldoInicial) {
-      state.form.saldoInicial = saldoInicial;
-    },
-    [CONTAS_CARREGADAS](state, contas) {
-      state.list = contas;
-    },
-    [CONTA_SET_ATUAL](state, conta) {
-      state.conta = conta;
-    },
-    [m.CONTA_SET_SALDO_INICIO](state, saldo) {
-      state.saldoInicio = saldo;
-      atualizaSaldoDiario(state.saldoInicio.saldo, state.lancamentos);
-      
-      state.lancamentos = [{
-        data: moment(saldo.data),
-        local: {nome: 'Saldo inicial'},
-        categoria: {},
-        saldoDiario: saldo.saldo
-      }, ...state.lancamentos];
-    },
-    [m.CONTA_SET_SALDO_FIM](state, saldo) {
-      state.saldoFim = saldo;
-      state.lancamentos.push({
-        data: moment(saldo.data),
-        local: {nome: 'Saldo final'},
-        categoria: {},
-        saldoDiario: saldo.saldo
-      });
-    },
-    [m.CONTA_SET_PARAMS](state, params) {
-      state.params = params;
+    [m.ADD_CONTA](state, conta) {
+      Vue.set(state.asMap, conta.id, conta);
+      state.asList.push(conta);
     }
   },
   getters: {
-    getConta(state) {
-      return contaId => {
-        if (state.conta && state.conta.id == contaId)
-          return state.conta;
-        return state.list.find(c => c.id == contaId);
-      }
-    },
     getContas(state) {
-      return state.list;
+      return state.asList;
+    },
+    getConta(state) {
+      return (id) => {
+        return state.asMap[id];
+      }
     }
   },
   actions: {
-    contaSubmit({commit, state, dispatch, rootState}) {
-      return new Promise((resolve, reject) => {
-        axios.post('/api/contas', {
-          nome: state.form.nome,
-          saldoInicial: state.form.saldoInicial,
-          usuario: rootState.authentication.usuario.id
-        }).then(res => {
-          dispatch(LOAD_CONTAS);
-          commit(SNACKS.m.UPDATE_SNACK, {
-            text: 'Conta cadastrada!',
-            context: 'success', 
-            timeout: 1500
-          });
-          resolve();
-        }).catch(() => {
-          reject();
-        })
+    contaSubmit({commit, getters}, conta) {
+      firebase.database().ref(getters.uid + '/contas').push(conta);
+    },
+    [d.INITIALIZE]({commit, getters}){
+      eventBus.bus.$on(eventBus.events.SIGN_IN, () => {
+        firebase.database().ref(getters.uid + '/contas').on('child_added', (snap) => {
+          const conta = snap.val();
+          conta.id = snap.key;
+          commit(m.ADD_CONTA, conta);
+        });
       })
-    },
-    [LOAD_CONTAS]({commit, state}) {
-      return new Promise((resolve, reject) => {
-        axios.get('/api/contas').then(res => {
-          commit(CONTAS_CARREGADAS, res.data);
-          resolve();
-        }).catch(err => {
-          console.error(err);
-          reject();
-        })
-      });
-    },
-    [CARREGA_CONTA]({commit, state}, contaId){
-      axios.get('/api/contas/' + contaId).then(res =>{
-        commit(CONTA_SET_ATUAL, res.data);
-      }).catch(err => {
-        console.error(err);
-      })
-    },
+    }
   }
 };
+
+export const CONTA = {
+  store, m, d
+};
+
+export default CONTA;

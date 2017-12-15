@@ -18,13 +18,18 @@ export default {
   },
   methods: {
     checkCredentials() {
-      if (!this.isAuthenticated)
+    }
+  },
+  watch: {
+    isAuthenticated() {
+      if (this.isAuthenticated != null && !this.isAuthenticated) {
         this.$router.push({
           path: '/login',
           query: {
           next: this.$route.path
           }
         });
+      }
     }
   },
   computed: {

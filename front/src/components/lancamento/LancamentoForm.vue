@@ -83,7 +83,7 @@ export default {
     },
     submit() {
       this.$refs.valor.blur();
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, Object.assign({}, this.lancamento)).then(() => {
         if (this.lancamento.id == null) {
           Object.assign(this.lancamento, this.lancamentoVazio());
           setTimeout(()  => {
