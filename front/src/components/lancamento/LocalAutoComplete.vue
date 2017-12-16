@@ -3,7 +3,7 @@
   <v-select
     ref="autoComplete"
     v-model="internal"
-    :items="locais"
+    :items="locaisAMostrar"
     autocomplete
     @input="$emit('input', $event)"
     :label="label"
@@ -37,10 +37,6 @@ export default {
     },
     maybeNewValue(val) {
       this.maybeNewLocal(val);
-    },
-    locaisExistentes() {
-      if (this.locais.length == 0)
-        this.locais = this.locaisExistentes
     }
   },
   methods: {
@@ -75,6 +71,11 @@ export default {
   computed: {
     locaisExistentes() {
       return this.$store.state.locais.list;
+    },
+    locaisAMostrar() {
+      if (this.locais.length == 0)
+        return this.locaisExistentes;
+      return this.locais;
     }
   }
 }

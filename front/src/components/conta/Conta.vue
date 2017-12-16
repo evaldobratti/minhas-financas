@@ -15,7 +15,7 @@
               <DatePicker v-model="dataFiltro" type="month"></DatePicker>
               </v-flex>
             </v-layout>
-            <LancamentoForm :conta="conta"></LancamentoForm>
+            <LancamentoForm :id-conta="conta.id" />
             <v-data-table
               :items="lancamentos"
               hide-actions

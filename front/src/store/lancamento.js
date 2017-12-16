@@ -18,7 +18,8 @@ const m = {
   SET_EDICAO: 'lancamentoSetEdicao',
   EDICAO_SET_LOCAL: 'lancamentoEdicaoSetLocal',
   SET_LANCAMENTOS: 'lancamentoSetList',
-  LANCAMENTO_UPDATE_SALDO: 'lancamentoUpdateSaldo'
+  LANCAMENTO_UPDATE_SALDO: 'lancamentoUpdateSaldo', 
+  REMOVE_LANCAMENTO_ID: 'lancamentoRemoveId'
 }
 
 const d = {
@@ -34,11 +35,41 @@ export const lancamentos = {
   d
 }
 
+export class Lancamento {
+  constructor(snapshot) {
+    if (snapshot) {
+      const firebaseObject = snapshot.val();
+      this.id = snapshot.key;
+      this.data = moment(firebaseObject.data);
+      this.idConta = firebaseObject.idConta;
+      this.local = firebaseObject.local;
+      this.valor = firebaseObject.valor;
+      this.efetivada = firebaseObject.efetivada;
+      return;
+    }
+    this.id = null;
+    this.idConta = null;
+    this.data = moment();
+    this.local = null;
+    this.valor = null;
+    this.efetivada = false;
+  }
+
+  toFirebaseObject() {
+    return {
+      idConta: this.idConta,
+      data: this.data.toISOString(),
+      local: this.local,
+      valor: this.valor
+    }
+  }
+
+}
+
 export function normalizeLancamentos(lancamentos, getters) {
   lancamentos.forEach(l => {
     if (typeof l.data === 'string')
       l.data = moment(l.data);
-    l.conta = getters.getConta(l.conta.id);
     
     const categoria = l.categoria ? getters.getCategoria(l.categoria.id) : null;
     if (categoria != null)
@@ -65,36 +96,11 @@ export function normalizeLancamentos(lancamentos, getters) {
 }
 
 function put({ dispatch, commit, state, getters}, lancamento) {
-  lancamento.data = lancamento.data.toISOString();
-  lancamento.idConta = lancamento.conta.id;
-  delete lancamento.conta;
+  if (lancamento.id) {
+    return firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(lancamento.toFirebaseObject());
+  } 
 
-  firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta).push(lancamento);
-
-  /*new Promise((resolve, reject) => {
-    axios.put('/api/lancamentos', lancamento).then(res => {
-      commit(LOCAIS.m.MAYBE_NOVO_LOCAL, res.data.local);
-      const lancamentos = state.list;
-      
-      if (lancamentos.indexOf(lancamento) >= 0) {
-        Object.assign(lancamento, res.data);
-      } else {
-        lancamentos.push(res.data);
-      }
-      
-      commit(m.SET_LANCAMENTOS, {
-        lancamentos: lancamentos,
-        getters
-      });
-      
-      resolve();
-    }).catch(err => {
-      if (err.response.status === 400) {
-        commit(m.SET_BACKEND_ERRORS, err.response.data.fieldErrors);
-      }
-      reject();
-    });
-  });*/
+  return firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta).push(lancamento.toFirebaseObject());
 }
 
 export const store = {
@@ -111,7 +117,7 @@ export const store = {
           return [];
         
         const lancamentosDaConta = state.list.filter(l => {
-          return contasIds.indexOf(l.conta.id) >= 0;
+          return contasIds.indexOf(l.idConta) >= 0;
         });
         const lancamentosDoMes = lancamentosDaConta.filter(l => {
           return l.data.month() == mes && l.data.year() == ano;
@@ -162,7 +168,7 @@ export const store = {
     },
     saldoEm(state) {
       return (conta, data) => {
-        const lancamentosDaConta = state.list.filter(l => l.conta.id == conta.id);
+        const lancamentosDaConta = state.list.filter(l => l.idConta == conta.id);
         
         const saldoAcumulado = lancamentosDaConta
           .filter(l => l.data.isSameOrBefore(data));
@@ -179,63 +185,55 @@ export const store = {
       
       const saldos = {};
       state.list.forEach(l => {
-        if (saldos[l.conta.id] == null) {
-          saldos[l.conta.id] = getters.getConta(l.conta.id).saldoInicial;
+        if (saldos[l.idConta] == null) {
+          saldos[l.idConta] = getters.getConta(l.idConta).saldoInicial;
         }
-        saldos[l.conta.id] += l.valor;
-        Vue.set(l, 'saldoDiario', saldos[l.conta.id]);
+        saldos[l.idConta] += l.valor;
+        Vue.set(l, 'saldoDiario', saldos[l.idConta]);
       });
     },
+    [m.REMOVE_LANCAMENTO_ID](state, id) {
+      const lancamento = state.list.find(l => l.id === id);
+      const ix = state.list.indexOf(lancamento);
+      console.info(ix);
+      state.list.splice(ix, 1);
+    }
   },
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
-      return put(context, lancamento)
+      return put(context, lancamento).then(() => {
+        context.commit(SNACKS.m.UPDATE_SUCESSO, 'Operação realizada!');
+      }).catch((err) => {
+        context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
+        throw err;
+      });
     },
     [d.LANCAMENTO_EDICAO_SUBMIT](context, lancamento)  {
       return put(context, lancamento)
     },
     [d.LANCAMENTO_LOAD]({state, dispatch, commit, getters}, contaId) {
-      console.info('request');
       firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_added', (snap) => {
-        const lancamento = snap.val();
-        lancamento.id = snap.key;
-        lancamento.conta = getters.getConta(lancamento.idConta);
-        lancamento.data = moment(lancamento.data);
+        const lancamento = new Lancamento(snap);
         commit(LOCAIS.m.ADD_LOCAL, lancamento.local);
         commit(m.SET_LANCAMENTOS, {
           lancamentos: [...state.list, lancamento],
           getters
         });
+      }, (err) => {
+        context.commit(SNACKS.m.UPDATE_ERRO, 'Erro ao carregar lançamentos! ' + err);
       });
 
-      /*return new Promise((resolve, reject) => {
-        axios.get('/api/lancamentos').then(res => {
-          res.data.forEach(l => {
-            return l.conta = getters.getConta(l.conta.id)
-          });
-          commit(m.SET_LANCAMENTOS, {
-            lancamentos: res.data,
-            getters
-          });
-          resolve();
-        })
-      });*/
+      firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_removed', (snap) => {
+        console.info('deve remover ' + snap.key);
+        commit(m.REMOVE_LANCAMENTO_ID, snap.key);
+      }, (err) => {
+        context.commit(SNACKS.m.UPDATE_ERRO, 'Erro ao remover lançamentos! ' + err);
+      });
     },
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
-      axios.delete('/api/lancamentos', {
-        data: lancamento
-      }).then(() => {
-        const lancamentosAtuais = [...state.list];
-        const ix = state.list.indexOf(lancamento);
-        lancamentosAtuais.splice(ix, 1);
-        commit(m.SET_LANCAMENTOS, {
-          lancamentos: lancamentosAtuais,
-          getters
-        });
-      }).catch(err => {
-        commit(SNACKS.m.TRATA_ERRO, err);
-      });
+      console.info('remove ' + lancamento.id);
+      firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove();
     }
   }
 }

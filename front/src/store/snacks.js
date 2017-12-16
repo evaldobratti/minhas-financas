@@ -2,8 +2,12 @@
 const m = {
   UPDATE_SNACK: 'snackUpdateSnack',
   UPDATE_SHOWING: 'snackUpdateShowing',
-  TRATA_ERRO: 'snackTrataErro'
+  TRATA_ERRO: 'snackTrataErro',
+  UPDATE_SUCESSO: 'snackSucesso',
+  UPDATE_ERRO: 'snackErro',
 }
+
+const DURACAO = 2500;
 
 export const SNACKS = {
   m
@@ -21,11 +25,35 @@ export default {
     notifications: []
   },
   mutations: {
+    [m.UPDATE_SUCESSO](state, text) {
+      state.notification = {
+        timeout: DURACAO,
+        text,
+        context: 'success'
+      };
+      state.showing = true;
+    },
+    [m.UPDATE_ERRO](state, text) {
+      state.notification = {
+        timeout: 0,
+        text,
+        context: 'error'
+      };
+      state.showing = true;
+    },
     [m.UPDATE_SNACK](state, snack) {
-      state.notification = Object.assign({}, {
-        timeout: 0, 
-        context: 'primary'
-      }, snack);
+      if (typeof snack == 'string') {
+        state.notification = {
+          timeout: DURACAO,
+          text: snack,
+          context: 'success'
+        }
+      } else {
+        state.notification = Object.assign({}, {
+          timeout: 0, 
+          context: 'success'
+        }, snack);
+      }
       state.showing = true;
     },
     [m.UPDATE_SHOWING](state, showing) {

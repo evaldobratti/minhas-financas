@@ -31,7 +31,7 @@
 <script>
 import axios from 'axios';
 import { d } from '../../store/categorias';
-import { lancamentos } from '../../store/lancamento';
+import { lancamentos, Lancamento } from '../../store/lancamento';
 import CategoriaIcone from '../categoria/CategoriaIcone';
 import LocalAutoComplete from './LocalAutoComplete';
 import CategoriaAutoComplete from './CategoriaAutoComplete';
@@ -41,27 +41,20 @@ import moment from 'moment';
 
 export default {
   props: {
-    conta: Object,
+    idConta: String,
     lancamento: {
       type: Object,
       default() {
-        return {
-          data: moment(),
-          conta: null,
-          valor: null,
-          categoria: null,
-          local: null,
-          efetivada: null
-        }
+        return new Lancamento();
       }
     }
   },
   created() {
-    this.lancamento.conta = this.conta;
+    this.lancamento.idConta = this.idConta;
   },
   watch: {
-    conta(val) {
-      this.lancamento.conta = val;
+    idConta(val) {
+      this.lancamento.idConta = val;
     }
   },
   data() {  
@@ -82,10 +75,13 @@ export default {
         }
     },
     submit() {
-      this.$refs.valor.blur();
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, Object.assign({}, this.lancamento)).then(() => {
+      this.$refs.valor.blur();      
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, Object.assign(Object.create(this.lancamento), this.lancamento)).then(() => {
         if (this.lancamento.id == null) {
-          Object.assign(this.lancamento, this.lancamentoVazio());
+          const data = this.lancamento.data;
+          Object.assign(this.lancamento, new Lancamento());
+          this.lancamento.data = data;
+          this.lancamento.idConta = this.idConta;
           setTimeout(()  => {
             this.$refs.localAutoComplete.focus()
           }, 100);

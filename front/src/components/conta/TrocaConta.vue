@@ -34,7 +34,7 @@ export default {
       },
       set(val) {
         if (this.lancamento)
-          this.lancamento.conta = val;
+          this.lancamento.idConta = val.id;
       }
     }
   }

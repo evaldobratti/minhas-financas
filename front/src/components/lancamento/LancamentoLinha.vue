@@ -66,15 +66,19 @@
         </v-list>
         </v-menu>
     </td>
-    <v-dialog v-model="isEditando" lazy max-width="80%">
+    <v-dialog 
+      v-model="isEditando" 
+      lazy 
+      max-width="80%">
       <v-card>
-          <LancamentoForm ref="form" :conta="lancamento.conta" 
-            :lancamento="lancamento"
-            @submetido="isEditando=false"
-            ></LancamentoForm>
+        <LancamentoForm 
+          ref="form" 
+          :id-conta="lancamento.idConta" 
+          :lancamento="lancamento"
+          @submetido="isEditando=false" />
       </v-card>
     </v-dialog>
-</tr>
+  </tr>
 </template>
 
 <script>
@@ -94,7 +98,7 @@ export default {
   },
   watch: {
     lancamento(val) {
-      this.backup = Object.assign({}, this.lancamento);
+      this.backup = Object.assign(Object.create(this.lancamento), this.lancamento);
     },
     'lancamento.efetivada'(atual, antigo) {
       if (this.lancamento.id > 0) {
@@ -121,7 +125,6 @@ export default {
     },
     editando(campo) {
       this.isEditando = true;
-      this.$refs.form.refresh();
     },
     getLocal(idLocal) {
       return this.$store.getters.getLocal(idLocal);
