@@ -31,6 +31,7 @@ const store = new Vuex.Store({
 store.dispatch(AUTH.d.INITIALIZE);
 store.dispatch(CONTA.d.INITIALIZE);
 store.dispatch(LOCAIS.d.INITIALIZE);
+store.dispatch(CATEGORIAS.d.INITIALIZE);
 
 
 export default store;

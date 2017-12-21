@@ -1,13 +1,17 @@
-import axios from 'axios';
 import { SNACKS } from './snacks';
+import firebase from 'firebase';
+import eventBus from '../EventBus';
 
 export const d = {
   LOAD_CATEGORIAS: 'loadCategorias',
-  SAVE_CATEGORIA: 'saveCategoria'
+  SAVE_CATEGORIA: 'saveCategoria',
+  INITIALIZE: 'categoriaInitialize'
 }
 
 export const m = {
-  LOADED_CATEGORIAS: 'loadedCategorias'
+  LOADED_CATEGORIAS: 'loadedCategorias',
+  ADD_CATEGORIA: 'categoriaAdd',
+  UPDATE_CATEGORIA: 'categoriaUpdate'
 }
 
 
@@ -20,6 +24,13 @@ export const store = {
     [m.LOADED_CATEGORIAS](state, {categorias, categoriasFlat}) {
       state.list = categorias;
       state.flat = categoriasFlat;
+    },
+    [m.ADD_CATEGORIA](state, categoria) {
+      state.list = [...state.list, categoria];
+    },
+    [m.UPDATE_CATEGORIA](state, categoria) {
+      const ix = state.list.findIndex(c => c.id == categoria.id);
+      state.list.splice(ix, 1, categoria);
     }
   },
   getters: {
@@ -30,6 +41,18 @@ export const store = {
     }
   },
   actions: {
+    [d.INITIALIZE]({commit, getters}) {
+      eventBus.bus.$on(eventBus.events.SIGN_IN, () => {
+        firebase.database().ref(getters.uid + '/categorias').on('child_added', (snap) => {
+          const categoria = snap.val();
+          categoria.id = snap.key;
+          commit(m.ADD_CATEGORIA, categoria);
+        });
+        firebase.database().ref(getters.uid + '/categorias').on('child_changed', (snap) => {
+          commit(m.UPDATE_CATEGORIA, snap.val());
+        });
+      })
+    },
     [d.LOAD_CATEGORIAS]({commit, state}, forceLoad) {
       if (forceLoad || state.list.length === 0) {
         return new Promise((resolve, reject) => {
@@ -51,20 +74,22 @@ export const store = {
         return Promise.resolve(state.list);
       }
     },
-    [d.SAVE_CATEGORIA]({dispatch, commit}, categoria) {
-      return new Promise((resolve, reject) => {
-        axios.put('/api/categorias', categoria).then(res => {
-          dispatch(d.LOAD_CATEGORIAS, true);
-          resolve();
-          commit(SNACKS.m.UPDATE_SNACK, {
-            text: 'Categoria cadastrada!',
-            timeout: 1500,
-            context: 'success'
-          });
-        }).catch(err => {
-          commit(SNACKS.m.TRATA_ERRO, err);
-          reject();
-        });
+    [d.SAVE_CATEGORIA]({dispatch, commit, getters}, categoria) {
+      let future;
+      let msg;
+      if (categoria.id) {
+        future = firebase.database().ref(getters.uid + '/categorias/' + categoria.id).set(categoria);
+        msg = 'Categoria atualizada com sucesso!';
+      } else {
+        future = firebase.database().ref(getters.uid + '/categorias').push(categoria);
+        msg = 'Categoria cadastrada com sucesso!';
+      }
+
+      return future.then(() => {
+        commit(SNACKS.m.UPDATE_SUCESSO, msg);
+      }).catch(err => {
+        commit(SNACKS.m.UPDATE_ERRO, err);
+        throw err;
       });
     }
   }

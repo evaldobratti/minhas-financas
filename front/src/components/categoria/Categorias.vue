@@ -42,9 +42,11 @@ export default {
       }
     }
   },
-  computed: mapState({
-    list: state => state.categorias.list
-  }),
+  computed: {
+    list() {
+      return this.$store.state.categorias.list;
+    }
+  },
   components: {
     ProtectedRoute,
     CategoriaForm,

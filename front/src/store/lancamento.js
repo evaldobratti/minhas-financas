@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { contas } from './conta';
 import { LOCAIS } from './locais';
 import moment from 'moment';
@@ -96,9 +95,8 @@ export function normalizeLancamentos(lancamentos, getters) {
 }
 
 function put({ dispatch, commit, state, getters}, lancamento) {
-  if (lancamento.id) {
+  if (lancamento.id)
     return firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(lancamento.toFirebaseObject());
-  } 
 
   return firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta).push(lancamento.toFirebaseObject());
 }
@@ -203,7 +201,12 @@ export const store = {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
       return put(context, lancamento).then(() => {
-        context.commit(SNACKS.m.UPDATE_SUCESSO, 'Operação realizada!');
+        let msg = '';
+        if (lancamento.id)
+          msg = 'Lançamento atualizado com sucesso!';
+        else
+          msg = 'Lançamento criado com sucesso!';
+        context.commit(SNACKS.m.UPDATE_SUCESSO, msg);
       }).catch((err) => {
         context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
         throw err;
@@ -225,15 +228,19 @@ export const store = {
       });
 
       firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_removed', (snap) => {
-        console.info('deve remover ' + snap.key);
         commit(m.REMOVE_LANCAMENTO_ID, snap.key);
       }, (err) => {
-        context.commit(SNACKS.m.UPDATE_ERRO, 'Erro ao remover lançamentos! ' + err);
+        commit(SNACKS.m.UPDATE_ERRO, 'Erro ao remover lançamentos! ' + err);
       });
     },
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
-      console.info('remove ' + lancamento.id);
-      firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove();
+      
+      firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
+        commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento removido com sucesso!');
+      }).catch((err) => {
+        context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
+        throw err;
+      });
     }
   }
 }

@@ -34,6 +34,8 @@ export default {
       state.showing = true;
     },
     [m.UPDATE_ERRO](state, text) {
+      if ('message' in text)
+        text = text.message;
       state.notification = {
         timeout: 0,
         text,

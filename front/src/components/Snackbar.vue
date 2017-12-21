@@ -4,7 +4,6 @@
     :timeout="timeout"
     :top="true"
     v-model="showing">
-    <v-icon dark>folder_open</v-icon>
     {{ text }}
     <v-btn 
       flat 
