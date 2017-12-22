@@ -9,7 +9,7 @@
         </v-btn>
       </transition>
       <transition name="fade">
-        <v-btn v-if="showActions" @click.native.stop="showModalRemove" color="primary" fab small dark class="small-fab-btn red">
+        <v-btn v-if="showActions" @click.native.stop="showModalRemove" fab small dark class="small-fab-btn red">
           <v-icon>remove</v-icon>
         </v-btn>
       </transition>
@@ -35,7 +35,7 @@
       </v-dialog>
     </div>
     <div v-if="aberto" style="margin-left: 25px">
-      <CategoriaList v-for="f in categoria.filhas" :key="f.id" :categoria="f"></CategoriaList>
+      <CategoriaList v-for="f in getFilhas(categoria.id)" :key="f.id" :categoria="f"></CategoriaList>
     </div>
   </div>
 </template>
@@ -65,6 +65,9 @@ export default {
     }
   },
   methods: {
+    getFilhas(idCategoria) {
+      return this.$store.getters.getCategoriasFilhas(idCategoria);
+    },
     abre() {
       this.aberto = !this.aberto;
     },

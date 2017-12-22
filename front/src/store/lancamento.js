@@ -18,7 +18,8 @@ const m = {
   EDICAO_SET_LOCAL: 'lancamentoEdicaoSetLocal',
   SET_LANCAMENTOS: 'lancamentoSetList',
   LANCAMENTO_UPDATE_SALDO: 'lancamentoUpdateSaldo', 
-  REMOVE_LANCAMENTO_ID: 'lancamentoRemoveId'
+  REMOVE_LANCAMENTO_ID: 'lancamentoRemoveId',
+  CONTA_CARREGADA: 'lancamentoContaCarregada'
 }
 
 const d = {
@@ -41,6 +42,7 @@ export class Lancamento {
       this.id = snapshot.key;
       this.data = moment(firebaseObject.data);
       this.idConta = firebaseObject.idConta;
+      this.idCategoria = firebaseObject.idCategoria;
       this.local = firebaseObject.local;
       this.valor = firebaseObject.valor;
       this.efetivada = firebaseObject.efetivada;
@@ -52,6 +54,7 @@ export class Lancamento {
     this.local = null;
     this.valor = null;
     this.efetivada = false;
+    this.idCategoria = null;
   }
 
   toFirebaseObject() {
@@ -59,7 +62,8 @@ export class Lancamento {
       idConta: this.idConta,
       data: this.data.toISOString(),
       local: this.local,
-      valor: this.valor
+      valor: this.valor,
+      idCategoria: this.idCategoria
     }
   }
 
@@ -103,7 +107,8 @@ function put({ dispatch, commit, state, getters}, lancamento) {
 
 export const store = {
   state: {
-    list: []
+    list: [],
+    contasCarregadas: []
   },
   getters: {
     lancamentoEdicao(state) {
@@ -176,6 +181,9 @@ export const store = {
     }
   },
   mutations: {
+    [m.CONTA_CARREGADA](state, idConta) {
+      state.contasCarregadas.push(idConta);
+    },
     [m.SET_LANCAMENTOS](state, {lancamentos, getters}) {
       state.list = lancamentos;
       
@@ -193,7 +201,6 @@ export const store = {
     [m.REMOVE_LANCAMENTO_ID](state, id) {
       const lancamento = state.list.find(l => l.id === id);
       const ix = state.list.indexOf(lancamento);
-      console.info(ix);
       state.list.splice(ix, 1);
     }
   },
@@ -216,6 +223,11 @@ export const store = {
       return put(context, lancamento)
     },
     [d.LANCAMENTO_LOAD]({state, dispatch, commit, getters}, contaId) {
+      if (state.contasCarregadas.indexOf(contaId) >= 0) 
+        return;
+
+      commit(m.CONTA_CARREGADA, contaId)
+
       firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_added', (snap) => {
         const lancamento = new Lancamento(snap);
         commit(LOCAIS.m.ADD_LOCAL, lancamento.local);

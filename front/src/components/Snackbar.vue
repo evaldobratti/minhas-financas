@@ -4,6 +4,7 @@
     :timeout="timeout"
     :top="true"
     v-model="showing">
+    <v-icon dark>check</v-icon>
     {{ text }}
     <v-btn 
       flat 

@@ -7,7 +7,7 @@
     <span @click.stop="editando('descricao')">{{ lancamento.local }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
   </td>
     <td>
-      <span @click.stop="editando('categoria')">{{ lancamento.categoria && lancamento.categoria.nome }}</span>
+      <span @click.stop="editando('categoria')" v-if="lancamento.idCategoria != null">{{ getCategoria(lancamento.idCategoria).nome }}</span>
     </td>
     <td class="text-xs-right" :class="css(lancamento.valor)">
         <span @click.stop="editando('valor')">{{ lancamento.valor | currency }}</span>
@@ -128,6 +128,9 @@ export default {
     },
     getLocal(idLocal) {
       return this.$store.getters.getLocal(idLocal);
+    },
+    getCategoria(idCategoria) {
+      return this.$store.getters.getCategoria(idCategoria);
     }
   },
   components: {

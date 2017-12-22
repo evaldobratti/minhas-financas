@@ -8,7 +8,7 @@
         <LocalAutoComplete ref="localAutoComplete" :errorMessages="errorMessages('local')" v-model="lancamento.local" label="Local"/>
       </v-flex>
       <v-flex xs5>
-        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="lancamento.categoria" label="Categoria" />
+        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="lancamento.idCategoria" label="Categoria" />
       </v-flex>
       <v-flex xs1>
         <v-text-field

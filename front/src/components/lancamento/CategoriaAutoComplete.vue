@@ -4,6 +4,7 @@
     :items="categoriasFlat"
     :value="value"
     item-text="nome"
+    item-value="id"
     v-bind="$attrs"
     v-on="$listeners"
     @input="$emit('input', $event)"
@@ -47,11 +48,7 @@ export default {
   },
   computed: {
     categoriasFlat() {
-      let flat = [];
-      for (let c of this.categorias) {
-        flat = flat.concat(this.categoriaAsFlat(c));
-      }
-      return flat;
+      return this.$store.state.categorias.list;
     },
     categorias() {
       return this.$store.state.categorias.list;

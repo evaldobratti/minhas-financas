@@ -36,8 +36,14 @@ export const store = {
   getters: {
     getCategoria(state) {
       return id => {
-        return state.flat.find(c => c.id == id);
+        return state.list.find(c => c.id == id);
       }
+    },
+    getCategoriasRaizes(state) {
+      return state.list.filter(c => c.pai == null);
+    },
+    getCategoriasFilhas(state) {
+      return idCategoria => state.list.filter(c => c.pai == idCategoria);
     }
   },
   actions: {

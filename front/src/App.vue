@@ -114,7 +114,7 @@ export default {
       return this.$store.state.auth.isAuthenticated;
     },
     contas() {
-      return this.$store.state.conta.list;
+      return this.$store.state.conta.asList;
     }
   },
   components: {

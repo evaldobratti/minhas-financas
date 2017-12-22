@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     list() {
-      return this.$store.state.categorias.list;
+      return this.$store.getters.getCategoriasRaizes;
     }
   },
   components: {
