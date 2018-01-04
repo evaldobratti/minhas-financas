@@ -27,7 +27,8 @@ const d = {
   LANCAMENTO_EDICAO_SUBMIT: 'lancamentoEdicaoSubmit',
   LANCAMENTO_LOAD: 'lancamentoLoad',
   UPDATE_SALDOS: 'lancamentoUpdateSaldos',
-  REMOVE_LANCAMENTO: 'lancamentoRemove'
+  REMOVE_LANCAMENTO: 'lancamentoRemove',
+  TROCA_CONTA: 'lancamentoTrocaConta'
 }
 
 export const lancamentos = {
@@ -119,17 +120,23 @@ export const store = {
         if (getters.getContas.length == 0)
           return [];
         
+        const dataBase = moment(ano + '-' + (mes + 1) + '-' + 1, 'YYYY-MM-DD');
+        const saldoDataInicial = dataBase.clone().add(-1, 'days');
+        const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
+
         const lancamentosDaConta = state.list.filter(l => {
           return contasIds.indexOf(l.idConta) >= 0;
         });
         const lancamentosDoMes = lancamentosDaConta.filter(l => {
           return l.data.month() == mes && l.data.year() == ano;
         });
+        const projecoes = getters.projecoesAte(contasIds, saldoDataFinal);
+        projecoes.filter(l => {
+          return l.data.month() == mes && l.data.year() == ano;
+        }).forEach(l => {
+          lancamentosDoMes.push(l);
+        })
         
-        const dataBase = moment(ano + '-' + (mes + 1) + '-' + 1, 'YYYY-MM-DD');
-        const saldoDataInicial = dataBase.clone().add(-1, 'days');
-        const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
-
         let saldoInicial = 0;
         contasIds.forEach(contaId => {
           saldoInicial += getters.saldoEm(getters.getConta(contaId), saldoDataInicial);
@@ -169,10 +176,13 @@ export const store = {
         return resultado;
       }
     },
-    saldoEm(state) {
+    saldoEm(state, getters) {
       return (conta, data) => {
-        const lancamentosDaConta = state.list.filter(l => l.idConta == conta.id);
-        
+        const lancamentosDaConta = [
+          ...state.list.filter(l => l.idConta == conta.id),
+          ...getters.projecoesAte([conta.id], data)
+        ];
+
         const saldoAcumulado = lancamentosDaConta
           .filter(l => l.data.isSameOrBefore(data));
 
@@ -248,10 +258,21 @@ export const store = {
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
       
       firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
-        commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento removido com sucesso!');
+        commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento excluído com sucesso!');
       }).catch((err) => {
         context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
         throw err;
+      });
+    },
+    [d.TROCA_CONTA]({dispatch, getters, commit}, { lancamento, idNovaConta }) {
+      firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
+        lancamento.idConta = idNovaConta;
+        firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(lancamento.toFirebaseObject()).then(() => {
+          commit(SNACKS.m.UPDATE_SUCESSO, 'Troca de conta efetuada com sucesso!');
+        }).catch((err) => {
+          commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
+          throw err;
+        })
       });
     }
   }

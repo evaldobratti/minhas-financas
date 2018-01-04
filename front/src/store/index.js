@@ -4,7 +4,7 @@ import axios from 'axios';
 import router from '../router'
 import { CATEGORIAS } from './categorias';
 import * as lancamento from './lancamento';
-import recorrencia from './recorrencia';
+import recorrencia, { RECORRENCIA } from './recorrencia';
 import parcelamentos from './parcelamentos';
 import snacks, {SNACKS} from './snacks';
 import { LOCAIS } from './locais';
@@ -32,6 +32,7 @@ store.dispatch(AUTH.d.INITIALIZE);
 store.dispatch(CONTA.d.INITIALIZE);
 store.dispatch(LOCAIS.d.INITIALIZE);
 store.dispatch(CATEGORIAS.d.INITIALIZE);
+store.dispatch(RECORRENCIA.d.INITIALIZE);
 
 
 export default store;

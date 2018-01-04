@@ -62,6 +62,11 @@
       }
     },
     watch: {
+      value(val) {
+        if (this.value) {
+          this.data = this.value.format('YYYY-MM-DD');
+        }
+      },
       data(val) {
         if (val != null) {
           const asMoment = moment(this.data);

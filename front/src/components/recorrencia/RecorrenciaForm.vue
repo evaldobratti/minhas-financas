@@ -15,8 +15,8 @@
           label="Conta"
           :items="contas"
           item-text="nome"
-          item-value="value"
-          v-model="recorrencia.conta"></v-select>
+          item-value="id"
+          v-model="recorrencia.idConta"></v-select>
         <v-text-field
           :disabled="recorrencia.id != null"
           label="Valor"
@@ -64,9 +64,9 @@ export default {
         id: null,
         valor: null,
         partirDe: null,
-        conta: null,
+        idConta: null,
         local: null,
-        categoria: null,
+        idCategoria: null,
         dia: null,
         lancamentoInicial: null,
         dataFim: null
@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     contas() {
-      return this.$store.state.conta.list;
+      return this.$store.getters.getContas;
     }
   },
   methods: {
@@ -101,28 +101,18 @@ export default {
         this.$set(this.recorrencia, 'id', null);
         this.$set(this.recorrencia, 'valor', l.valor);
         this.$set(this.recorrencia, 'partirDe', l.data);
-        this.$set(this.recorrencia, 'conta', l.conta);
+        this.$set(this.recorrencia, 'idConta', l.idConta);
         this.$set(this.recorrencia, 'tipoFrequencia', 'MES');
         this.$set(this.recorrencia, 'aCada', 1);
         this.$set(this.recorrencia, 'local', l.local);
-        this.$set(this.recorrencia, 'categoria', l.categoria);
-        this.$set(this.recorrencia, 'dia', l.dia);
-        this.$set(this.recorrencia, 'lancamentoInicial', l);
-        this.$set(this.recorrencia, 'dataFim', null);
+        this.$set(this.recorrencia, 'idCategoria', l.idCategoria);
+        this.$set(this.recorrencia, 'idLancamentoInicial', l.id);
+        this.$set(this.recorrencia, 'dataFim', null); 
       }
     },
     submit() {
-      axios.put('/api/recorrencias', this.recorrencia).then(() => {
-        this.submetido = true;
-        this.$store.dispatch(lancamentos.d.LANCAMENTO_LOAD);
-        this.$store.commit(SNACKS.m.UPDATE_SNACK, {
-          text: 'Recorrência cadastrada!',
-          timeout: 1500,
-          context: 'success'
-        });
-        this.$emit('cadastrado');
-      }).catch(err => {
-        this.$store.commit(SNACKS.m.TRATA_ERRO, err);
+      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM, this.recorrencia).then(() => {
+        this.$emit('cadastrado'); 
       });
     }
   }

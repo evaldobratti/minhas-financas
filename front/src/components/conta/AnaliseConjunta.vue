@@ -77,7 +77,7 @@ export default {
   }, 
   computed: {
     contas() {
-      return this.$store.state.conta.list;
+      return this.$store.getters.getContas;
     }
   },
   components: {

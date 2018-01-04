@@ -1,22 +1,17 @@
 import axios from 'axios';
 import { SNACKS } from './snacks';
-import { lancamentos } from './lancamento';
+import { lancamentos, Lancamento } from './lancamento';
+import firebase from 'firebase';
+import eventBus from '../EventBus';
+import moment from 'moment';
 
 export const m = {
-  UPDATE_FORM: 'recorrenciaUpdateForm',
-  UPDATE_FORM_TIPO_FREQUENCIA: 'recorrenciaUpdateFormTipoFrequencia',
-  UPDATE_FORM_VALOR: 'recorrenciaUpdateFormValor',
-  UPDATE_FORM_A_CADA: 'recorrenciaUpdateFormACada',
-  UPDATE_FORM_DIA: 'recorrenciaUpdateFormDia',
-  UPDATE_FORM_PARTIR_DE: 'recorrenciaUpdateFormPartirDe',
-  UPDATE_FORM_CONTA: 'recorrenciaUpdateFormConta',
-  UPDATE_FORM_CATEGORIA: 'recorrenciaUpdateFormCategoria',
-  UPDATE_FORM_LOCAL: 'recorrenciaUpdateFormLocal',
-  UPDATE_FORM_LANCAMENTO_INICIAL: 'recorrenciaUpdateFormLancamentoInicial',
+ ADD_RECORRENCIA: 'recorrenciaAdd'
 }
 
 export const d = {
-  SUBMIT_FORM: 'recorrenciaSubmitForm'
+  SUBMIT_FORM: 'recorrenciaSubmitForm',
+  INITIALIZE: 'recorrenciaInitialize'
 }
 export const RECORRENCIA = {
   m, d
@@ -24,62 +19,74 @@ export const RECORRENCIA = {
 
 export default {
   state: {
-    form: {
-      tipoFrequencia: 'MES',//
-      aCada: 1,//
-      valor: null,//
-      dia: null,
-      partirDe: null,//
-      conta: null,
-      categoria: null,
-      local: null, 
-      lancamentoInicial: null
-    }
+    list: []
   },
   mutations: {
-    [m.UPDATE_FORM_TIPO_FREQUENCIA](state, tipoFrequencia) {
-      state.form.tipoFrequencia = tipoFrequencia;
-    },
-    [m.UPDATE_FORM_VALOR](state, valor) {
-      state.form.valor = valor;
-    },
-    [m.UPDATE_FORM_A_CADA](state, aCada) {
-      state.form.aCada = aCada;
-    },
-    [m.UPDATE_FORM_DIA](state, dia) {
-      state.form.dia = dia;
-    },
-    [m.UPDATE_FORM_PARTIR_DE](state, partirDe) {
-      state.form.partirDe = partirDe;
-    },
-    [m.UPDATE_FORM_CONTA](state, conta) {
-      state.form.conta = conta;
-    },
-    [m.UPDATE_FORM_CATEGORIA](state, categoria) {
-      state.form.categoria = categoria;
-    },
-    [m.UPDATE_FORM_LOCAL](state, local) {
-      state.form.local = local;
-    },
-    [m.UPDATE_FORM_LANCAMENTO_INICIAL](state, lancamentoInicial) {
-      state.form.lancamentoInicial = lancamentoInicial;
-    },
+    [m.ADD_RECORRENCIA](state, recorrencia) {
+      recorrencia.partirDe = moment(recorrencia.partirDe);
+      state.list.push(recorrencia);
+    }
+  },
+  getters: {
+    projecoesAte(state) {
+      return (idsContas, ate) => {
+        const lancamentos = [];
+        const recorrencias = state.list.filter(r => idsContas.indexOf(r.idConta) >= 0 && r.partirDe.isSameOrBefore(ate));
+        recorrencias.forEach(r => {
+          let data = r.partirDe;
+          
+          while (data.isSameOrBefore(ate)) {
+            data = data.clone().add(1, 'month');
+            if (r.lancamentos.find(gerado => moment(gerado.data).isSame(data)))
+              continue;
+
+            const lancamento = new Lancamento();
+            lancamento.data = data;
+            lancamento.idCategoria = r.idCategoria;
+            lancamento.idConta = r.idConta;
+            lancamento.local = r.local;
+            lancamento.valor = r.valor;
+            
+            lancamentos.push(lancamento);
+            
+          }
+
+        });
+        return lancamentos;
+
+      }
+    }
   },
   actions: {
-    [d.SUBMIT_FORM]({commit, state, dispatch}) {
-      return new Promise((resolve, reject) => {
-        axios.post('/api/recorrencias', state.form).then(() => {
-          dispatch(lancamentos.d.LANCAMENTO_LOAD);
-          commit(SNACKS.m.UPDATE_SNACK, {
-            text: 'Recorrência cadastrada!',
-            timeout: 1500,
-            context: 'success'
-          });
-          resolve();
-        }).catch(err => {
-          commit(SNACKS.m.TRATA_ERRO, err);
-        })
+    [d.INITIALIZE]({commit, getters}) {
+      eventBus.bus.$on(eventBus.events.SIGN_IN, () => {
+        firebase.database().ref(getters.uid + '/recorrencias').on('child_added', (snap) => {
+          const recorrencia = snap.val();
+          recorrencia.id = snap.key;
+          commit(m.ADD_RECORRENCIA, recorrencia);
+        });
       })
+    },
+    [d.SUBMIT_FORM]({commit, state, getters, dispatch}, recorrencia) {
+      const normalized = Object.assign({}, recorrencia);
+      normalized.partirDe = recorrencia.partirDe.toISOString();
+
+      
+      normalized.lancamentos = []
+      normalized.lancamentos.push({
+        data: normalized.partirDe,
+        idLancamento: normalized.idLancamentoInicial
+      })
+      delete normalized.idLancamentoInicial
+      
+      return firebase.database().ref(getters.uid + '/recorrencias/').push(normalized, (err) => {
+        if (err) {
+          commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
+          return;
+        }
+
+        commit(SNACKS.m.UPDATE_SUCESSO, 'Recorrência criada com sucesso!');
+      });
     }
   }
 }

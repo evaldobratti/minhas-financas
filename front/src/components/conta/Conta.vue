@@ -76,13 +76,13 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="trocaContaDialog">
+    <v-dialog v-model="trocaContaDialog" lazy>
       <v-card>
         <v-card-title>
           <div class="headline">Troca de conta</div>
         </v-card-title>
         <v-card-text>
-          <TrocaConta :lancamento="lancamentoAcao" @cadastrado="trocaContaDialog = false"></TrocaConta>
+          <TrocaConta :key="lancamentoAcao ? lancamentoAcao.id : 'null'" :lancamento="lancamentoAcao" @cadastrado="trocaContaDialog = false"></TrocaConta>
         </v-card-text>
       </v-card>
     </v-dialog>
