@@ -42,7 +42,8 @@
                 </tr>
               </template>
               <template slot="items" slot-scope="l">
-                <LancamentoLinha :lancamento="l.item"
+                <LancamentoLinha :key="l.item.id"
+                  :lancamento="l.item"
                   @novaRecorrencia="novaRecorrencia(l.item)" 
                   @novoParcelamento="novoParcelamento(l.item)"
                   @deleteLancamento="deleteLancamento(l.item)"
@@ -123,6 +124,7 @@ export default Vue.extend({
     lancamentos() {
       var mes = this.dataFiltro.month();
       var ano = this.dataFiltro.year();
+      
       if (this.conta)
         return this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano);
       else

@@ -45,7 +45,6 @@
 import ProtectedRoute from './ProtectedRoute'
 import axios from 'axios';
 import LancamentoLinha from './lancamento/LancamentoLinha'
-import { normalizeLancamentos } from '../store/lancamento';
 
 export default {
   data() {
@@ -66,7 +65,6 @@ export default {
       formData.append('extrato', e.target.files[0], e.target.files[0].name);
       axios.post('/api/'+this.conta.id+'/upload', formData).then(res => {
         this.lancamentos = res.data;
-        normalizeLancamentos(this.lancamentos, this.$store.getters);
       }).then(err => console.info(err));
     }
   },

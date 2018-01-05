@@ -107,16 +107,6 @@ export default {
     }
   },
   methods: {
-    validoParaSubmissao(atual, antigo) {
-      if (this.lancamento && this.lancamento.id < 0)
-        return;
-
-      if ('id' in atual && 'id' in antigo && (atual.id == antigo.id || antigo.id < 0))
-        return;
-      
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_EDICAO_SUBMIT, this.lancamento);
-      
-    },
     css(valor) {
       return {
         'red--text': valor < 0,

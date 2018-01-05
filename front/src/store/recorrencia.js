@@ -6,7 +6,8 @@ import eventBus from '../EventBus';
 import moment from 'moment';
 
 export const m = {
- ADD_RECORRENCIA: 'recorrenciaAdd'
+ ADD_RECORRENCIA: 'recorrenciaAdd',
+ UPDATE_RECORRENCIA: 'recorrenciaUpdate'
 }
 
 export const d = {
@@ -25,6 +26,12 @@ export default {
     [m.ADD_RECORRENCIA](state, recorrencia) {
       recorrencia.partirDe = moment(recorrencia.partirDe);
       state.list.push(recorrencia);
+    },
+    [m.UPDATE_RECORRENCIA](state, recorrencia) {
+      recorrencia.partirDe = moment(recorrencia.partirDe);
+      
+      const ix = state.list.findIndex(r => r.id == recorrencia.id);
+      state.list.splice(ix, 1, recorrencia);
     }
   },
   getters: {
@@ -41,6 +48,7 @@ export default {
     },
     projecoesAte(state, getters) {
       return (idsContas, ate) => {
+        
         const lancamentos = [];
         const recorrencias = state.list.filter(r => idsContas.indexOf(r.idConta) >= 0 && r.partirDe.isSameOrBefore(ate));
         recorrencias.forEach(r => {
@@ -84,7 +92,13 @@ export default {
           recorrencia.id = snap.key;
           commit(m.ADD_RECORRENCIA, recorrencia);
         });
-      })
+
+        firebase.database().ref(getters.uid + '/recorrencias').on('child_changed', (snap) => {
+          commit(m.UPDATE_RECORRENCIA, snap.val());
+        });
+      });
+      
+      
     },
     [d.SUBMIT_FORM]({commit, state, getters, dispatch}, recorrencia) {
       const normalized = Object.assign({}, recorrencia);

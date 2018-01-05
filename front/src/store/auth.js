@@ -58,7 +58,6 @@ export const store = {
     },
     [d.INITIALIZE]({commit}) {
       firebase.auth().onAuthStateChanged(user => {
-        console.info('login');
         commit(m.LOGGED_IN, user);
       })
     }

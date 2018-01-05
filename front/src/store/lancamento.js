@@ -6,27 +6,14 @@ import { SNACKS } from './snacks';
 import firebase from 'firebase';
 
 const m = {
-  LANCAMENTO_SET_DATA: 'lancamentoSetData',
-  LANCAMENTO_SET_LOCAL: 'lancamentoSetLocal',
-  LANCAMENTO_SET_CONTA: 'lancamentoSetConta',
-  LANCAMENTO_SET_CATEGORIA: 'lancamentoSetCategoria',
-  LANCAMENTO_SET_VALOR: 'lancamentoSetValor',
-  LANCAMENTO_SET_EFETUADA: 'lancamentoSetEfetuada',
-  LIMPA_FORMULARIO: 'lancamentoLimpaFormulario',
-  SET_BACKEND_ERRORS: 'lancamentoBackendErrors',
-  SET_EDICAO: 'lancamentoSetEdicao',
-  EDICAO_SET_LOCAL: 'lancamentoEdicaoSetLocal',
   SET_LANCAMENTOS: 'lancamentoSetList',
-  LANCAMENTO_UPDATE_SALDO: 'lancamentoUpdateSaldo', 
   REMOVE_LANCAMENTO_ID: 'lancamentoRemoveId',
   CONTA_CARREGADA: 'lancamentoContaCarregada'
 }
 
 const d = {
   LANCAMENTO_SUBMIT: 'lancamentoFormSubmit',
-  LANCAMENTO_EDICAO_SUBMIT: 'lancamentoEdicaoSubmit',
   LANCAMENTO_LOAD: 'lancamentoLoad',
-  UPDATE_SALDOS: 'lancamentoUpdateSaldos',
   REMOVE_LANCAMENTO: 'lancamentoRemove',
   TROCA_CONTA: 'lancamentoTrocaConta'
 }
@@ -34,35 +21,6 @@ const d = {
 export const lancamentos = {
   m,
   d
-}
-
-export function normalizeLancamentos(lancamentos, getters) {
-  lancamentos.forEach(l => {
-    if (typeof l.data === 'string')
-      l.data = moment(l.data);
-    
-    const categoria = l.categoria ? getters.getCategoria(l.categoria.id) : null;
-    if (categoria != null)
-      l.categoria = categoria;
-
-    if (l.motivo != null)  {
-      if (l.motivo['@class'].endsWith("RecorrenciaLancamentoGerado")) {
-        l.motivo.data = moment(l.motivo.data);
-        l.motivo.recorrencia.partirDe = moment(l.motivo.recorrencia.partirDe);
-        l.motivo.recorrencia.dataFim = l.motivo.recorrencia.dataFim != null ?
-          moment(l.motivo.recorrencia.dataFim) :
-          null;
-      }
-    }
-  });
-
-  lancamentos.sort((a, b) => {
-    const porData = a.data.valueOf() - b.data.valueOf();
-    if (porData != 0)
-      return porData;
-    
-    return a.id - b.id;
-  });
 }
 
 function put({ dispatch, commit, state, getters}, lancamento) {
@@ -162,8 +120,6 @@ export const store = {
     [m.SET_LANCAMENTOS](state, {lancamentos, getters}) {
       state.list = lancamentos;
       
-      normalizeLancamentos(state.list, getters);
-      
       const saldos = {};
       state.list.forEach(l => {
         if (saldos[l.idConta] == null) {
@@ -182,6 +138,7 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
+      
       return put(context, lancamento).then((l) => {
         let msg = '';
         if (lancamento.id) {
@@ -197,9 +154,6 @@ export const store = {
         context.commit(SNACKS.m.UPDATE_ERRO, err);
         throw err;
       });
-    },
-    [d.LANCAMENTO_EDICAO_SUBMIT](context, lancamento)  {
-      return put(context, lancamento)
     },
     [d.LANCAMENTO_LOAD]({state, dispatch, commit, getters}, contaId) {
       if (state.contasCarregadas.indexOf(contaId) >= 0) 
