@@ -14,7 +14,7 @@
     </td>
     <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
     <td>
-      <v-checkbox style="width: 40px" v-if="lancamento.id > 0" v-model="lancamento.efetivada"></v-checkbox>
+      <v-checkbox style="width: 40px" v-if="lancamento.id" v-model="lancamento.efetivada"></v-checkbox>
     </td>
     <td>
       
@@ -41,7 +41,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('deleteLancamento', lancamento)">
             <v-list-tile-title>
-                <v-btn color="primary" fab small dark class="small-fab-btn red">
+                <v-btn fab small dark class="small-fab-btn red">
                 <v-icon>remove</v-icon>
                 </v-btn>
                 Apagar
@@ -49,7 +49,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('efetiva', lancamento)" :disabled="lancamento.id != null" >
               <v-list-tile-title>
-                  <v-btn color="primary" fab small dark class="small-fab-btn green">
+                  <v-btn fab small dark class="small-fab-btn green">
                   <v-icon>add</v-icon>
                   </v-btn>
                   Efetivar
@@ -57,7 +57,7 @@
             </v-list-tile>
             <v-list-tile @click="$emit('trocaConta', lancamento)">
               <v-list-tile-title>
-                  <v-btn color="primary" fab small dark class="small-fab-btn green">
+                  <v-btn fab small dark class="small-fab-btn green">
                   <v-icon>swap_horiz</v-icon>
                   </v-btn>
                   Trocar de conta
@@ -100,8 +100,8 @@ export default {
     lancamento(val) {
       this.backup = Object.assign(Object.create(this.lancamento), this.lancamento);
     },
-    'lancamento.efetivada'(atual, antigo) {
-      if (this.lancamento.id > 0) {
+    'lancamento.efetivada'() {
+      if (this.lancamento.id) {
         this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
       }
     }

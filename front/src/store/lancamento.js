@@ -36,40 +36,6 @@ export const lancamentos = {
   d
 }
 
-export class Lancamento {
-  constructor(snapshot) {
-    if (snapshot) {
-      const firebaseObject = snapshot.val();
-      this.id = snapshot.key;
-      this.data = moment(firebaseObject.data);
-      this.idConta = firebaseObject.idConta;
-      this.idCategoria = firebaseObject.idCategoria;
-      this.local = firebaseObject.local;
-      this.valor = firebaseObject.valor;
-      this.efetivada = firebaseObject.efetivada;
-      return;
-    }
-    this.id = null;
-    this.idConta = null;
-    this.data = moment();
-    this.local = null;
-    this.valor = null;
-    this.efetivada = false;
-    this.idCategoria = null;
-  }
-
-  toFirebaseObject() {
-    return {
-      idConta: this.idConta,
-      data: this.data.toISOString(),
-      local: this.local,
-      valor: this.valor,
-      idCategoria: this.idCategoria
-    }
-  }
-
-}
-
 export function normalizeLancamentos(lancamentos, getters) {
   lancamentos.forEach(l => {
     if (typeof l.data === 'string')
@@ -100,10 +66,11 @@ export function normalizeLancamentos(lancamentos, getters) {
 }
 
 function put({ dispatch, commit, state, getters}, lancamento) {
-  if (lancamento.id)
-    return firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(lancamento.toFirebaseObject());
+  const normalized = JSON.parse(JSON.stringify(lancamento));
+  if (normalized.id)
+    return firebase.database().ref(getters.uid + '/lancamentos/' + normalized.idConta + '/' + normalized.id).set(normalized);
 
-  return firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta).push(lancamento.toFirebaseObject());
+  return firebase.database().ref(getters.uid + '/lancamentos/' + normalized.idConta).push(normalized);
 }
 
 export const store = {
@@ -154,7 +121,6 @@ export const store = {
         }, saldoInicial);
 
         const resultado = [ {
-            id: -1,
             data: saldoDataInicial,
             conta: null,
             local: 'Saldo inicial',
@@ -164,7 +130,6 @@ export const store = {
           }, 
           ...lancamentosDoMes, 
           {
-            id: -2,
             data: saldoDataFinal,
             conta: null,
             local: 'Saldo final',
@@ -217,15 +182,19 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
-      return put(context, lancamento).then(() => {
+      return put(context, lancamento).then((l) => {
         let msg = '';
-        if (lancamento.id)
+        if (lancamento.id) {
           msg = 'Lançamento atualizado com sucesso!';
-        else
+        }
+        else {
           msg = 'Lançamento criado com sucesso!';
+          if (lancamento.creationCallback)
+            lancamento.creationCallback(l.key, lancamento);
+        }
         context.commit(SNACKS.m.UPDATE_SUCESSO, msg);
       }).catch((err) => {
-        context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
+        context.commit(SNACKS.m.UPDATE_ERRO, err);
         throw err;
       });
     },
@@ -239,7 +208,10 @@ export const store = {
       commit(m.CONTA_CARREGADA, contaId)
 
       firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_added', (snap) => {
-        const lancamento = new Lancamento(snap);
+        const lancamento = snap.val();
+        lancamento.id = snap.key;
+        lancamento.data = moment(lancamento.data);
+
         commit(LOCAIS.m.ADD_LOCAL, lancamento.local);
         commit(m.SET_LANCAMENTOS, {
           lancamentos: [...state.list, lancamento],
@@ -256,7 +228,6 @@ export const store = {
       });
     },
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
-      
       firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
         commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento excluído com sucesso!');
       }).catch((err) => {

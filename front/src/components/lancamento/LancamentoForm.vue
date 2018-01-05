@@ -31,7 +31,7 @@
 <script>
 import axios from 'axios';
 import { d } from '../../store/categorias';
-import { lancamentos, Lancamento } from '../../store/lancamento';
+import { lancamentos } from '../../store/lancamento';
 import CategoriaIcone from '../categoria/CategoriaIcone';
 import LocalAutoComplete from './LocalAutoComplete';
 import CategoriaAutoComplete from './CategoriaAutoComplete';
@@ -45,7 +45,10 @@ export default {
     lancamento: {
       type: Object,
       default() {
-        return new Lancamento();
+        return {
+          data: moment(),
+          efetivada: true
+        };
       }
     }
   },
@@ -76,12 +79,11 @@ export default {
     },
     submit() {
       this.$refs.valor.blur();      
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, Object.assign(Object.create(this.lancamento), this.lancamento)).then(() => {
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
         if (this.lancamento.id == null) {
-          const data = this.lancamento.data;
-          Object.assign(this.lancamento, new Lancamento());
-          this.lancamento.data = data;
-          this.lancamento.idConta = this.idConta;
+          this.lancamento.local = '';
+          this.lancamento.idCategoria = null;
+          this.lancamento.valor = null;
           setTimeout(()  => {
             this.$refs.localAutoComplete.focus()
           }, 100);

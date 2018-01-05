@@ -28,7 +28,18 @@ export default {
     }
   },
   getters: {
-    projecoesAte(state) {
+    recorrenciaOriginadora(state) {
+      return idLancamento => {
+        for (const recorrencia of state.list) {
+          for (const gerou of recorrencia.lancamentos) {
+            if (gerou.idLancamnento == idLancamento)
+              return recorrencia;
+          }
+        }
+        return null;
+      }
+    },
+    projecoesAte(state, getters) {
       return (idsContas, ate) => {
         const lancamentos = [];
         const recorrencias = state.list.filter(r => idsContas.indexOf(r.idConta) >= 0 && r.partirDe.isSameOrBefore(ate));
@@ -40,12 +51,20 @@ export default {
             if (r.lancamentos.find(gerado => moment(gerado.data).isSame(data)))
               continue;
 
-            const lancamento = new Lancamento();
-            lancamento.data = data;
-            lancamento.idCategoria = r.idCategoria;
-            lancamento.idConta = r.idConta;
-            lancamento.local = r.local;
-            lancamento.valor = r.valor;
+            const lancamento = {
+              data,
+              idCategoria: r.idCategoria,
+              idConta: r.idConta,
+              local: r.local,
+              valor: r.valor,
+              creationCallback: (id, lancamento) => {
+                r.lancamentos.push({
+                  data: lancamento.data,
+                  idLancamento: id
+                })
+              }
+            };
+            firebase.database().ref(getters.uid + '/recorrencias/' + r.id).set(JSON.parse(JSON.stringify(r)));
             
             lancamentos.push(lancamento);
             

@@ -60,17 +60,7 @@ export default {
         value: 'ANO',
         text: 'Ano'
       }],
-      recorrencia: {
-        id: null,
-        valor: null,
-        partirDe: null,
-        idConta: null,
-        local: null,
-        idCategoria: null,
-        dia: null,
-        lancamentoInicial: null,
-        dataFim: null
-      },
+      recorrencia: {},
       submetido: false
     }
   },
@@ -94,10 +84,11 @@ export default {
 
       this.submetido = false;
 
-      if (l.motivo && l.motivo['@class'].endsWith('RecorrenciaLancamentoGerado')) {
-        this.recorrencia = Object.assign({}, l.motivo.recorrencia);  
-      }
-      else {
+      const recorrenciaOriginadora = this.$store.getters.recorrenciaOriginadora(l.id);
+
+      if (recorrenciaOriginadora) {
+        this.recorrencia = Object.assign({}, recorrenciaOriginadora);  
+      } else {
         this.$set(this.recorrencia, 'id', null);
         this.$set(this.recorrencia, 'valor', l.valor);
         this.$set(this.recorrencia, 'partirDe', l.data);
