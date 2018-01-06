@@ -183,6 +183,9 @@ export const store = {
     },
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
       firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
+        if (lancamento.creationCallback)
+          lancamento.creationCallback('REMOVIDO', lancamento);
+          
         commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento excluído com sucesso!');
       }).catch((err) => {
         context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
