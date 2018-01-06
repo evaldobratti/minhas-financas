@@ -4,7 +4,7 @@
     {{ lancamento.data | date }}
   </td>
   <td>
-    <span @click.stop="editando('descricao')">{{ lancamento.local }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
+    <span @click.stop="editando('descricao')">{{ lancamento.local + getComplemento() }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
   </td>
     <td>
       <span @click.stop="editando('categoria')" v-if="lancamento.idCategoria != null">{{ getCategoria(lancamento.idCategoria).nome }}</span>
@@ -112,6 +112,9 @@ export default {
         'red--text': valor < 0,
         'blue--text text--darken-3': valor >= 0
       }
+    },
+    getComplemento() {
+      return this.$store.getters.getComplemento(this.lancamento);
     },
     editando(campo) {
       this.isEditando = true;

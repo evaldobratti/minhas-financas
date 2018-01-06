@@ -29,6 +29,18 @@
           <DatePicker label="Fim" :disabled="(recorrencia.id != null && recorrencia.dataFim != null) && submetido" v-model="recorrencia.dataFim"></DatePicker>
         </v-flex>
       </v-layout>
+      <v-layout>
+        <v-flex xs6>
+          <v-text-field
+            v-model="recorrencia.parcelaInicio"
+            label="Parcela">
+          </v-text-field>
+          <v-text-field
+            v-model="recorrencia.parcelaQuantidade"
+            label="de">
+          </v-text-field>
+        </v-flex>
+      </v-layout>
       <v-layout justify-space-around>
         <v-btn type="submit">Salvar</v-btn>
       </v-layout>
@@ -102,14 +114,22 @@ export default {
         this.$set(this.recorrencia, 'idCategoria', l.idCategoria);
         this.$set(this.recorrencia, 'dataFim', null); 
         this.$set(this.recorrencia, 'lancamentos', []);
-
-        this.recorrencia.lancamentos.push({
-          data: this.recorrencia.partirDe,
-          idLancamento: l.id
-        });
       }
     },
     submit() {
+      if (this.recorrencia.lancamentos.length == 0) {
+        const parcelaGerada = {
+          data: this.recorrencia.partirDe,
+          idLancamento: this.lancamento.id
+        };
+
+        if (this.recorrencia.parcelaInicio) {
+          parcelaGerada.parcelaNumero = this.recorrencia.parcelaInicio;
+        }
+
+        this.recorrencia.lancamentos.push(parcelaGerada);
+      }
+
       this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM, this.recorrencia).then(() => {
         this.$emit('cadastrado'); 
       });

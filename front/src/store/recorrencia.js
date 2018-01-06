@@ -18,18 +18,23 @@ export const RECORRENCIA = {
   m, d
 }
 
+let lancamentosTransientes = [];
+
 export default {
   state: {
-    list: []
+    list: [],
+    
   },
   mutations: {
     [m.ADD_RECORRENCIA](state, recorrencia) {
       recorrencia.partirDe = moment(recorrencia.partirDe);
+      lancamentosTransientes = [];
       state.list.push(recorrencia);
     },
     [m.UPDATE_RECORRENCIA](state, recorrencia) {
       recorrencia.partirDe = moment(recorrencia.partirDe);
-      
+      lancamentosTransientes = [];
+
       const ix = state.list.findIndex(r => r.id == recorrencia.id);
       state.list.splice(ix, 1, recorrencia);
     }
@@ -51,21 +56,44 @@ export default {
         return null;
       }
     },
+    getComplemento(state) {
+      return lancamento => {
+        for (const recorrencia of state.list) {
+          for (const gerou of recorrencia.lancamentos) {
+            if (gerou.idLancamento == lancamento.id)
+              return ' BIRL';
+            
+            if (lancamentosTransientes.find(l => l.lancamento == lancamento)) {
+              return ' RÁ';
+            }
+          }
+        }
+        return '';
+      }
+    },
     projecoesAte(state, getters) {
       return (idsContas, ate) => {
-        
         const lancamentos = [];
         const recorrencias = state.list.filter(r => idsContas.indexOf(r.idConta) >= 0 && r.partirDe.isSameOrBefore(ate));
+        
         recorrencias.forEach(r => {
           let data = r.partirDe;
-          
+          let ixParcela = r.parcelaInicio;  
           while (data.isSameOrBefore(ate)) {
-            data = data.clone().add(1, 'month');
+            data = data.clone().add(r.aCada, 'month');
+            ixParcela += 1;
 
             if (r.dataFim && data.isAfter(r.dataFim))
               break;
+            
+            for (const gerado of r.lancamentos) {
 
+              
+            }
             if (r.lancamentos.find(gerado => moment(gerado.data).isSame(data)))
+              continue;
+
+            if (r.parcelaInicio != null && r.lancamentos.find(gerado => gerado.parcelaNumero == ixParcela))
               continue;
 
             const lancamento = {
@@ -74,15 +102,23 @@ export default {
               idConta: r.idConta,
               local: r.local,
               valor: r.valor,
-              idRecorrencia: r.id,
-              creationCallback: (id, lancamento) => {
-                r.lancamentos.push({
-                  data: lancamento.data,
-                  idLancamento: id
-                })
-                firebase.database().ref(getters.uid + '/recorrencias/' + r.id).set(JSON.parse(JSON.stringify(r)));
-              }
+              idRecorrencia: r.id
             };
+
+            lancamentosTransientes.push({
+              lancamento,
+              gerado: {
+                data: lancamento.data,
+                parcelaNumero: ixParcela
+              }
+            });
+
+            lancamento.creationCallback = (id, lancamento) => {
+              const gerado = lancamentosTransientes.find(l => l.lancamento == lancamento).gerado;
+              gerado.idLancamento = id;
+              r.lancamentos.push(gerado);
+              firebase.database().ref(getters.uid + '/recorrencias/' + r.id).set(JSON.parse(JSON.stringify(r)));
+            }
             
             
             lancamentos.push(lancamento);
@@ -90,6 +126,7 @@ export default {
           }
 
         });
+        console.info(lancamentosTransientes);
         return lancamentos;
 
       }
