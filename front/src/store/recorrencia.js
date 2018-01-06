@@ -35,11 +35,16 @@ export default {
     }
   },
   getters: {
+    getRecorrencia(state) {
+      return idRecorrencia => {
+        return state.list.find(r => r.id == idRecorrencia)
+      }
+    },
     recorrenciaOriginadora(state) {
       return idLancamento => {
         for (const recorrencia of state.list) {
           for (const gerou of recorrencia.lancamentos) {
-            if (gerou.idLancamnento == idLancamento)
+            if (gerou.idLancamento == idLancamento)
               return recorrencia;
           }
         }
@@ -56,6 +61,10 @@ export default {
           
           while (data.isSameOrBefore(ate)) {
             data = data.clone().add(1, 'month');
+
+            if (r.dataFim && data.isAfter(r.dataFim))
+              break;
+
             if (r.lancamentos.find(gerado => moment(gerado.data).isSame(data)))
               continue;
 
@@ -65,14 +74,16 @@ export default {
               idConta: r.idConta,
               local: r.local,
               valor: r.valor,
+              idRecorrencia: r.id,
               creationCallback: (id, lancamento) => {
                 r.lancamentos.push({
                   data: lancamento.data,
                   idLancamento: id
                 })
+                firebase.database().ref(getters.uid + '/recorrencias/' + r.id).set(JSON.parse(JSON.stringify(r)));
               }
             };
-            firebase.database().ref(getters.uid + '/recorrencias/' + r.id).set(JSON.parse(JSON.stringify(r)));
+            
             
             lancamentos.push(lancamento);
             
@@ -101,24 +112,20 @@ export default {
       
     },
     [d.SUBMIT_FORM]({commit, state, getters, dispatch}, recorrencia) {
-      const normalized = Object.assign({}, recorrencia);
-      normalized.partirDe = recorrencia.partirDe.toISOString();
-
-      
-      normalized.lancamentos = []
-      normalized.lancamentos.push({
-        data: normalized.partirDe,
-        idLancamento: normalized.idLancamentoInicial
-      })
-      delete normalized.idLancamentoInicial
-      
-      return firebase.database().ref(getters.uid + '/recorrencias/').push(normalized, (err) => {
-        if (err) {
-          commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
-          return;
-        }
-
-        commit(SNACKS.m.UPDATE_SUCESSO, 'Recorrência criada com sucesso!');
+      let normalized = JSON.parse(JSON.stringify(recorrencia));
+      let future;
+      let msg;
+      if (recorrencia.id) {
+        future = firebase.database().ref(getters.uid + '/recorrencias/' + recorrencia.id).set(normalized);
+        msg = 'Recorrência atualizada com sucesso!';
+      } else {
+        future = firebase.database().ref(getters.uid + '/recorrencias/').push(normalized);
+        msg = 'Recorrência criada com sucesso!';
+      }
+      return future.then(() => {
+        commit(SNACKS.m.UPDATE_SUCESSO, msg);
+      }).catch(err => {
+        commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
       });
     }
   }

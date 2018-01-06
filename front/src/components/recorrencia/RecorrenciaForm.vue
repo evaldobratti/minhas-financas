@@ -84,7 +84,10 @@ export default {
 
       this.submetido = false;
 
-      const recorrenciaOriginadora = this.$store.getters.recorrenciaOriginadora(l.id);
+      let recorrenciaOriginadora = this.$store.getters.recorrenciaOriginadora(l.id);
+      
+      if (!recorrenciaOriginadora)
+        recorrenciaOriginadora = this.$store.getters.getRecorrencia(l.idRecorrencia);
 
       if (recorrenciaOriginadora) {
         this.recorrencia = Object.assign({}, recorrenciaOriginadora);  
@@ -97,8 +100,13 @@ export default {
         this.$set(this.recorrencia, 'aCada', 1);
         this.$set(this.recorrencia, 'local', l.local);
         this.$set(this.recorrencia, 'idCategoria', l.idCategoria);
-        this.$set(this.recorrencia, 'idLancamentoInicial', l.id);
         this.$set(this.recorrencia, 'dataFim', null); 
+        this.$set(this.recorrencia, 'lancamentos', []);
+
+        this.recorrencia.lancamentos.push({
+          data: this.recorrencia.partirDe,
+          idLancamento: l.id
+        });
       }
     },
     submit() {
