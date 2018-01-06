@@ -32,11 +32,11 @@
       <v-layout>
         <v-flex xs6>
           <v-text-field
-            v-model="recorrencia.parcelaInicio"
+            v-model.number="recorrencia.parcelaInicio"
             label="Parcela">
           </v-text-field>
           <v-text-field
-            v-model="recorrencia.parcelaQuantidade"
+            v-model.number="recorrencia.parcelaQuantidade"
             label="de">
           </v-text-field>
         </v-flex>
@@ -99,7 +99,7 @@ export default {
       let recorrenciaOriginadora = this.$store.getters.recorrenciaOriginadora(l.id);
       
       if (!recorrenciaOriginadora)
-        recorrenciaOriginadora = this.$store.getters.getRecorrencia(l.idRecorrencia);
+        recorrenciaOriginadora = this.$store.getters.getRecorrencia(l);
 
       if (recorrenciaOriginadora) {
         this.recorrencia = Object.assign({}, recorrenciaOriginadora);  
@@ -117,20 +117,17 @@ export default {
       }
     },
     submit() {
-      if (this.recorrencia.lancamentos.length == 0) {
-        const parcelaGerada = {
-          data: this.recorrencia.partirDe,
-          idLancamento: this.lancamento.id
-        };
+      
+      const parcelaGerada = {
+        data: this.recorrencia.partirDe,
+        idLancamento: this.lancamento.id
+      };
 
-        if (this.recorrencia.parcelaInicio) {
-          parcelaGerada.parcelaNumero = this.recorrencia.parcelaInicio;
-        }
-
-        this.recorrencia.lancamentos.push(parcelaGerada);
+      if (this.recorrencia.parcelaInicio) {
+        parcelaGerada.parcelaNumero = this.recorrencia.parcelaInicio;
       }
 
-      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM, this.recorrencia).then(() => {
+      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM, { recorrencia: this.recorrencia, gerada: parcelaGerada }).then(() => {
         this.$emit('cadastrado'); 
       });
     }
