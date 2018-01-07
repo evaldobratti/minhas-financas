@@ -96,7 +96,7 @@ export default {
 
       this.submetido = false;
 
-      let recorrenciaOriginadora = this.$store.getters.recorrenciaOriginadora(l.id);
+      let recorrenciaOriginadora = this.$store.getters.recorrenciaOriginadora(l);
       
       if (!recorrenciaOriginadora)
         recorrenciaOriginadora = this.$store.getters.getRecorrencia(l);

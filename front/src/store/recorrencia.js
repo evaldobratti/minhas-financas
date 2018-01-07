@@ -40,6 +40,7 @@ export default {
       state.list.splice(ix, 1, recorrencia);
     },
     [m.ADD_RECORRENCIA_GERADA](state, gerada) {
+      lancamentosTransientes = [];
       state.geradas.push(gerada);
     }
   },
@@ -49,11 +50,18 @@ export default {
         return state.list.find(r => r.id == idRecorrencia)
       }
     },
-    recorrenciaOriginadora(state) {
-      return idLancamento => {
-        const gerada = state.geradas.find(g => g.idLancamento == idLancamento);
+    recorrenciaOriginadora(state, getters) {
+      return lancamento => {
+        let gerada = state.geradas.find(g => g.idLancamento == lancamento.id);
+
+        if (!gerada)  {
+          const transiente = lancamentosTransientes.find(l => l.lancamento == lancamento);
+          if (transiente)
+            gerada = transiente.gerado;
+        }
+
         if (gerada) 
-          return state.list.find(r => r.id == gerada.idRecorrencia);
+          return getters.getRecorrencia(gerada.idRecorrencia);
 
         return null;
       }
@@ -124,9 +132,6 @@ export default {
             lancamento.creationCallback = (id, lancamento) => {
               const gerado = lancamentosTransientes.find(l => l.lancamento == lancamento).gerado;
               gerado.idLancamento = id;
-              /*r.lancamentos.push(gerado);
-              firebase.database().ref(getters.uid + '/recorrencias/' + r.id).set(JSON.parse(JSON.stringify(r)));*/
-
               firebase.database().ref(getters.uid + '/recorrenciasGeradas/').push(JSON.parse(JSON.stringify(gerado)));
             }
              
