@@ -40,7 +40,7 @@
                 </tr>
               </template>
               <template slot="items" slot-scope="l">
-                <LancamentoLinha :lancamento="l.item" />
+                <LancamentoLinha :key="l.item.id" :lancamento="l.item" />
               </template>
             </v-data-table>
       </v-card-text>

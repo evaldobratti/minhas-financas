@@ -156,6 +156,9 @@ export const store = {
       });
     },
     [d.LANCAMENTO_LOAD]({state, dispatch, commit, getters}, contaId) {
+      if (!getters.uid)
+        return;
+
       if (state.contasCarregadas.indexOf(contaId) >= 0) 
         return;
 
@@ -172,7 +175,7 @@ export const store = {
           getters
         });
       }, (err) => {
-        context.commit(SNACKS.m.UPDATE_ERRO, 'Erro ao carregar lançamentos! ' + err);
+        commit(SNACKS.m.UPDATE_ERRO, 'Erro ao carregar lançamentos! ' + err);
       });
 
       firebase.database().ref(getters.uid + '/lancamentos/' + contaId).on('child_removed', (snap) => {

@@ -2,14 +2,26 @@ import axios from 'axios';
 import firebase from 'firebase';
 import {bus, events} from '../EventBus';
 
-firebase.initializeApp({
-  apiKey: "AIzaSyB5mLWc-ry7gdmx8H8UeBIfmlWfqNRkBa4",
-  authDomain: "eb-minhas-financas.firebaseapp.com",
-  databaseURL: "https://eb-minhas-financas.firebaseio.com",
-  projectId: "eb-minhas-financas",
-  storageBucket: "eb-minhas-financas.appspot.com",
-  messagingSenderId: "761623811227"
-});
+if (process.env.NODE_ENV == 'development') {
+  firebase.initializeApp({
+    apiKey: "AIzaSyDNId3qWk7ivtZG4CxPVvc_ZHfl4-dH8Jw",
+    authDomain: "eb-minhas-financas-dev.firebaseapp.com",
+    databaseURL: "https://eb-minhas-financas-dev.firebaseio.com",
+    projectId: "eb-minhas-financas-dev",
+    storageBucket: "",
+    messagingSenderId: "1040340906347"
+  });
+} else {
+  firebase.initializeApp({
+    apiKey: "AIzaSyB5mLWc-ry7gdmx8H8UeBIfmlWfqNRkBa4",
+    authDomain: "eb-minhas-financas.firebaseapp.com",
+    databaseURL: "https://eb-minhas-financas.firebaseio.com",
+    projectId: "eb-minhas-financas",
+    storageBucket: "eb-minhas-financas.appspot.com",
+    messagingSenderId: "761623811227"
+  });
+}
+
 
 export const d = {
   LOGIN: 'login',
@@ -39,7 +51,7 @@ export const store = {
     }
   },
   actions: {
-    [d.LOGIN]({commit}) {
+    [d.LOGIN]({commit, dispatch}) {
       var provider = new firebase.auth.GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/userinfo.email');
 
@@ -47,8 +59,8 @@ export const store = {
         firebase.auth().signInWithPopup(provider).then((res) => {
           commit(m.LOGGED_IN, res.user);
           resolve();
-        }).catch(() => {
-          commit(m.LOGGED_OUT);
+        }).catch((err) => {
+          dispatch(d.LOGOUT);
           reject();
         })}
       );
