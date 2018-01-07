@@ -1,12 +1,12 @@
 # minhas-financas
 
-> Projeto para estudo de tecnologias web e gerenciamento de finanças
+Projeto para estudo de tecnologias web e gerenciamento de finanças
 
-#techstack
+# techstack
 - vue
 - vuex
 - vuetify
 - firebase
 - chart.js
 
-[Produçao](https://eb-minhas-financas.firebaseapp.com)
+[Produção](https://eb-minhas-financas.firebaseapp.com)
