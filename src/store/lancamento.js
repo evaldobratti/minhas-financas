@@ -25,11 +25,23 @@ export const lancamentos = {
 }
 
 function put({ dispatch, commit, state, getters}, lancamento) {
+  let location = '';
+  let id = '';
   const normalized = JSON.parse(JSON.stringify(lancamento));
-  if (normalized.id)
-    return firebase.database().ref(getters.uid + '/lancamentos/' + normalized.idConta + '/' + normalized.id).set(normalized);
-
-  return firebase.database().ref(getters.uid + '/lancamentos/' + normalized.idConta).push(normalized);
+  if (normalized.id) {
+    id = normalized.id;
+    location = getters.uid + '/lancamentos/' + normalized.idConta + '/' + normalized.id;
+  }
+  else {
+    const ref = firebase.database().ref(getters.uid + '/lancamentos/' + normalized.idConta).push()
+    id = ref.key;
+    location = getters.uid + '/lancamentos/' + normalized.idConta + '/' + ref.key;
+  }
+  return {
+    id,
+    location,
+    value: normalized
+  }
 }
 
 export const store = {
@@ -145,16 +157,28 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
-      
-      return put(context, lancamento).then((l) => {
+      var actionSubmit = put(context, lancamento);
+      var actions = [];
+      actions.push({
+        location: actionSubmit.location,
+        value: actionSubmit.value
+      });
+
+      if (lancamento.creationCallback)
+        actions.push(lancamento.creationCallback(actionSubmit.id, lancamento));
+
+      var update = {};
+      for (const action of actions) {
+        update[action.location] = action.value;
+      }
+
+      return  firebase.database().ref().update(update) .then((l) => {
         let msg = '';
         if (lancamento.id) {
           msg = 'Lançamento atualizado com sucesso!';
         }
         else {
           msg = 'Lançamento criado com sucesso!';
-          if (lancamento.creationCallback)
-            lancamento.creationCallback(l.key, lancamento);
         }
         context.commit(SNACKS.m.UPDATE_SUCESSO, msg);
       }).catch((err) => {
@@ -192,10 +216,14 @@ export const store = {
       });
     },
     [d.REMOVE_LANCAMENTO]({state, dispatch, commit, getters}, lancamento) {
-      firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
-        if (lancamento.creationCallback)
-          lancamento.creationCallback('REMOVIDO', lancamento);
-          
+      var update = {};
+      update[getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id] = null;
+      if (lancamento.creationCallback) {
+        const recorrencia = lancamento.creationCallback('REMOVIDO', lancamento);
+        update[recorrencia.location] = recorrencia.value;
+      }
+      
+      firebase.database().ref().update(update).then(() => {  
         commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento excluído com sucesso!');
       }).catch((err) => {
         context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');

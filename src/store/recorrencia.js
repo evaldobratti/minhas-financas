@@ -135,11 +135,10 @@ export default {
             lancamento.creationCallback = (id, lancamento) => {
               const gerado = lancamentosTransientes.find(l => l.lancamento == lancamento).gerado;
               gerado.idLancamento = id;
-              /*const ref = firebase.database().ref(getters.uid + '/recorrenciasGeradas/');
-              ref.push(JSON.parse(JSON.stringify(gerado)));*/
+              const ref = firebase.database().ref(getters.uid + '/recorrenciasGeradas/').push();
               return {
-                location: getters.uid + '/recorrenciasGeradas/',
-                value: JSON.parse(JSON.stringify(gerado));
+                location: getters.uid + '/recorrenciasGeradas/' + ref.key,
+                value: JSON.parse(JSON.stringify(gerado))
               }
             }
              
