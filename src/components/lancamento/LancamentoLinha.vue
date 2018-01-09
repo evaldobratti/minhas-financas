@@ -14,7 +14,7 @@
     </td>
     <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
     <td>
-      <v-checkbox style="width: 40px" v-if="lancamento.id" v-model="lancamento.efetivada"></v-checkbox>
+      <v-checkbox style="width: 40px" v-model="lancamento.efetivada" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
     </td>
     <td>
       
@@ -101,9 +101,7 @@ export default {
       this.backup = Object.assign(Object.create(this.lancamento), this.lancamento);
     },
     'lancamento.efetivada'() {
-      if (this.lancamento.id) {
-        this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
-      }
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
     }
   },
   methods: {

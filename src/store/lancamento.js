@@ -15,7 +15,8 @@ const d = {
   LANCAMENTO_SUBMIT: 'lancamentoFormSubmit',
   LANCAMENTO_LOAD: 'lancamentoLoad',
   REMOVE_LANCAMENTO: 'lancamentoRemove',
-  TROCA_CONTA: 'lancamentoTrocaConta'
+  TROCA_CONTA: 'lancamentoTrocaConta',
+  LANCAMENTOS_EM: 'lancamentosEm'
 }
 
 export const lancamentos = {
@@ -83,8 +84,7 @@ export const store = {
             conta: null,
             local: 'Saldo inicial',
             categoria: { id: -1},
-            saldoDiario: saldoInicial,
-            efetuada: false
+            saldoDiario: saldoInicial
           }, 
           ...lancamentosDoMes, 
           {
@@ -92,10 +92,17 @@ export const store = {
             conta: null,
             local: 'Saldo final',
             categoria: { id: -2 },
-            saldoDiario: saldoFinal,
-            efetuada: false
+            saldoDiario: saldoFinal
           }
         ];
+        resultado.sort((a, b) => {
+          const porData = a.data.valueOf() - b.data.valueOf();
+          if (porData != 0)
+            return porData;
+          
+          return a.valor - b.valor;
+        });
+        
         return resultado;
       }
     },

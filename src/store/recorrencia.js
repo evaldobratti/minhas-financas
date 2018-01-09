@@ -4,6 +4,7 @@ import { lancamentos, Lancamento } from './lancamento';
 import firebase from 'firebase';
 import eventBus from '../EventBus';
 import moment from 'moment';
+import uuid from 'uuid'
 
 export const m = {
  ADD_RECORRENCIA: 'recorrenciaAdd',
@@ -117,7 +118,9 @@ export default {
               idCategoria: r.idCategoria,
               idConta: r.idConta,
               local: r.local,
-              valor: r.valor
+              valor: r.valor,
+              efetivada: false,
+              tempId: uuid.v4()
             };
 
             lancamentosTransientes.push({
@@ -132,7 +135,12 @@ export default {
             lancamento.creationCallback = (id, lancamento) => {
               const gerado = lancamentosTransientes.find(l => l.lancamento == lancamento).gerado;
               gerado.idLancamento = id;
-              firebase.database().ref(getters.uid + '/recorrenciasGeradas/').push(JSON.parse(JSON.stringify(gerado)));
+              /*const ref = firebase.database().ref(getters.uid + '/recorrenciasGeradas/');
+              ref.push(JSON.parse(JSON.stringify(gerado)));*/
+              return {
+                location: getters.uid + '/recorrenciasGeradas/',
+                value: JSON.parse(JSON.stringify(gerado));
+              }
             }
              
             lancamentos.push(lancamento);

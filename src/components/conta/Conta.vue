@@ -42,7 +42,7 @@
                 </tr>
               </template>
               <template slot="items" slot-scope="l">
-                <LancamentoLinha :key="l.item.id"
+                <LancamentoLinha :key="l.item.tempId || l.item.id"
                   :lancamento="l.item"
                   @novaRecorrencia="novaRecorrencia(l.item)" 
                   @novoParcelamento="novoParcelamento(l.item)"
@@ -64,16 +64,6 @@
         </v-card-title>
         <v-card-text>
           <RecorrenciaForm :lancamento="lancamentoAcao" ref="recorrenciaForm" @cadastrado="recorrenciaDialog = false"></RecorrenciaForm>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-    <v-dialog v-model="parcelamentoDialog">
-      <v-card>
-        <v-card-title>
-          <div class="headline">Novo Parcelamento</div>
-        </v-card-title>
-        <v-card-text>
-          <ParcelamentoForm :lancamento="lancamentoAcao" @cadastrado="parcelamentoDialog = false"></ParcelamentoForm>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -111,7 +101,8 @@ export default Vue.extend({
       lancamentoAcao: null,
       recorrenciaDialog: false,
       parcelamentoDialog: false,
-      trocaContaDialog: false
+      trocaContaDialog: false,
+      turnReactive: {}
     }
   },
   created() {
@@ -125,8 +116,13 @@ export default Vue.extend({
       var mes = this.dataFiltro.month();
       var ano = this.dataFiltro.year();
       
-      if (this.conta)
-        return this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano);
+      if (this.conta) {
+        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano);
+        for (const l of ls) {
+          this.turnReactive = l;
+        }
+        return ls;
+      }
       else
         return []
     },

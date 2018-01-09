@@ -6,6 +6,8 @@ export default {
       context: 'error',
       text: 'Erro: ' + err.response && err.response.data && err.response.data.message
     });
-  }
+  },
+
+  
 }
 

@@ -30,13 +30,6 @@ export default {
         this.$emit('cadastrado');
       });
     }
-  },
-  computed: {
-    ...mapGetSet({
-      inicioParcelas: ['parcelamentos.form.inicioParcelas', PARCELAMENTOS.m.UPDATE_FORM_INICIO_PARCELAS],
-      quantidadeParcelas: ['parcelamentos.form.quantidadeParcelas', PARCELAMENTOS.m.UPDATE_FORM_QUANTIDADE_PARCELAS],
-      lancamentoInicial: ['parcelamentos.form.lancamentoInicial', PARCELAMENTOS.m.UPDATE_FORM_LANCAMENTO_INICIAL],
-    })
   }
   
 }

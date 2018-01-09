@@ -20,7 +20,7 @@
         <v-text-field
           :disabled="recorrencia.id != null"
           label="Valor"
-          v-model="recorrencia.valor"></v-text-field>
+          v-model.number="recorrencia.valor"></v-text-field>
       <v-layout>
         <v-flex xs6>
           <DatePicker label="Inicio" :disabled="recorrencia.id != null" v-model="recorrencia.partirDe"></DatePicker>
@@ -33,7 +33,8 @@
         <v-flex xs6>
           <v-text-field
             v-model.number="recorrencia.parcelaInicio"
-            label="Parcela">
+            label="Parcela"
+            type="number">
           </v-text-field>
           <v-text-field
             v-model.number="recorrencia.parcelaQuantidade"
@@ -82,6 +83,16 @@ export default {
   watch: {
     lancamento(lancamento) {
       this.updateLancamento(lancamento);
+    },
+    'recorrencia.parcelaInicio'() {
+      if (this.recorrencia.parcelaInicio == '') {
+        this.recorrencia.parcelaInicio = null;
+      }
+    },
+    'recorrencia.parcelaQuantidade'() {
+      if (this.recorrencia.parcelaQuantidade == '') {
+        this.recorrencia.parcelaQuantidade = null;
+      }
     }
   },
   computed: {

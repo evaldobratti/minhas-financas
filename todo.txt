@@ -1,5 +1,3 @@
 - ordenar lançamentos
-- inicio/quantidade parcelas ser number / nulo / undefined
-- valor recorrencia ser number
 - tem alguma coisa estranha nas categorias
 - relogin recuperando dados 2x
