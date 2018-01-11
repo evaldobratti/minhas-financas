@@ -85,6 +85,14 @@ export const store = {
           saldoFinal += getters.saldoEm(getters.getConta(contaId), saldoDataFinal);
         });
 
+        lancamentosDoMes.sort((a, b) => {
+          const porData = a.data.valueOf() - b.data.valueOf();
+          if (porData != 0)
+            return porData;
+          
+          return a.valor - b.valor;
+        });
+
         lancamentosDoMes.reduce((x, y) => {
           const saldo = x + y.valor;
           Vue.set(y, 'saldoDiario', saldo);
@@ -107,13 +115,6 @@ export const store = {
             saldoDiario: saldoFinal
           }
         ];
-        resultado.sort((a, b) => {
-          const porData = a.data.valueOf() - b.data.valueOf();
-          if (porData != 0)
-            return porData;
-          
-          return a.valor - b.valor;
-        });
         
         return resultado;
       }
