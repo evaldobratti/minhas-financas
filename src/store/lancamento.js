@@ -16,7 +16,9 @@ const d = {
   LANCAMENTO_LOAD: 'lancamentoLoad',
   REMOVE_LANCAMENTO: 'lancamentoRemove',
   TROCA_CONTA: 'lancamentoTrocaConta',
-  LANCAMENTOS_EM: 'lancamentosEm'
+  LANCAMENTOS_EM: 'lancamentosEm',
+  SOBE_LANCAMENTO: 'lancamentoSobe',
+  DESCE_LANCAMENTO: 'lancamentoDesce'
 }
 
 export const lancamentos = {
@@ -44,6 +46,18 @@ function put({ dispatch, commit, state, getters}, lancamento) {
   }
 }
 
+function ordena(lancamentos) {
+  const copia = [...lancamentos];
+  copia.sort((a, b) => {
+    const porData = a.data.valueOf() - b.data.valueOf();
+    if (porData != 0)
+      return porData;
+    
+    return a.ordem - b.ordem;
+  });
+  return copia;
+}
+
 export const store = {
   state: {
     list: [],
@@ -65,7 +79,7 @@ export const store = {
         const lancamentosDaConta = state.list.filter(l => {
           return contasIds.indexOf(l.idConta) >= 0;
         });
-        const lancamentosDoMes = lancamentosDaConta.filter(l => {
+        let lancamentosDoMes = lancamentosDaConta.filter(l => {
           return l.data.month() == mes && l.data.year() == ano;
         });
         const projecoes = getters.projecoesAte(contasIds, saldoDataFinal);
@@ -85,13 +99,8 @@ export const store = {
           saldoFinal += getters.saldoEm(getters.getConta(contaId), saldoDataFinal);
         });
 
-        lancamentosDoMes.sort((a, b) => {
-          const porData = a.data.valueOf() - b.data.valueOf();
-          if (porData != 0)
-            return porData;
-          
-          return a.valor - b.valor;
-        });
+
+        lancamentosDoMes = ordena(lancamentosDoMes);
 
         lancamentosDoMes.reduce((x, y) => {
           const saldo = x + y.valor;
@@ -131,6 +140,11 @@ export const store = {
 
         return conta.saldoInicial + saldoAcumulado.map(l => l.valor).reduce((x, y) => x+y, 0);
       }
+    },
+    lancamentosDia(state) {
+      return (idConta, data) => {
+        return ordena(state.list.filter(l => l.idConta == idConta && l.data.isSame(data)));
+      }
     }
   },
   mutations: {
@@ -158,6 +172,13 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
+      const doDia = context.getters.lancamentosDia(lancamento.idConta, lancamento.data);
+      if (doDia.length > 0) {
+        lancamento.ordem =  doDia[doDia.length - 1].ordem;
+      } else {
+        lancamento.ordem = 0;
+      }
+
       var actionSubmit = put(context, lancamento);
       var actions = [];
       actions.push({
@@ -241,6 +262,30 @@ export const store = {
           throw err;
         })
       });
+    },
+    [d.SOBE_LANCAMENTO]({getters, dispatch}, lancamento) {
+      const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
+      const ix = lancamentos.indexOf(lancamento);
+      if (ix > 0) {
+        const anterior = lancamentos[ix - 1];
+        console.info('subindo ' + lancamento.ordem + ' com ' + anterior.ordem)
+        const ordemAnterior = anterior.ordem;
+        anterior.ordem = lancamento.ordem;
+        lancamento.ordem = ordemAnterior;
+      }
+    },
+    [d.DESCE_LANCAMENTO]({getters, dispatch}, lancamento) {
+      
+      const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
+      const ix = lancamentos.indexOf(lancamento);
+      console.info(ix)
+      if (ix < lancamentos.length - 1) {
+        const posterior = lancamentos[ix + 1];
+        console.info('descendo ' + lancamento.ordem + ' com ' + posterior.ordem)
+        const ordemPosterior = posterior.ordem;
+        posterior.ordem = lancamento.ordem;
+        lancamento.ordem = ordemPosterior;
+      }
     }
   }
 }

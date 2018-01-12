@@ -17,6 +17,10 @@
       <v-checkbox style="width: 40px" v-model="lancamento.efetivada" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
     </td>
     <td>
+      <button @click="sobe()">/\</button>
+      <button @click="desce()">\/</button>
+    </td>
+    <td>
       
         <v-menu lazy style="width: 40px"  bottom right>
         <v-btn icon slot="activator">
@@ -122,6 +126,12 @@ export default {
     },
     getCategoria(idCategoria) {
       return this.$store.getters.getCategoria(idCategoria);
+    },
+    sobe() {
+      this.$store.dispatch(lancamentos.d.SOBE_LANCAMENTO, this.lancamento);
+    },
+    desce() {
+      this.$store.dispatch(lancamentos.d.DESCE_LANCAMENTO, this.lancamento);
     }
   },
   components: {

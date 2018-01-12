@@ -1,6 +1,7 @@
 import axios from 'axios';
 import firebase from 'firebase';
 import {bus, events} from '../EventBus';
+import MIGRATIONS from './migrations';
 
 if (process.env.NODE_ENV == 'development') {
   firebase.initializeApp({
@@ -42,7 +43,6 @@ export const store = {
     [m.LOGGED_IN]: (state, usuario) => {
       state.isAuthenticated = usuario != null;
       state.usuario = usuario || {};
-      bus.$emit(state.isAuthenticated ? events.SIGN_IN : events.SIGN_IN, usuario);
     }
   },
   getters: {
@@ -57,8 +57,7 @@ export const store = {
 
       return new Promise((resolve, reject) => {
         firebase.auth().signInWithPopup(provider).then((res) => {
-          commit(m.LOGGED_IN, res.user);
-          resolve();
+
         }).catch((err) => {
           dispatch(d.LOGOUT);
           reject();
@@ -68,9 +67,13 @@ export const store = {
     [d.LOGOUT]() {
       firebase.auth().signOut();
     },
-    [d.INITIALIZE]({commit}) {
+    [d.INITIALIZE]({commit, dispatch}) {
       firebase.auth().onAuthStateChanged(user => {
         commit(m.LOGGED_IN, user);
+        console.info('logou ' + user)
+        dispatch(MIGRATIONS.d.MIGRATE).then(() => {
+          bus.$emit(user != null ? events.SIGN_IN : events.SIGN_OUT, res.user);
+        });
       })
     }
   }

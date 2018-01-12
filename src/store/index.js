@@ -11,6 +11,7 @@ import { LOCAIS } from './locais';
 //import * as bla from './affe';
 import AUTH from './auth';
 import CONTA from './conta';
+import MIGRATIONS from './migrations';
 
 
 Vue.use(Vuex);
@@ -24,7 +25,8 @@ const store = new Vuex.Store({
     recorrencias: recorrencia,
     parcelamentos,
     snacks,
-    locais: LOCAIS.store
+    locais: LOCAIS.store,
+    migrations: MIGRATIONS.store
   }
 });
 
