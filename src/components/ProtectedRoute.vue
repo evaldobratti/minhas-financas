@@ -2,8 +2,8 @@
   <div>
     <slot v-if="isAuthenticated">
     </slot>
-    <div v-else>
-      vc não está logado :S
+    <div v-if="isUndetermined">
+      Aguarde 1 momento
     </div>
   </div>
 </template>
@@ -18,11 +18,7 @@ export default {
   },
   methods: {
     checkCredentials() {
-    }
-  },
-  watch: {
-    isAuthenticated() {
-      if (this.isAuthenticated != null && !this.isAuthenticated) {
+      if (!this.isUndetermined && this.isNotAuthenticated) {
         this.$router.push({
           path: '/login',
           query: {
@@ -37,7 +33,13 @@ export default {
       return this.$store.state.auth.usuario;
     },
     isAuthenticated() {
-      return this.$store.state.auth.isAuthenticated;
+      return this.$store.getters.isAuthenticated;
+    },
+    isUndetermined() {
+      return this.$store.getters.isUndetermined;
+    },
+    isNotAuthenticated() {
+      return this.$store.getters.isNotAuthenticated;
     }
   }
 }

@@ -92,7 +92,8 @@
     <v-content>
       <v-container fluid>
         <Snackbar />
-        <router-view v-if="isAuthenticated != null" :key="$route.path" />
+        <Migrating v-if="isMigrating" />
+        <router-view v-if="!isMigrating" :key="$route.path" />
       </v-container>
     </v-content>
   </v-app>
@@ -100,6 +101,7 @@
 
 <script>
 import Snackbar from './components/Snackbar';
+import Migrating from './components/Migrating'
 import AUTH from './store/auth';
 
 export default {
@@ -111,14 +113,18 @@ export default {
   },
   computed: {
     isAuthenticated() {
-      return this.$store.state.auth.isAuthenticated;
+      return this.$store.getters.isAuthenticated;
+    },
+    isMigrating() {
+      return this.$store.getters.isMigrating;
     },
     contas() {
       return this.$store.state.conta.asList;
     }
   },
   components: {
-    Snackbar
+    Snackbar,
+    Migrating
   }
 }
 </script>

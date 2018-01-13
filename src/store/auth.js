@@ -31,23 +31,51 @@ export const d = {
 }
 
 export const m = {
-  LOGGED_IN: 'authLogin'
+  LOGGED_IN: 'authLogin',
+  SET_AUTH_STATE: 'authSetState'
 }
 
 export const store = {
   state: {
     isAuthenticated: null,
-    usuario: {}
+    usuario: {},
+    authState: 'UNDETERMINED'
   },
   mutations: {
     [m.LOGGED_IN]: (state, usuario) => {
-      state.isAuthenticated = usuario != null;
-      state.usuario = usuario || {};
+      if (usuario) {
+        state.isAuthenticated = true;
+        state.usuario = usuario;
+        state.authState = 'MIGRATING';
+      } else {
+        state.isAuthenticated = false;
+        state.usuario = {};
+        state.authState = 'NOT_AUTHENTICATED';
+      }
+    },
+    [m.SET_AUTH_STATE](state, authState) {
+      state.authState = authState;
     }
+
   },
   getters: {
     uid(state) {
       return state.usuario.uid;
+    },
+    usuario(state) {
+      return state.usuario
+    },
+    isAuthUndetermined(state) {
+      return state.authState == 'UNDETERMINED';
+    },
+    isAuthenticated(state) {
+      return state.authState == 'AUTHENTICATED';
+    },
+    isMigrating(state) {
+      return state.authState == 'MIGRATING';
+    },
+    isNotAuthenticated(state) {
+      return state.authState == 'NOT_AUTHENTICATED';
     }
   },
   actions: {
@@ -67,13 +95,15 @@ export const store = {
     [d.LOGOUT]() {
       firebase.auth().signOut();
     },
-    [d.INITIALIZE]({commit, dispatch}) {
+    [d.INITIALIZE]({commit, dispatch, getters}) {
       firebase.auth().onAuthStateChanged(user => {
         commit(m.LOGGED_IN, user);
-        console.info('logou ' + user)
-        dispatch(MIGRATIONS.d.MIGRATE).then(() => {
-          bus.$emit(user != null ? events.SIGN_IN : events.SIGN_OUT, res.user);
-        });
+        if (getters.isMigrating) {
+          dispatch(MIGRATIONS.d.MIGRATE).then(() => {
+            commit(m.SET_AUTH_STATE, 'AUTHENTICATED');
+            bus.$emit(user != null ? events.SIGN_IN : events.SIGN_OUT, user);
+          });
+        }
       })
     }
   }
