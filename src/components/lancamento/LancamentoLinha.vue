@@ -17,8 +17,14 @@
       <v-checkbox style="width: 40px" v-model="lancamento.efetivada" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
     </td>
     <td>
-      <button @click="sobe()">/\</button>
-      <button @click="desce()">\/</button>
+      <span v-if="!lancamento.isSaldo">
+        <v-btn flat icon small @click="sobe()" style="margin: 0" v-if="podeSubir && lancamento.id != null">
+          <v-icon>keyboard_arrow_up</v-icon>
+        </v-btn>
+        <v-btn flat icon small @click="desce()" style="margin: 0" v-if="podeDescer && lancamento.id != null">
+          <v-icon>keyboard_arrow_down</v-icon>
+        </v-btn>
+      </span>
     </td>
     <td>
       
@@ -108,7 +114,20 @@ export default {
       this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
     }
   },
+  computed: {
+    podeSubir() {
+      const lancamentos = this.lancamentosDia();
+      return lancamentos[0] != this.lancamento;
+    },
+    podeDescer() {
+      const lancamentos = this.lancamentosDia();
+      return lancamentos[lancamentos.length - 1] != this.lancamento;
+    }
+  },
   methods: {
+    lancamentosDia() {
+      return this.$store.getters.lancamentosDia(this.lancamento.idConta, this.lancamento.data);
+    },
     css(valor) {
       return {
         'red--text': valor < 0,
@@ -150,6 +169,14 @@ export default {
 
 .inlineEdit .input-group--select__autocomplete {
   font-size: 13px;
+}
+
+.small-btn-icon {
+  margin: 0;
+}
+
+.small-btn-icon .btn__content {
+  width: 10px;
 }
 
 </style>

@@ -113,7 +113,8 @@ export const store = {
             conta: null,
             local: 'Saldo inicial',
             categoria: { id: -1},
-            saldoDiario: saldoInicial
+            saldoDiario: saldoInicial,
+            isSaldo: true
           }, 
           ...lancamentosDoMes, 
           {
@@ -121,7 +122,8 @@ export const store = {
             conta: null,
             local: 'Saldo final',
             categoria: { id: -2 },
-            saldoDiario: saldoFinal
+            saldoDiario: saldoFinal,
+            isSaldo: true
           }
         ];
         
@@ -174,7 +176,7 @@ export const store = {
       const state = context.state;
       const doDia = context.getters.lancamentosDia(lancamento.idConta, lancamento.data);
       if (doDia.length > 0) {
-        lancamento.ordem =  doDia[doDia.length - 1].ordem;
+        lancamento.ordem =  doDia[doDia.length - 1].ordem + 1;
       } else {
         lancamento.ordem = 0;
       }
