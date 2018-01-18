@@ -67,6 +67,11 @@ export default {
         return null;
       }
     },
+    isRecorrente(state, getters) {
+      return lancamento => {
+        return getters.recorrenciaOriginadora(lancamento) != null;
+      }
+    },
     getComplemento(state, getters) {
       return lancamento => {
         let gerada = state.geradas.find(g => g.idLancamento == lancamento.id);
@@ -81,7 +86,6 @@ export default {
           if (recorrencia.parcelaInicio) {
             return ' (' + gerada.parcelaNumero + '/' + recorrencia.parcelaQuantidade + ')';
           }
-          return ' R';
         }
 
         return '';

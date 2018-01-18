@@ -22,13 +22,13 @@
               class="elevation-5 lancamentos">
               <template slot="headers" slot-scope="props">
                 <tr>
-                  <th style="width: 10px">
+                  <th>
                     Data
                   </th>
-                  <th>
+                  <th style="width: 300px">
                     Local
                   </th>
-                  <th style="width: 130px">
+                  <th>
                     Categoria
                   </th>
                   <th style="text-align: right; width: 140px">

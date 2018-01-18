@@ -1,6 +1,11 @@
 <template>
   <form @submit.prevent="submit">
-    <v-text-field ref="nome" v-model="categoriaEdit.nome" label="Nome"></v-text-field>
+    <v-text-field 
+      ref="nome" 
+      v-model="categoriaEdit.nome" 
+      :rules="[() => categoriaEdit.nome.length > 0 || 'Campo obrigatório' ]"
+      required 
+      label="Nome"></v-text-field>
     <v-btn type="submit">salvar</v-btn>
   </form>
 </template>

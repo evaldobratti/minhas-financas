@@ -1,10 +1,16 @@
 <template>
-<tr>
+<tr class="lancamentoLinha" 
+  :style="{ color: isProjecaoNaoPersistida() ? 'gray' : 'black'}" 
+  :title="isProjecaoNaoPersistida() ? 'Este lançamento é uma projeção de uma recorrência que ainda não foi salvo. Quando ele for salvo o texto ficará preto.' : ''">
   <td xs3>
     {{ lancamento.data | date }}
   </td>
   <td>
-    <span @click.stop="editando('descricao')">{{ lancamento.local + getComplemento() }} <span v-if="lancamento.motivo && lancamento.motivo.complementoDescricao">{{lancamento.motivo.complementoDescricao}} </span> </span>
+    <span @click.stop="editando('descricao')">
+      
+      {{ lancamento.local + getComplemento() }} 
+      <v-icon v-if="isRecorrente" style="float: right">refresh</v-icon>  
+    </span>
   </td>
     <td>
       <span @click.stop="editando('categoria')" v-if="lancamento.idCategoria != null">{{ getCategoria(lancamento.idCategoria).nome }}</span>
@@ -17,7 +23,7 @@
       <v-checkbox style="width: 40px" v-model="lancamento.efetivada" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
     </td>
     <td>
-      <span v-if="!lancamento.isSaldo">
+      <span class="ordenacao" v-if="!isProjecaoNaoPersistida()">
         <v-btn flat icon small @click="sobe()" style="margin: 0" v-if="podeSubir && lancamento.id != null">
           <v-icon>keyboard_arrow_up</v-icon>
         </v-btn>
@@ -122,6 +128,9 @@ export default {
     podeDescer() {
       const lancamentos = this.lancamentosDia();
       return lancamentos[lancamentos.length - 1] != this.lancamento;
+    },
+    isRecorrente() {
+      return this.$store.getters.isRecorrente(this.lancamento);
     }
   },
   methods: {
@@ -151,6 +160,9 @@ export default {
     },
     desce() {
       this.$store.dispatch(lancamentos.d.DESCE_LANCAMENTO, this.lancamento);
+    },
+    isProjecaoNaoPersistida() {
+      return this.isRecorrente && !this.lancamento.id;
     }
   },
   components: {
@@ -179,4 +191,11 @@ export default {
   width: 10px;
 }
 
+.lancamentoLinha .ordenacao {
+  opacity: 0;
+}
+
+.lancamentoLinha:hover .ordenacao {
+  opacity: 1;
+}
 </style>
