@@ -1,3 +1,6 @@
-- ordenar lançamentos
 - tem alguma coisa estranha nas categorias
 - relogin recuperando dados 2x
+
+- inclusão / não inclusão de saldo anterior
+- relatórios por categoria
+- transferência

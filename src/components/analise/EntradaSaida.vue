@@ -3,12 +3,12 @@
       <v-flex xs6>
         <v-card class="conta-card">
           <date-picker type="month" v-model="mes"/>
-          <!--line-chart
+          <line-chart
             :chart-data="saldos"
             :options="options"
             :height="300"
             chart-id="canvas2"
-            ></line-chart-->
+            ></line-chart>
         </v-card>
       </v-flex>
   </v-layout>
@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     saldos() {
-      var contasIds = this.$store.state.conta.list.map(c => c.id);
+      var contasIds = this.$store.state.conta.asList.map(c => c.id);
       var lancamentos = this.$store.getters.lancamentosDe(contasIds, this.mes.month(), this.mes.year());
       var saldos = lancamentos.map(l => {
         return {
