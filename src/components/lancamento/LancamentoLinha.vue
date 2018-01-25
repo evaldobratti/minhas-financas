@@ -40,28 +40,20 @@
         </v-btn>
         <v-list>
             <v-list-tile @click="$emit('novaRecorrencia', lancamento)" :disabled="!(lancamento.motivo == null || lancamento.motivo['@class'].endsWith('RecorrenciaLancamentoGerado'))">
-            <v-list-tile-title>
-                <v-btn color="primary" fab small dark class="small-fab-btn">
-                <v-icon>refresh</v-icon>
-                </v-btn>
-                Recorrencia
-            </v-list-tile-title>
-            </v-list-tile>
-            <v-list-tile @click="$emit('novoParcelamento', lancamento)" :disabled="lancamento.motivo != null">
-            <v-list-tile-title>
-                <v-btn color="primary" fab small dark class="small-fab-btn">
-                <v-icon>refresh</v-icon>
-                </v-btn>
-                Parcelamento
-            </v-list-tile-title>
+              <v-list-tile-title>
+                  <v-btn color="primary" fab small dark class="small-fab-btn">
+                  <v-icon>refresh</v-icon>
+                  </v-btn>
+                  Repetição
+              </v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="$emit('deleteLancamento', lancamento)">
-            <v-list-tile-title>
-                <v-btn fab small dark class="small-fab-btn red">
-                <v-icon>remove</v-icon>
-                </v-btn>
-                Apagar
-            </v-list-tile-title>
+              <v-list-tile-title>
+                  <v-btn fab small dark class="small-fab-btn red">
+                  <v-icon>remove</v-icon>
+                  </v-btn>
+                  Apagar
+              </v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="$emit('efetiva', lancamento)" :disabled="lancamento.id != null" >
               <v-list-tile-title>

@@ -12,7 +12,10 @@
                 </h3>
               </v-flex>
               <v-flex xs4>
-              <DatePicker v-model="dataFiltro" type="month"></DatePicker>
+                <v-checkbox v-model="incluiSaldoAnterior" label="Saldo anterior"></v-checkbox>
+              </v-flex>
+              <v-flex xs4>
+                <DatePicker v-model="dataFiltro" type="month"></DatePicker>
               </v-flex>
             </v-layout>
             <LancamentoForm :id-conta="conta.id" />
@@ -37,8 +40,7 @@
                   <th style="text-align: right; width: 140px">
                     Saldo
                   </th>
-                  <th  style="width: 40px" ></th>
-                  <th  style="width: 40px" ></th>
+                  <th>Efetivada</th>
                 </tr>
               </template>
               <template slot="items" slot-scope="l">
@@ -102,6 +104,7 @@ export default Vue.extend({
       recorrenciaDialog: false,
       parcelamentoDialog: false,
       trocaContaDialog: false,
+      incluiSaldoAnterior: true,
       turnReactive: {}
     }
   },
@@ -117,7 +120,7 @@ export default Vue.extend({
       var ano = this.dataFiltro.year();
       
       if (this.conta) {
-        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano);
+        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano, this.incluiSaldoAnterior);
         for (const l of ls) {
           this.turnReactive = l;
         }

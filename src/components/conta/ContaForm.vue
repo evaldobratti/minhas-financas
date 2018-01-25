@@ -10,7 +10,7 @@
           </v-layout>
           <v-layout row>
             <v-flex xs12>
-              <v-text-field class="number-input" type="number" step="0.01" v-model="saldoInicial" label="Saldo inicial"></v-text-field>  
+              <v-text-field class="number-input" type="number" step="0.01" v-model.number="saldoInicial" label="Saldo inicial"></v-text-field>  
             </v-flex>
           </v-layout>
           <v-layout row justify-space-around>

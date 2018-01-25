@@ -68,7 +68,7 @@ export const store = {
       return state.edicao;
     },
     lancamentosDe(state, getters) {
-      return (contasIds, mes, ano) => {
+      return (contasIds, mes, ano, incluiSaldoAnterior) => {
         if (getters.getContas.length == 0)
           return [];
         
@@ -90,9 +90,10 @@ export const store = {
         })
         
         let saldoInicial = 0;
-        contasIds.forEach(contaId => {
-          saldoInicial += getters.saldoEm(getters.getConta(contaId), saldoDataInicial);
-        });
+        if (incluiSaldoAnterior)
+          contasIds.forEach(contaId => {
+            saldoInicial += getters.saldoEm(getters.getConta(contaId), saldoDataInicial);
+          });
 
         let saldoFinal = 0;
         contasIds.forEach(contaId => {
@@ -257,7 +258,7 @@ export const store = {
     [d.TROCA_CONTA]({dispatch, getters, commit}, { lancamento, idNovaConta }) {
       firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
         lancamento.idConta = idNovaConta;
-        firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(lancamento.toFirebaseObject()).then(() => {
+        firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(JSON.parse(JSON.stringify(lancamento))).then(() => {
           commit(SNACKS.m.UPDATE_SUCESSO, 'Troca de conta efetuada com sucesso!');
         }).catch((err) => {
           commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
@@ -280,7 +281,6 @@ export const store = {
       
       const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
       const ix = lancamentos.indexOf(lancamento);
-      console.info(ix)
       if (ix < lancamentos.length - 1) {
         const posterior = lancamentos[ix + 1];
         console.info('descendo ' + lancamento.ordem + ' com ' + posterior.ordem)
