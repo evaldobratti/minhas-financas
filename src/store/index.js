@@ -12,6 +12,7 @@ import { LOCAIS } from './locais';
 import AUTH from './auth';
 import CONTA from './conta';
 import MIGRATIONS from './migrations';
+import TRANSFERENCIAS from './transferencias';
 
 
 Vue.use(Vuex);
@@ -26,7 +27,8 @@ const store = new Vuex.Store({
     parcelamentos,
     snacks,
     locais: LOCAIS.store,
-    migrations: MIGRATIONS.store
+    migrations: MIGRATIONS.store,
+    transferencias: TRANSFERENCIAS.store
   }
 });
 
@@ -35,6 +37,7 @@ store.dispatch(CONTA.d.INITIALIZE);
 store.dispatch(LOCAIS.d.INITIALIZE);
 store.dispatch(CATEGORIAS.d.INITIALIZE);
 store.dispatch(RECORRENCIA.d.INITIALIZE);
+store.dispatch(TRANSFERENCIAS.d.INITIALIZE);
 
 
 export default store;

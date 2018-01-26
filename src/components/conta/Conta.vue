@@ -51,6 +51,7 @@
                   @deleteLancamento="deleteLancamento(l.item)"
                   @efetiva="efetiva(l.item)"
                   @trocaConta="trocaConta(l.item)"
+                  @transferencia="transferencia(l.item)"
                   />
               </template>
             </v-data-table>
@@ -79,6 +80,16 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="transferenciaDialog" lazy>
+      <v-card>
+        <v-card-title>
+          <div class="headline">Transferência</div>
+        </v-card-title>
+        <v-card-text>
+          <transferencia-form :key="lancamentoAcao ? lancamentoAcao.id : 'null'" :lancamento="lancamentoAcao" @cadastrado="trocaContaDialog = false"></transferencia-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </ProtectedRoute>
 </template>
 
@@ -90,6 +101,7 @@ import LancamentoForm from '../lancamento/LancamentoForm';
 import LancamentoLinha from '../lancamento/LancamentoLinha';
 import RecorrenciaForm from '../recorrencia/RecorrenciaForm';
 import ParcelamentoForm from '../parcelamento/ParcelamentoForm';
+import TransferenciaForm from '../transferencia/TransferenciaForm';
 import TrocaConta from './TrocaConta';
 import moment from 'moment';
 import DatePicker from '../DatePicker';
@@ -104,6 +116,7 @@ export default Vue.extend({
       recorrenciaDialog: false,
       parcelamentoDialog: false,
       trocaContaDialog: false,
+      transferenciaDialog: false,
       incluiSaldoAnterior: true,
       turnReactive: {}
     }
@@ -152,6 +165,10 @@ export default Vue.extend({
       this.lancamentoAcao = lancamento;
       this.trocaContaDialog = true;
     },
+    transferencia(lancamento) {
+      this.lancamentoAcao = lancamento;
+      this.transferenciaDialog = true;
+    },
     efetiva(lancamento) {
       this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, lancamento).then(() => {
         this.$emit('submetido');
@@ -165,7 +182,8 @@ export default Vue.extend({
     RecorrenciaForm,
     ParcelamentoForm,
     TrocaConta,
-    DatePicker
+    DatePicker,
+    TransferenciaForm
   }
 });
 </script>

@@ -176,7 +176,7 @@ export const store = {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
       const doDia = context.getters.lancamentosDia(lancamento.idConta, lancamento.data);
-      if (doDia.length > 0) {
+      if (lancamento.ordem == null && doDia.length > 0) {
         lancamento.ordem =  doDia[doDia.length - 1].ordem + 1;
       } else {
         lancamento.ordem = 0;

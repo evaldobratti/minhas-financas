@@ -65,10 +65,18 @@
             </v-list-tile>
             <v-list-tile @click="$emit('trocaConta', lancamento)">
               <v-list-tile-title>
-                  <v-btn fab small dark class="small-fab-btn green">
-                  <v-icon>swap_horiz</v-icon>
-                  </v-btn>
-                  Trocar de conta
+                <v-btn fab small dark class="small-fab-btn green">
+                 <v-icon>swap_horiz</v-icon>
+                </v-btn>
+                Trocar de conta
+              </v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="$emit('transferencia', lancamento)">
+              <v-list-tile-title>
+                <v-btn fab small dark class="small-fab-btn green">
+                 <v-icon>swap_horiz</v-icon>
+                </v-btn>
+                Transferencia
               </v-list-tile-title>
             </v-list-tile>
         </v-list>
