@@ -160,6 +160,7 @@ export default {
     },
     sobe() {
       this.$store.dispatch(lancamentos.d.SOBE_LANCAMENTO, this.lancamento).then(msg => {
+        console.info(msg)
         this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
       });
     },

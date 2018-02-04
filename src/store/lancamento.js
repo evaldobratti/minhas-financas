@@ -247,7 +247,7 @@ export const store = {
         firebase.database().ref().update(update).then(() => {  
           resolve('Lançamento excluído com sucesso!');
         }).catch((err) => {
-          resolve('Ocorreram erros!');
+          reject('Ocorreram erros!');
         });
       });
       
@@ -288,8 +288,9 @@ export const store = {
           }).catch(() => {
             reject('Erro ao reordenar lançamentos');
           });
+        } else {
+          resolve();
         }
-        resolve();
       })
     },
     [d.DESCE_LANCAMENTO]({getters, dispatch}, lancamento) {
@@ -309,15 +310,15 @@ export const store = {
           const update = {};
           update[updateAtual.location] = updateAtual.value;
           update[updatePosterior.location] = updatePosterior.value;
-1'2-0481-ew9fisd8fasd
+
           firebase.database().ref().update(update).then().then(() => {
             resolve('Lançamentos reordenados!');
           }).catch(() => {
             reject('Erro ao reordenar lançamentos');
           });
-
+        } else {
+          resolve();
         }
-        resolve();
       });
     }
   }

@@ -59,6 +59,11 @@ export default {
   watch: {
     idConta(val) {
       this.lancamento.idConta = val;
+    },
+    'lancamento.data'(data, anterior) {
+      if (!data.isSame(anterior)) {
+        this.lancamento.ordem = null;
+      }
     }
   },
   data() {  
@@ -87,6 +92,7 @@ export default {
           this.lancamento.local = '';
           this.lancamento.idCategoria = null;
           this.lancamento.valor = null;
+          this.lancamento.ordem = null;
           setTimeout(()  => {
             this.$refs.localAutoComplete.focus()
           }, 100);
