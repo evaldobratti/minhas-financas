@@ -1,7 +1,7 @@
-- tem alguma coisa estranha nas categorias
+- tem alguma coisa estranha nas categorias no formulário de lançamento
 - relogin recuperando dados 2x
 
 - relatórios por categoria
-- transferência
-- colocar alertas nos componentes, tirar da store
 - criação de categorias ao novo usuário
+
+- colocar moment em utc, para evitar conflito de datas entre diferentes timezones configurados nas máquinas
