@@ -26,6 +26,9 @@ export default {
   },
   mutations: {
     [m.UPDATE_SUCESSO](state, text) {
+      if (!text)
+        return;
+
       state.notification = {
         timeout: DURACAO,
         text,

@@ -38,6 +38,7 @@ import CategoriaAutoComplete from './CategoriaAutoComplete';
 import { LOCAIS } from '../../store/locais';
 import DatePicker from '../DatePicker';
 import moment from 'moment';
+import { SNACKS } from '../../store/snacks';
 
 export default {
   props: {
@@ -79,7 +80,9 @@ export default {
     },
     submit() {
       this.$refs.valor.blur();      
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(() => {
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then((msg) => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg)
+
         if (this.lancamento.id == null) {
           this.lancamento.local = '';
           this.lancamento.idCategoria = null;

@@ -103,6 +103,7 @@ import mapGetSet from '../../store/mapGetSet';
 import LocalAutoComplete from './LocalAutoComplete';
 import CategoriaAutoComplete from './CategoriaAutoComplete'
 import LancamentoForm from './LancamentoForm';
+import { SNACKS } from '../../store/snacks';
 
 export default {
   props: ['lancamento'],
@@ -117,7 +118,9 @@ export default {
       this.backup = Object.assign(Object.create(this.lancamento), this.lancamento);
     },
     'lancamento.efetivada'() {
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento);
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(msg => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
+      });
     }
   },
   computed: {
@@ -156,10 +159,14 @@ export default {
       return this.$store.getters.getCategoria(idCategoria);
     },
     sobe() {
-      this.$store.dispatch(lancamentos.d.SOBE_LANCAMENTO, this.lancamento);
+      this.$store.dispatch(lancamentos.d.SOBE_LANCAMENTO, this.lancamento).then(msg => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
+      });
     },
     desce() {
-      this.$store.dispatch(lancamentos.d.DESCE_LANCAMENTO, this.lancamento);
+      this.$store.dispatch(lancamentos.d.DESCE_LANCAMENTO, this.lancamento).then(msg => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
+      });
     },
     isProjecaoNaoPersistida() {
       return this.isRecorrente && !this.lancamento.id;

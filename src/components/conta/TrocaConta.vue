@@ -15,6 +15,7 @@
 <script>
 import Vue from 'vue';
 import { lancamentos } from '../../store/lancamento';
+import { SNACKS } from '../../store/snacks';
 
 export default {
   props: ['lancamento'],
@@ -24,7 +25,6 @@ export default {
     }
   },
   created() {
-    console.info(this.lancamento);
     this.idNovaConta = this.lancamento.idConta;
   },
   methods: {
@@ -32,8 +32,12 @@ export default {
       this.$store.dispatch(lancamentos.d.TROCA_CONTA, {
         lancamento: this.lancamento, 
         idNovaConta: this.idNovaConta
+      }).then(msg => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
+        this.$emit('cadastrado');
+      }).catch(err => {
+        this.$store.commit(SNACKS.m.UPDATE_ERRO, err);
       });
-      this.$emit('cadastrado');
     }
   },
   computed: {

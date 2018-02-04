@@ -107,6 +107,7 @@ import moment from 'moment';
 import DatePicker from '../DatePicker';
 import Vue from 'vue';
 import axios from 'axios';
+import { SNACKS } from '../../store/snacks';
 
 export default Vue.extend({
   data() {
@@ -151,7 +152,11 @@ export default Vue.extend({
   },
   methods: {
     deleteLancamento(lancamento) {
-      this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento);      
+      this.$store.dispatch(lancamentos.d.REMOVE_LANCAMENTO, lancamento).then(msg => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg)
+      }).catch(err => {
+        this.$store.commit(SNACKS.m.UPDATE_ERRO, msg)
+      }); 
     },
     novaRecorrencia(lancamento) {
       this.lancamentoAcao = lancamento;

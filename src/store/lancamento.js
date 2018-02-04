@@ -26,7 +26,7 @@ export const lancamentos = {
   d
 }
 
-function put({ dispatch, commit, state, getters}, lancamento) {
+function put({ getters}, lancamento) {
   let location = '';
   let id = '';
   const normalized = JSON.parse(JSON.stringify(lancamento));
@@ -90,16 +90,11 @@ export const store = {
         })
         
         let saldoInicial = 0;
-        if (incluiSaldoAnterior)
+        if (incluiSaldoAnterior) {
           contasIds.forEach(contaId => {
             saldoInicial += getters.saldoEm(getters.getConta(contaId), saldoDataInicial);
           });
-
-        let saldoFinal = 0;
-        contasIds.forEach(contaId => {
-          saldoFinal += getters.saldoEm(getters.getConta(contaId), saldoDataFinal);
-        });
-
+        }
 
         lancamentosDoMes = ordena(lancamentosDoMes);
 
@@ -108,6 +103,10 @@ export const store = {
           Vue.set(y, 'saldoDiario', saldo);
           return saldo;
         }, saldoInicial);
+
+        const saldoFinal = lancamentosDoMes.length == 0 ?
+          saldoInicial :
+          lancamentosDoMes[lancamentosDoMes.length - 1].saldoDiario;
 
         const resultado = [ {
             data: saldoDataInicial,
@@ -175,11 +174,13 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
-      const doDia = context.getters.lancamentosDia(lancamento.idConta, lancamento.data);
-      if (lancamento.ordem == null && doDia.length > 0) {
-        lancamento.ordem =  doDia[doDia.length - 1].ordem + 1;
-      } else {
-        lancamento.ordem = 0;
+      if (lancamento.ordem == null) {
+        const doDia = context.getters.lancamentosDia(lancamento.idConta, lancamento.data);
+        if (doDia.length > 0) {
+          lancamento.ordem =  doDia[doDia.length - 1].ordem + 1;
+        } else {
+          lancamento.ordem = 0;
+        }
       }
 
       var actionSubmit = put(context, lancamento);
@@ -197,18 +198,12 @@ export const store = {
         update[action.location] = action.value;
       }
 
-      return  firebase.database().ref().update(update) .then((l) => {
-        let msg = '';
-        if (lancamento.id) {
-          msg = 'Lançamento atualizado com sucesso!';
-        }
-        else {
-          msg = 'Lançamento criado com sucesso!';
-        }
-        context.commit(SNACKS.m.UPDATE_SUCESSO, msg);
-      }).catch((err) => {
-        context.commit(SNACKS.m.UPDATE_ERRO, err);
-        throw err;
+      return new Promise((resolve, reject) => {
+        firebase.database().ref().update(update) .then((l) => {
+          resolve(lancamento.id ? 'Lançamento atualizado com sucesso!' : 'Lançamento criado com sucesso!');
+        }).catch((err) => {
+          reject(err);
+        });
       });
     },
     [d.LANCAMENTO_LOAD]({state, dispatch, commit, getters}, contaId) {
@@ -248,46 +243,82 @@ export const store = {
         update[recorrencia.location] = recorrencia.value;
       }
       
-      firebase.database().ref().update(update).then(() => {  
-        commit(SNACKS.m.UPDATE_SUCESSO, 'Lançamento excluído com sucesso!');
-      }).catch((err) => {
-        context.commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
-        throw err;
+      return new Promise((resolve, reject) => {
+        firebase.database().ref().update(update).then(() => {  
+          resolve('Lançamento excluído com sucesso!');
+        }).catch((err) => {
+          resolve('Ocorreram erros!');
+        });
       });
+      
     },
     [d.TROCA_CONTA]({dispatch, getters, commit}, { lancamento, idNovaConta }) {
       firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).remove().then(() => {
         lancamento.idConta = idNovaConta;
-        firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(JSON.parse(JSON.stringify(lancamento))).then(() => {
-          commit(SNACKS.m.UPDATE_SUCESSO, 'Troca de conta efetuada com sucesso!');
-        }).catch((err) => {
-          commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
-          throw err;
-        })
+        return new Promise((resolve, reject) => {
+          firebase.database().ref(getters.uid + '/lancamentos/' + lancamento.idConta + '/' + lancamento.id).set(JSON.parse(JSON.stringify(lancamento))).then(() => {
+            resolve('Troca de conta efetuada com sucesso!');
+          }).catch((err) => {
+            commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
+            throw err;
+          })
+        });
       });
     },
     [d.SOBE_LANCAMENTO]({getters, dispatch}, lancamento) {
-      const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
-      const ix = lancamentos.indexOf(lancamento);
-      if (ix > 0) {
-        const anterior = lancamentos[ix - 1];
-        console.info('subindo ' + lancamento.ordem + ' com ' + anterior.ordem)
-        const ordemAnterior = anterior.ordem;
-        anterior.ordem = lancamento.ordem;
-        lancamento.ordem = ordemAnterior;
-      }
+      return new Promise((resolve, reject) => {
+        const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
+        const ix = lancamentos.indexOf(lancamento);
+        if (ix > 0) {
+          const anterior = lancamentos[ix - 1];
+          
+          const ordemAnterior = anterior.ordem;
+          anterior.ordem = lancamento.ordem;
+          lancamento.ordem = ordemAnterior;
+
+          const updateAtual = put({getters}, lancamento);
+          const updateAnterior = put({getters}, anterior);
+
+          const update = {};
+          update[updateAtual.location] = updateAtual.value;
+          update[updateAnterior.location] = updateAnterior.value;
+
+          firebase.database().ref().update(update).then(() => {
+            resolve('Lançamentos reordenados!');
+          }).catch(() => {
+            reject('Erro ao reordenar lançamentos');
+          });
+        }
+        resolve();
+      })
     },
     [d.DESCE_LANCAMENTO]({getters, dispatch}, lancamento) {
-      
-      const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
-      const ix = lancamentos.indexOf(lancamento);
-      if (ix < lancamentos.length - 1) {
-        const posterior = lancamentos[ix + 1];
-        console.info('descendo ' + lancamento.ordem + ' com ' + posterior.ordem)
-        const ordemPosterior = posterior.ordem;
-        posterior.ordem = lancamento.ordem;
-        lancamento.ordem = ordemPosterior;
-      }
+      return new Promise((resolve, reject) => {
+        const lancamentos = getters.lancamentosDia(lancamento.idConta, lancamento.data);
+        const ix = lancamentos.indexOf(lancamento);
+        if (ix < lancamentos.length - 1) {
+          const posterior = lancamentos[ix + 1];
+          
+          const ordemPosterior = posterior.ordem;
+          posterior.ordem = lancamento.ordem;
+          lancamento.ordem = ordemPosterior;
+
+          const updateAtual = put({getters}, lancamento);
+          const updatePosterior = put({getters}, posterior);
+
+          const update = {};
+          update[updateAtual.location] = updateAtual.value;
+          update[updatePosterior.location] = updatePosterior.value;
+1'2-0481-ew9fisd8fasd
+          firebase.database().ref().update(update).then().then(() => {
+            resolve('Lançamentos reordenados!');
+          }).catch(() => {
+            reject('Erro ao reordenar lançamentos');
+          });
+
+        }
+        resolve();
+      });
     }
   }
 }

@@ -27,7 +27,7 @@ const store = {
           const transf = snap.val();
           transf.id = snap.key;
           commit(m.ADD_TRANSFERENCIA, transf);
-        });
+        });   
       });
     },
     [d.SUBMIT]({getters, dispatch}, { lancamento, idContaDestino }) {

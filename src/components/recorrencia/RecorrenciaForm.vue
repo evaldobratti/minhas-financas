@@ -138,8 +138,11 @@ export default {
         parcelaGerada.parcelaNumero = this.recorrencia.parcelaInicio;
       }
 
-      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM, { recorrencia: this.recorrencia, gerada: parcelaGerada }).then(() => {
+      this.$store.dispatch(RECORRENCIA.d.SUBMIT_FORM, { recorrencia: this.recorrencia, gerada: parcelaGerada }).then((msg) => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
         this.$emit('cadastrado'); 
+      }).catch((err) => {
+        this.$store.commit(SNACKS.m.UPDATE_ERRO, err);
       });
     }
   }

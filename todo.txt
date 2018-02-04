@@ -3,3 +3,5 @@
 
 - relatórios por categoria
 - transferência
+- colocar alertas nos componentes, tirar da store
+- criação de categorias ao novo usuário

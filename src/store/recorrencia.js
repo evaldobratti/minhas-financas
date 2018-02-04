@@ -189,11 +189,13 @@ export default {
         firebase.database().ref(getters.uid + '/recorrenciasGeradas').push(JSON.parse(JSON.stringify(gerada)));
         msg = 'Recorrência criada com sucesso!';
       }
-      return future.then(() => {
-        commit(SNACKS.m.UPDATE_SUCESSO, msg);
-      }).catch(err => {
-        commit(SNACKS.m.UPDATE_ERRO, 'Ocorreram erros!');
-      });
+      return new Promise((resolve, reject) => {
+        future.then(() => {
+          resolve(msg);
+        }).catch(err => {
+          reject('Ocorreram erros!');
+        });
+      }) 
     }
   }
 }
