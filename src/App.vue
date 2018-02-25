@@ -86,6 +86,9 @@
           <v-list-tile>
             <v-list-tile-title @click="logout">Logout</v-list-tile-title>
           </v-list-tile>
+          <v-list-tile>
+            <v-list-tile-title @click="dialogSobre = true">Sobre</v-list-tile-title>
+          </v-list-tile>
         </v-list>
       </v-menu>
     </v-toolbar>
@@ -96,6 +99,16 @@
         <router-view v-if="!isMigrating" :key="$route.path" />
       </v-container>
     </v-content>
+    <v-dialog v-model="dialogSobre" width="300px">
+      <v-card>
+          <v-card-title>
+            <div class="headline">Sobre</div>
+          </v-card-title>
+        <v-card-text>
+          <About />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -103,9 +116,15 @@
 import Snackbar from './components/Snackbar';
 import Migrating from './components/Migrating'
 import AUTH from './store/auth';
+import About from './components/About';
 
 export default {
   name: 'app',
+  data() {
+    return {
+      dialogSobre: false
+    }
+  },
   methods: {
     logout() {
       this.$store.dispatch(AUTH.d.LOGOUT);
@@ -124,7 +143,8 @@ export default {
   },
   components: {
     Snackbar,
-    Migrating
+    Migrating,
+    About
   }
 }
 </script>

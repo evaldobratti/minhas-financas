@@ -59,6 +59,9 @@ export const store = {
 
   },
   getters: {
+    version() {
+      return process.env.VERSION;
+    },
     uid(state) {
       return state.usuario.uid;
     },
