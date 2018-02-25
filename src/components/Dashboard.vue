@@ -2,6 +2,7 @@
   <ProtectedRoute>
       <ContasDashboard></ContasDashboard>
       <entrada-saida></entrada-saida>
+      <gastos></gastos>
   </ProtectedRoute>
 </template>
 
@@ -9,12 +10,14 @@
 import ProtectedRoute from './ProtectedRoute';
 import ContasDashboard from './conta/ContasDashboard';
 import EntradaSaida from './analise/EntradaSaida';
+import Gastos from './analise/Gastos';
 
 export default {
   components: {
     ProtectedRoute,
     ContasDashboard,
-    EntradaSaida
+    EntradaSaida,
+    Gastos
   }
 }
 </script>

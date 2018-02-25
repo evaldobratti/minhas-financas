@@ -4,6 +4,7 @@ import moment from 'moment';
 import eventBus from '../EventBus';
 import firebase from 'firebase'
 import { SNACKS } from './snacks';
+import { lancamentos } from './lancamento';
 
 export const d = {
   INITIALIZE: 'contaInitialize',
@@ -52,12 +53,13 @@ export const store =  {
     contaSubmit({commit, getters}, conta) {
       firebase.database().ref(getters.uid + '/contas').push(conta);
     },
-    [d.INITIALIZE]({commit, getters}){
+    [d.INITIALIZE]({commit, getters, dispatch}){
       eventBus.bus.$on(eventBus.events.SIGN_IN, () => {
         firebase.database().ref(getters.uid + '/contas').on('child_added', (snap) => {
           const conta = snap.val();
           conta.id = snap.key;
           commit(m.ADD_CONTA, conta);
+          dispatch(lancamentos.d.LANCAMENTO_LOAD, conta.id);
         });
       })
     }
