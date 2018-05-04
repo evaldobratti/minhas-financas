@@ -30,25 +30,42 @@ const store = {
         });   
       });
     },
-    [d.SUBMIT]({getters, dispatch}, { lancamento, idContaDestino }) {
-      const update = {};
-      const idTransferencia = firebase.database().ref(getters.uid + '/transferencias').push().key;
+    [d.SUBMIT]({getters, dispatch}, {data, idContaOrigem, idContaDestino, valor }) {
+      var updateOrigem = lancamentos.utils.newLancamento({getters}, {
+        idConta: idContaOrigem,
+        data: data,
+        local: 'Transferência',
+        valor: valor
+      })
 
-      const contraPartida = Object.assign({}, lancamento);
-      contraPartida.id = null;
-      contraPartida.idConta = idContaDestino;
-      contraPartida.valor = -lancamento.valor;
-      contraPartida.creationCallback = (id) => {
-        return {
-          location: getters.uid + '/transferencias/' + idTransferencia,
-          value: {
-            de: lancamento.id,
-            para: id
-          }
+      var updateDestino = lancamentos.utils.newLancamento({getters}, {
+        idConta: idContaDestino,
+        data: data,
+        local: 'Transferência',
+        valor: -valor
+      })
+
+      const idTransferencia = firebase.database().ref(getters.uid + '/transferencias').push().key;
+      var updateTransferencia = {
+        location: getters.uid + '/transferencias/' + idTransferencia,
+        value: {
+          de: updateOrigem.id,
+          para: updateDestino.id
         }
       }
-
-      dispatch(lancamentos.d.LANCAMENTO_SUBMIT, contraPartida);
+      
+      var update = {}
+      update[updateOrigem.location] = updateOrigem.value;
+      update[updateDestino.location] = updateDestino.value;
+      update[updateTransferencia.location] = updateTransferencia.value;
+      
+      return new Promise((resolve, reject) => {
+        firebase.database().ref().update(update) .then((l) => {
+          resolve('Transferência criada com sucesso!');
+        }).catch((err) => {
+          reject(err);
+        });
+      });
     }
   }
 }

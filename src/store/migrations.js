@@ -21,6 +21,19 @@ function colocaOrdemNosLancamentos(uid, migrations) {
   }
 }
 
+function removeSaldoDiario(uid, migrations) {
+  if (!migrations.removeSaldoDiario) {
+    firebase.database().ref(uid + '/lancamentos').once('value').then(ref => {
+      ref.forEach((idContaRef) => {
+        idContaRef.forEach((lancamentoRef) => {
+          lancamentoRef.ref.update({saldoDiario: null})
+        })
+      });
+    });
+    migrations.removeSaldoDiario = true;
+  }
+}
+
 const store = {
   actions: {
     [d.MIGRATE]({getters}) {
@@ -28,6 +41,7 @@ const store = {
         firebase.database().ref(getters.uid + '/migrations').once('value').then(ref => {
           const appliedMigrations = ref.val() || {};
           colocaOrdemNosLancamentos(getters.uid, appliedMigrations);
+          removeSaldoDiario(getters.uid, appliedMigrations);
           firebase.database().ref(getters.uid + '/migrations').set(appliedMigrations);
           resolve();
         });

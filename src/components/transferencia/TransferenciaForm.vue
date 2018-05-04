@@ -35,6 +35,7 @@ export default {
   methods: {
     submit() {
       this.$store.dispatch(TRANSFERENCIAS.d.SUBMIT, { lancamento: this.lancamento, idContaDestino: this.idContaDestino });
+      this.$emit("cadastrado")
     }
   }
 }

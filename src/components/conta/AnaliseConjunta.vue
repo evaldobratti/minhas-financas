@@ -62,9 +62,9 @@ export default {
   },
   methods: {
     refreshLancamentos() {
-      var mes = this.dataFiltro.month();
-      var ano = this.dataFiltro.year();
-      this.lancamentos = this.$store.getters.lancamentosDe(this.contasSelecionadas, mes, ano);
+      var inicio = this.dataFiltro.startOf('month');
+      var fim = this.dataFiltro.endOf('month');
+      this.lancamentos = this.$store.getters.lancamentosDe(this.contasSelecionadas, inicio, fim);
     }
   },
   watch: {

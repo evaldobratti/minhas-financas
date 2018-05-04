@@ -2,18 +2,18 @@
   <form @submit.prevent="submit">
     <v-layout row>
       <v-flex xs2>
-        <DatePicker v-model="lancamento.data"></DatePicker>
+        <DatePicker v-model="data"></DatePicker>
       </v-flex>
       <v-flex xs5>
-        <LocalAutoComplete ref="localAutoComplete" :errorMessages="errorMessages('local')" v-model="lancamento.local" label="Local"/>
+        <LocalAutoComplete ref="localAutoComplete" :errorMessages="errorMessages('local')" v-model="local" label="Local"/>
       </v-flex>
       <v-flex xs5>
-        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="lancamento.idCategoria" label="Categoria" />
+        <CategoriaAutoComplete :errorMessages="errorMessages('categoria')" v-model="idCategoria" label="Categoria" />
       </v-flex>
       <v-flex xs1>
         <v-text-field
           ref="valor"
-          v-model.number="lancamento.valor"
+          v-model.number="valor"
           label="Valor"
           type="number"
           step="0.01"
@@ -21,7 +21,7 @@
         </v-text-field>
       </v-flex>
       <v-flex xs2>
-        <v-checkbox label="Efetivada" v-model="lancamento.efetivada"></v-checkbox>
+        <v-checkbox label="Efetivada" v-model="efetivada"></v-checkbox>
       </v-flex>
       <v-btn type="submit" v-show="false">wtf</v-btn>
     </v-layout>
@@ -55,20 +55,32 @@ export default {
   },
   created() {
     this.lancamento.idConta = this.idConta;
+    this.data = this.lancamento.data;
+    this.local = this.lancamento.local;
+    this.idCategoria = this.lancamento.idCategoria;
+    this.ordem = this.lancamento.ordem;
+    this.valor = this.lancamento.valor;
+    this.efetivada = this.lancamento.efetivada;
   },
   watch: {
     idConta(val) {
       this.lancamento.idConta = val;
     },
-    'lancamento.data'(data, anterior) {
+    data(data, anterior) {
       if (!data.isSame(anterior)) {
-        this.lancamento.ordem = null;
+        this.ordem = null;
       }
     }
   },
   data() {  
     return {
       menu: false,
+      data: null,
+      local: null,
+      idCategoria: null,
+      ordem: null,
+      valor: null,
+      efetivada: null
     }
   },
   methods: {
@@ -84,7 +96,14 @@ export default {
         }
     },
     submit() {
-      this.$refs.valor.blur();      
+      this.$refs.valor.blur();
+      this.lancamento.data = this.data;
+      this.lancamento.local = this.local;
+      this.lancamento.idCategoria = this.idCategoria;
+      this.lancamento.ordem = this.ordem;
+      this.lancamento.valor = this.valor;
+      this.lancamento.efetivada = this.efetivada;
+
       this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then((msg) => {
         this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg)
 
@@ -94,7 +113,8 @@ export default {
           this.lancamento.valor = null;
           this.lancamento.ordem = null;
           setTimeout(()  => {
-            this.$refs.localAutoComplete.focus()
+            if (this.$refs.localAutoComplete)
+              this.$refs.localAutoComplete.focus()
           }, 100);
         }
         this.$emit('submetido');

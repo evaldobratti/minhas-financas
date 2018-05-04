@@ -8,7 +8,7 @@
   <td>
     <span @click.stop="editando('descricao')">
       
-      {{ lancamento.local + getComplemento() }} 
+      {{lancamento.ordem}} {{ lancamento.local + getComplemento() }} 
       <v-icon v-if="isRecorrente" style="float: right">refresh</v-icon>  
     </span>
   </td>
@@ -20,7 +20,7 @@
     </td>
     <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
     <td>
-      <v-checkbox style="width: 40px" v-model="lancamento.efetivada" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
+      <v-checkbox style="width: 40px" v-model="lancamento.efetivada" @click="efetiva" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
     </td>
     <td>
       <span class="ordenacao" v-if="!isProjecaoNaoPersistida()">
@@ -116,11 +116,6 @@ export default {
   watch: {
     lancamento(val) {
       this.backup = Object.assign(Object.create(this.lancamento), this.lancamento);
-    },
-    'lancamento.efetivada'() {
-      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(msg => {
-        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
-      });
     }
   },
   computed: {
@@ -137,6 +132,12 @@ export default {
     }
   },
   methods: {
+    efetiva() {
+      this.lancamento.efetivada = !(this.lancamento.efetivada || false);
+      this.$store.dispatch(lancamentos.d.LANCAMENTO_SUBMIT, this.lancamento).then(msg => {
+        this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
+      });
+    },
     lancamentosDia() {
       return this.$store.getters.lancamentosDia(this.lancamento.idConta, this.lancamento.data);
     },
@@ -160,7 +161,6 @@ export default {
     },
     sobe() {
       this.$store.dispatch(lancamentos.d.SOBE_LANCAMENTO, this.lancamento).then(msg => {
-        console.info(msg)
         this.$store.commit(SNACKS.m.UPDATE_SUCESSO, msg);
       });
     },

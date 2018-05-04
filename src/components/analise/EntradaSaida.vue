@@ -60,7 +60,10 @@ export default {
   computed: {
     saldos() {
       var contasIds = this.$store.state.conta.asList.map(c => c.id);
-      var lancamentos = this.$store.getters.lancamentosDe(contasIds, this.mes.month(), this.mes.year());
+      var inicio = this.mes.startOf('month');
+      var fim = this.mes.endOf('month');
+
+      var lancamentos = this.$store.getters.lancamentosDe(contasIds, inicio, fim);
       var saldos = lancamentos.map(l => {
         return {
           data: l.data, 

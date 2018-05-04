@@ -18,7 +18,34 @@
                 <DatePicker v-model="dataFiltro" type="month"></DatePicker>
               </v-flex>
             </v-layout>
-            <LancamentoForm :id-conta="conta.id" />
+            <v-tabs
+              class="small-tab"
+              v-model="tabLancamento"
+              grow
+            >
+              <v-tabs-slider></v-tabs-slider>
+              <v-tab key="avulso">
+                Lançamento
+              </v-tab>
+              <v-tab key="transferencia">
+                Transferência
+              </v-tab>
+            </v-tabs>
+            <v-tabs-items v-model="tabLancamento">
+              <v-tab-item key="avulso">
+                <LancamentoForm :id-conta="conta.id" />
+              </v-tab-item>
+              <v-tab-item key="transferencia">
+                <v-card flat>
+                  <v-card-text>
+                    <lancamento-transferencia-form :id-conta-origem="conta.id"/>
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>
+            </v-tabs-items>
+
+            <v-container style="max-height: 400px" class="scroll-y">
+              <v-layout>
             <v-data-table
               :items="lancamentos"
               hide-actions
@@ -41,6 +68,8 @@
                     Saldo
                   </th>
                   <th>Efetivada</th>
+                  <th></th>
+                  <th></th>
                 </tr>
               </template>
               <template slot="items" slot-scope="l">
@@ -55,6 +84,8 @@
                   />
               </template>
             </v-data-table>
+              </v-layout>
+            </v-container>
         </v-container>
       </v-card-text>
     </v-card>
@@ -86,7 +117,7 @@
           <div class="headline">Transferência</div>
         </v-card-title>
         <v-card-text>
-          <transferencia-form :key="lancamentoAcao ? lancamentoAcao.id : 'null'" :lancamento="lancamentoAcao" @cadastrado="trocaContaDialog = false"></transferencia-form>
+          <transferencia-form :key="lancamentoAcao ? lancamentoAcao.id : 'null'" :lancamento="lancamentoAcao" @cadastrado="transferenciaDialog = false"></transferencia-form>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -108,6 +139,7 @@ import DatePicker from '../DatePicker';
 import Vue from 'vue';
 import axios from 'axios';
 import { SNACKS } from '../../store/snacks';
+import LancamentoTransferenciaForm from '../transferencia/LancamentoTransferenciaForm';
 
 export default Vue.extend({
   data() {
@@ -119,6 +151,7 @@ export default Vue.extend({
       trocaContaDialog: false,
       transferenciaDialog: false,
       incluiSaldoAnterior: true,
+      tabLancamento: '',
       turnReactive: {}
     }
   },
@@ -130,11 +163,11 @@ export default Vue.extend({
       return this.$store.getters.getConta(this.$route.params.id);
     },
     lancamentos() {
-      var mes = this.dataFiltro.month();
-      var ano = this.dataFiltro.year();
+      var inicio = this.dataFiltro.clone().startOf('month');
+      var fim = this.dataFiltro.clone().endOf('month');
       
       if (this.conta) {
-        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], mes, ano, this.incluiSaldoAnterior);
+        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], inicio, fim, this.incluiSaldoAnterior);
         for (const l of ls) {
           this.turnReactive = l;
         }
@@ -188,7 +221,8 @@ export default Vue.extend({
     ParcelamentoForm,
     TrocaConta,
     DatePicker,
-    TransferenciaForm
+    TransferenciaForm,
+    LancamentoTransferenciaForm
   }
 });
 </script>
@@ -209,4 +243,9 @@ table.table tbody tr .small-fab-btn {
 table.table tbody tr:hover .small-fab-btn {
   display: block;
 }
+
+.small-tab .tabs__container--grow {
+  height: 30px
+}
+
 </style>

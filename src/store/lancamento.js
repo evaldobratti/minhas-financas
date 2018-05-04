@@ -21,14 +21,18 @@ const d = {
   DESCE_LANCAMENTO: 'lancamentoDesce'
 }
 
-export const lancamentos = {
-  m,
-  d
-}
-
-function put({ getters}, lancamento) {
+function newLancamento({ getters}, lancamento) {
   let location = '';
   let id = '';
+  if (lancamento.ordem == null) {
+    const doDia = getters.lancamentosDia(lancamento.idConta, lancamento.data);
+    if (doDia.length > 0) {
+      lancamento.ordem =  doDia[doDia.length - 1].ordem + 1;
+    } else {
+      lancamento.ordem = 0;
+    }
+  }
+
   const normalized = JSON.parse(JSON.stringify(lancamento));
   if (normalized.id) {
     id = normalized.id;
@@ -43,6 +47,14 @@ function put({ getters}, lancamento) {
     id,
     location,
     value: normalized
+  }
+}
+
+export const lancamentos = {
+  m,
+  d,
+  utils: {
+    newLancamento
   }
 }
 
@@ -68,66 +80,27 @@ export const store = {
       return state.edicao;
     },
     lancamentosDe(state, getters) {
-      return (contasIds, mes, ano, incluiSaldoAnterior) => {
+      return (contasIds, inicio, fim, incluiSaldoAnterior) => {
         if (getters.getContas.length == 0)
           return [];
         
-        const dataBase = moment(ano + '-' + (mes + 1) + '-' + 1, 'YYYY-MM-DD');
-        const saldoDataInicial = dataBase.clone().add(-1, 'days');
-        const saldoDataFinal = dataBase.clone().add(1, 'month').add(-1, 'days');
-
         const lancamentosDaConta = state.list.filter(l => {
           return contasIds.indexOf(l.idConta) >= 0;
         });
+        
         let lancamentosDoMes = lancamentosDaConta.filter(l => {
-          return l.data.month() == mes && l.data.year() == ano;
+          return l.data.isSameOrAfter(inicio) && l.data.isSameOrBefore(fim);
         });
-        const projecoes = getters.projecoesAte(contasIds, saldoDataFinal);
+        
+        const projecoes = getters.projecoesAte(contasIds, fim);
+        
         projecoes.filter(l => {
-          return l.data.month() == mes && l.data.year() == ano;
+          return l.data.isSameOrAfter(inicio) && l.data.isSameOrBefore(fim);
         }).forEach(l => {
           lancamentosDoMes.push(l);
         })
         
-        let saldoInicial = 0;
-        if (incluiSaldoAnterior) {
-          contasIds.forEach(contaId => {
-            saldoInicial += getters.saldoEm(getters.getConta(contaId), saldoDataInicial);
-          });
-        }
-
-        lancamentosDoMes = ordena(lancamentosDoMes);
-
-        lancamentosDoMes.reduce((x, y) => {
-          const saldo = x + y.valor;
-          Vue.set(y, 'saldoDiario', saldo);
-          return saldo;
-        }, saldoInicial);
-
-        const saldoFinal = lancamentosDoMes.length == 0 ?
-          saldoInicial :
-          lancamentosDoMes[lancamentosDoMes.length - 1].saldoDiario;
-
-        const resultado = [ {
-            data: saldoDataInicial,
-            conta: null,
-            local: 'Saldo inicial',
-            categoria: { id: -1},
-            saldoDiario: saldoInicial,
-            isSaldo: true
-          }, 
-          ...lancamentosDoMes, 
-          {
-            data: saldoDataFinal,
-            conta: null,
-            local: 'Saldo final',
-            categoria: { id: -2 },
-            saldoDiario: saldoFinal,
-            isSaldo: true
-          }
-        ];
-        
-        return resultado;
+        return ordena(lancamentosDoMes);
       }
     },
     saldoEm(state, getters) {
@@ -153,17 +126,8 @@ export const store = {
     [m.CONTA_CARREGADA](state, idConta) {
       state.contasCarregadas.push(idConta);
     },
-    [m.SET_LANCAMENTOS](state, {lancamentos, getters}) {
+    [m.SET_LANCAMENTOS](state, {lancamentos}) {
       state.list = lancamentos;
-      
-      const saldos = {};
-      state.list.forEach(l => {
-        if (saldos[l.idConta] == null) {
-          saldos[l.idConta] = getters.getConta(l.idConta).saldoInicial;
-        }
-        saldos[l.idConta] += l.valor;
-        Vue.set(l, 'saldoDiario', saldos[l.idConta]);
-      });
     },
     [m.REMOVE_LANCAMENTO_ID](state, id) {
       const lancamento = state.list.find(l => l.id === id);
@@ -174,16 +138,8 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
-      if (lancamento.ordem == null) {
-        const doDia = context.getters.lancamentosDia(lancamento.idConta, lancamento.data);
-        if (doDia.length > 0) {
-          lancamento.ordem =  doDia[doDia.length - 1].ordem + 1;
-        } else {
-          lancamento.ordem = 0;
-        }
-      }
-
-      var actionSubmit = put(context, lancamento);
+      
+      var actionSubmit = newLancamento(context, lancamento);
       var actions = [];
       actions.push({
         location: actionSubmit.location,
@@ -276,8 +232,8 @@ export const store = {
           anterior.ordem = lancamento.ordem;
           lancamento.ordem = ordemAnterior;
 
-          const updateAtual = put({getters}, lancamento);
-          const updateAnterior = put({getters}, anterior);
+          const updateAtual = newLancamento({getters}, lancamento);
+          const updateAnterior = newLancamento({getters}, anterior);
 
           const update = {};
           update[updateAtual.location] = updateAtual.value;
@@ -304,8 +260,8 @@ export const store = {
           posterior.ordem = lancamento.ordem;
           lancamento.ordem = ordemPosterior;
 
-          const updateAtual = put({getters}, lancamento);
-          const updatePosterior = put({getters}, posterior);
+          const updateAtual = newLancamento({getters}, lancamento);
+          const updatePosterior = newLancamento({getters}, posterior);
 
           const update = {};
           update[updateAtual.location] = updateAtual.value;
