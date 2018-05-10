@@ -2,7 +2,7 @@
   <ProtectedRoute>
     <v-layout row>
       <v-flex xs12>
-    <v-card v-if="conta">
+    <v-card v-if="conta" style="min-height: 100%; max-height: 100%; overflow: auto">
       <v-card-text>
         <v-container fluid>
             <v-layout row>
@@ -44,7 +44,7 @@
               </v-tab-item>
             </v-tabs-items>
 
-            <v-container style="max-height: 400px" class="scroll-y">
+            <v-container :style="{'max-height': heightTabela + 'px'}" class="scroll-y">
               <v-layout>
             <v-data-table
               :items="lancamentos"
@@ -75,6 +75,7 @@
               <template slot="items" slot-scope="l">
                 <LancamentoLinha :key="l.item.tempId || l.item.id"
                   :lancamento="l.item"
+                  :saldo="saldo(l.item)"
                   @novaRecorrencia="novaRecorrencia(l.item)" 
                   @novoParcelamento="novoParcelamento(l.item)"
                   @deleteLancamento="deleteLancamento(l.item)"
@@ -144,6 +145,7 @@ import LancamentoTransferenciaForm from '../transferencia/LancamentoTransferenci
 export default Vue.extend({
   data() {
     return {
+      heightTabela: 1,
       dataFiltro: moment(),
       lancamentoAcao: null,
       recorrenciaDialog: false,
@@ -157,6 +159,7 @@ export default Vue.extend({
   },
   created() {
     this.$store.dispatch(lancamentos.d.LANCAMENTO_LOAD, this.$route.params.id);
+    this.heightTabela = screen.height - 500;
   },
   computed: {
     conta() {
@@ -167,17 +170,21 @@ export default Vue.extend({
       var fim = this.dataFiltro.clone().endOf('month');
       
       if (this.conta) {
-        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], inicio, fim, this.incluiSaldoAnterior);
+        const ls = this.$store.getters.lancamentosDe([ this.conta.id ], inicio, fim);
+
+        const saldoInicial = {
+          data: inicio, 
+          local: 'Saldo inicial',
+          valor: this.$store.getters.saldoEm(this.conta, inicio)
+        }
+
         for (const l of ls) {
           this.turnReactive = l;
         }
-        return ls;
+        return [saldoInicial, ...ls];
       }
       else
         return []
-    },
-    saldoInicio() {
-      return this.$store.state.conta.saldoInicio;
     },
     saldoFim() {
       return this.$store.state.conta.saldoFim;
@@ -212,6 +219,17 @@ export default Vue.extend({
         this.$emit('submetido');
       });
     },
+    saldo(lancamento) {
+      var lancamentos = this.lancamentos;
+      var saldo = 0;
+      for (var i = 0; i < lancamentos.length; i++) {
+        if (lancamentos[i] == lancamento) {
+          return saldo + lancamento.valor;
+        }
+        saldo += lancamentos[i].valor;
+      }
+      return 'wtf'
+    }
   },
   components: {
     ProtectedRoute,

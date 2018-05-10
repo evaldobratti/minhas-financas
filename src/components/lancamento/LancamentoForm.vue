@@ -32,6 +32,7 @@
 import axios from 'axios';
 import { d } from '../../store/categorias';
 import { lancamentos } from '../../store/lancamento';
+import {TRANSFERENCIAS } from '../../store/transferencias';
 import CategoriaIcone from '../categoria/CategoriaIcone';
 import LocalAutoComplete from './LocalAutoComplete';
 import CategoriaAutoComplete from './CategoriaAutoComplete';

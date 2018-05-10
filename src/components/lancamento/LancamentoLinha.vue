@@ -18,7 +18,7 @@
     <td class="text-xs-right" :class="css(lancamento.valor)">
         <span @click.stop="editando('valor')">{{ lancamento.valor | currency }}</span>
     </td>
-    <td class="text-xs-right" :class="css(lancamento.saldoDiario)">{{ lancamento.saldoDiario | currency }}</td>
+    <td class="text-xs-right" :class="css(saldo)">{{ saldo | currency }}</td>
     <td>
       <v-checkbox style="width: 40px" v-model="lancamento.efetivada" @click="efetiva" v-if="lancamento.tempId || lancamento.id"></v-checkbox>
     </td>
@@ -106,7 +106,7 @@ import LancamentoForm from './LancamentoForm';
 import { SNACKS } from '../../store/snacks';
 
 export default {
-  props: ['lancamento'],
+  props: ['lancamento', 'saldo'],
   data() {
     return {
       isEditando: false,

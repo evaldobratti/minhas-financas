@@ -4,6 +4,8 @@ import moment from 'moment';
 import Vue from 'vue';
 import { SNACKS } from './snacks';
 import firebase from 'firebase';
+import EventBus from '../EventBus';
+import { createNoSubstitutionTemplateLiteral } from 'typescript';
 
 const m = {
   SET_LANCAMENTOS: 'lancamentoSetList',
@@ -80,7 +82,7 @@ export const store = {
       return state.edicao;
     },
     lancamentosDe(state, getters) {
-      return (contasIds, inicio, fim, incluiSaldoAnterior) => {
+      return (contasIds, inicio, fim) => {
         if (getters.getContas.length == 0)
           return [];
         
@@ -110,8 +112,7 @@ export const store = {
           ...getters.projecoesAte([conta.id], data)
         ];
 
-        const saldoAcumulado = lancamentosDaConta
-          .filter(l => l.data.isSameOrBefore(data));
+        const saldoAcumulado = lancamentosDaConta.filter(l => l.data.isSameOrBefore(data));
 
         return conta.saldoInicial + saldoAcumulado.map(l => l.valor).reduce((x, y) => x+y, 0);
       }
@@ -119,6 +120,11 @@ export const store = {
     lancamentosDia(state) {
       return (idConta, data) => {
         return ordena(state.list.filter(l => l.idConta == idConta && l.data.isSame(data)));
+      }
+    },
+    getLancamento(state) {
+      return (idLancamento) => {
+        return state.list.find(lancamento => lancamento.id == idLancamento);
       }
     }
   },
@@ -138,6 +144,10 @@ export const store = {
   actions: {
     [d.LANCAMENTO_SUBMIT](context, lancamento) {
       const state = context.state;
+
+      let futureInteressado = EventBus.notificaInteressados(EventBus.events.ATUALIZANDO_LANCAMENTO, lancamento);
+      if (futureInteressado != null)
+        return futureInteressado;
       
       var actionSubmit = newLancamento(context, lancamento);
       var actions = [];

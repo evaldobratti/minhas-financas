@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer app clipped fixed v-if="isAuthenticated" :width="200">
+    <v-navigation-drawer app clipped fixed v-if="isAuthenticated">
       <v-list dense class="pt-0">
         <v-list-tile>
           <v-list-tile-action>
@@ -162,8 +162,8 @@ export default {
   text-align: right;
 }
 
-main .content {
+/*main .content {
   padding: 64px 0px 0px 200px !important;
-}
+}*/
 
 </style>
