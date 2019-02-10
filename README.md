@@ -1,12 +1,34 @@
 # minhas-financas
 
-Projeto para estudo de tecnologias web e gerenciamento de finanças
+## Project setup
+```
+npm install
+```
 
-# techstack
-- vue
-- vuex
-- vuetify
-- firebase
-- chart.js
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-[Produção](https://eb-minhas-financas.firebaseapp.com)
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Run your tests
+```
+npm run test
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Run your unit tests
+```
+npm run test:unit
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -1,7 +1,5 @@
-import axios from 'axios';
-import firebase from 'firebase';
-import {bus, events} from '../EventBus';
-import MIGRATIONS from './migrations';
+import firebase from 'firebase'
+import repo from './repo'
 
 if (process.env.NODE_ENV == 'development') {
   firebase.initializeApp({
@@ -23,97 +21,56 @@ if (process.env.NODE_ENV == 'development') {
   });
 }
 
-
-export const d = {
-  LOGIN: 'login',
-  INITIALIZE: 'authInitialize',
-  LOGOUT: 'logout'
+const state = {
+  isAutenticado: null,
+  autenticacao: {}
 }
 
-export const m = {
-  LOGGED_IN: 'authLogin',
-  SET_AUTH_STATE: 'authSetState'
-}
-
-export const store = {
-  state: {
-    isAuthenticated: null,
-    usuario: {},
-    authState: 'UNDETERMINED'
+const mutations = {
+  login: (_, autenticacao) => {
+    state.isAutenticado = true
+    state.autenticacao = autenticacao
   },
-  mutations: {
-    [m.LOGGED_IN]: (state, usuario) => {
-      if (usuario) {
-        state.isAuthenticated = true;
-        state.usuario = usuario;
-        state.authState = 'MIGRATING';
-      } else {
-        state.isAuthenticated = false;
-        state.usuario = {};
-        state.authState = 'NOT_AUTHENTICATED';
-      }
-    },
-    [m.SET_AUTH_STATE](state, authState) {
-      state.authState = authState;
-    }
-
-  },
-  getters: {
-    version() {
-      return process.env.VERSION;
-    },
-    uid(state) {
-      return state.usuario.uid;
-    },
-    usuario(state) {
-      return state.usuario
-    },
-    isAuthUndetermined(state) {
-      return state.authState == 'UNDETERMINED';
-    },
-    isAuthenticated(state) {
-      return state.authState == 'AUTHENTICATED';
-    },
-    isMigrating(state) {
-      return state.authState == 'MIGRATING';
-    },
-    isNotAuthenticated(state) {
-      return state.authState == 'NOT_AUTHENTICATED';
-    }
-  },
-  actions: {
-    [d.LOGIN]({commit, dispatch}) {
-      var provider = new firebase.auth.GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/userinfo.email');
-
-      return new Promise((resolve, reject) => {
-        firebase.auth().signInWithPopup(provider).then((res) => {
-
-        }).catch((err) => {
-          dispatch(d.LOGOUT);
-          reject();
-        })}
-      );
-    },
-    [d.LOGOUT]() {
-      firebase.auth().signOut();
-    },
-    [d.INITIALIZE]({commit, dispatch, getters}) {
-      firebase.auth().onAuthStateChanged(user => {
-        commit(m.LOGGED_IN, user);
-        if (getters.isMigrating) {
-          dispatch(MIGRATIONS.d.MIGRATE).then(() => {
-            commit(m.SET_AUTH_STATE, 'AUTHENTICATED');
-            bus.$emit(user != null ? events.SIGN_IN : events.SIGN_OUT, user);
-          });
-        }
-      })
-    }
+  logout: (state) => {
+    state.isAutenticado = false
+    state.autenticacao = {}
   }
 }
 
-export const AUTH = {
-  store, m, d
-};
+const actions = {
+  inicializa: ({commit, dispatch}) => {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        commit('login', user)
+        dispatch('posLogin')
+      }
+      else
+        commit('logout')
+    })
+  },
+  login: ({commit}) => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/userinfo.email');
 
-export default AUTH;
+    return new Promise((resolve, reject) => {
+      firebase.auth().signInWithPopup(provider).then(() => {
+        resolve()
+      }).catch(() => {
+        commit('logout');
+        reject();
+      })}
+    );
+  },
+  logout: ({commit, dispatch}) => {
+    firebase.auth().signOut().then(() => {
+      commit('resetAll'); 
+      commit('logout');
+    })
+  }
+}
+
+export default {
+  state,
+  mutations,
+  actions
+}

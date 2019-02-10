@@ -15,8 +15,10 @@
       prepend-icon="event"
       readonly
     ></v-text-field>
-    <v-date-picker v-model="date" @input="dialog = false"></v-date-picker>
+    <v-date-picker v-model="date" type="month"></v-date-picker>
   </v-menu>
+
+  
 </template>
 
 <script>
@@ -25,21 +27,21 @@ import moment from 'moment'
 export default {
   props: ['value'],
   data() {
-    const hoje = new Date()
     return {
-      date: `${hoje.getFullYear()}-${hoje.getMonth() + 1}-${hoje.getDate()}`,
-      dialog: false
+      dialog: false,
+      date: null
     }
   },
   created() {
-    this.date = this.value.format('YYYY-MM-DD')
-    this.$emit('input', )
+    this.date = this.value.format('YYYY-MM')
   },
   watch: {
     date() {
       this.$emit('input', moment(this.date))
+      this.dialog = false
     }
   }
+
 }
 </script>
 
