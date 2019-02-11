@@ -84,14 +84,16 @@ const actions = {
 
     if (lancamentoMeReferencia) {
       lancamentoMeReferencia.lancamentoAnterior = lancamentoReferenciava
-      const atualizar = {
-        ...lancamentoMeReferencia,
-        data: lancamentoMeReferencia.data.toISOString()
-      }
+      
       repo.update({
-        ['/lancamentos/' + lancamento.idConta + '/' + lancamentoMeReferencia.id]: atualizar
+        ['/lancamentos/' + lancamento.idConta + '/' + lancamentoMeReferencia.id]: lancamentoMeReferencia
       })
     }
+  },
+  lancamentoAtualizar(_, lancamento) {
+    repo.update({
+      ['/lancamentos/' + lancamento.idConta + '/' + lancamento.id]: lancamento
+    })
   }
 }
 

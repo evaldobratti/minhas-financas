@@ -1,4 +1,20 @@
 import firebase from 'firebase'
+import moment from 'moment'
+
+function normalize(object) {
+  const val = Object.keys(object).reduce((ant, atual) => {
+    let value = object[atual]
+    if (moment.isMoment(value))
+      value = value.toISOString()
+
+    return {
+      ...ant,
+      [atual]: value
+    }
+  }, {})
+
+  return JSON.parse(JSON.stringify(val))
+}
 
 
 export function hookAdded(path, cb) {
@@ -22,7 +38,7 @@ function hookRemoved(path, cb) {
 }
 
 export function add(path, value) {
-  firebase.database().ref(firebase.auth().currentUser.uid + path).push(value)
+  firebase.database().ref(firebase.auth().currentUser.uid + path).push(normalize(value))
 }
 
 function remove(path, id) {
@@ -37,7 +53,7 @@ function update(updates) {
     }), {}
   )
   
-  firebase.database().ref().update(JSON.parse(JSON.stringify(normalized)))
+  firebase.database().ref().update(normalize(normalized))
 }
 
 export default {

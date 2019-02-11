@@ -39,6 +39,9 @@ export default {
     date() {
       this.$emit('input', moment(this.date))
       this.dialog = false
+    },
+    value() {
+      this.date = this.value.format('YYYY-MM')
     }
   }
 

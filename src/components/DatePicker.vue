@@ -13,6 +13,7 @@
       slot="activator"
       v-model="date"
       prepend-icon="event"
+      :label="label"
       readonly
     ></v-text-field>
     <v-date-picker v-model="date" @input="dialog = false"></v-date-picker>
@@ -23,7 +24,7 @@
 import moment from 'moment'
 
 export default {
-  props: ['value'],
+  props: ['value', 'label'],
   data() {
     const hoje = new Date()
     return {

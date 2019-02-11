@@ -1,5 +1,8 @@
 # minhas-financas
 
+##todo
+input type number/monetário
+
 ## Project setup
 ```
 npm install

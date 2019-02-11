@@ -4,16 +4,25 @@
       <v-flex>
         <v-btn @click="dialogNovoLancamento = true">Novo lançamento</v-btn>
         <v-btn @click="excluirConta" color="error">Excluir conta</v-btn>
-        <month-picker v-model="mesAtual" />
       </v-flex>
     </v-layout>
     <v-layout>
+      <v-flex><v-btn @click="mesAnterior">Anterior</v-btn></v-flex>
+      <v-flex><month-picker v-model="mesAtual" /></v-flex>
+      <v-flex><v-btn @click="mesProximo">Próximo</v-btn></v-flex>
+    </v-layout>
+    <v-layout>
       <v-flex>
-        <lancamento-list :lancamentos="lancamentos[0]" :saldos="lancamentos[1]" @excluir="excluirLancamento"  />
+        <lancamento-list 
+          :lancamentos="lancamentos[0]" 
+          :saldos="lancamentos[1]" 
+          @excluir="excluirLancamento"
+          @alternaEfetiva="alternaEfetiva"  />
       </v-flex>
     </v-layout>
     <v-dialog
       v-model="dialogNovoLancamento"
+      width="400"
     >
       <v-card>
         <v-card-title class="headline">Novo lançamento na conta {{conta.nome}}</v-card-title>
@@ -30,7 +39,6 @@ import {mapState} from 'vuex'
 import LancamentoForm from '../components/LancamentoForm'
 import LancamentoList from '../components/LancamentoList'
 import moment from 'moment'
-
 
 export default {
   created() {
@@ -54,6 +62,15 @@ export default {
     excluirLancamento(lancamento) {
       if (confirm("Tem certeza disso?"))
         this.$store.dispatch("lancamentoExcluir", lancamento)
+    },
+    alternaEfetiva(lancamento) {
+      this.$store.dispatch("lancamentoAtualizar", lancamento)
+    },
+    mesAnterior() {
+      this.mesAtual = moment(this.mesAtual).add(-1, 'month')
+    },
+    mesProximo() {
+      this.mesAtual = moment(this.mesAtual).add(1, 'month')
     }
   },
   computed: {

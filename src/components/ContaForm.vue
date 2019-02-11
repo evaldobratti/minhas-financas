@@ -28,6 +28,11 @@ export default {
       this.$emit("salvo")
       Object.assign(this, initialForm)
     }
+  }, 
+  watch: {
+    saldoInicial() {
+      this.saldoInicial = Number(this.saldoInicial)
+    }
   }
 
 }
