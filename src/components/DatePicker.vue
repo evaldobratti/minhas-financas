@@ -39,6 +39,9 @@ export default {
   watch: {
     date() {
       this.$emit('input', moment(this.date))
+    },
+    value() {
+      this.date = this.value.format('YYYY-MM-DD')
     }
   }
 }

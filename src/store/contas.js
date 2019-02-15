@@ -34,10 +34,14 @@ const actions = {
     })
   },
   contaCriar(_, conta) {
-    repo.add('/contas', conta)
+    repo.save('/contas', conta)
   },
   contaExcluir(_, idConta) {
     repo.remove('/contas', idConta)
+    repo.remove('/lancamentos/', idConta)
+  },
+  contaCarrega(_, idConta) {
+    return repo.load("/contas/" + idConta)
   }
 }
 

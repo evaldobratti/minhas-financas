@@ -13,8 +13,8 @@ const state = {
 }
 
 const getters = {
-  lancamentos: (state) => (contas, de, ate) => {
-    let lancamentosDasContas = contas.map(conta => state.byConta[conta.id] || []).reduce((ant, atual) => [...ant, ...atual], [])
+  lancamentos: (state, getters) => (contas, de, ate) => {
+    let lancamentosDasContas = contas.map(conta => getters.lancamentosDaConta(conta.id, de, ate)).reduce((ant, atual) => [...ant, ...atual], [])
     let lancamentosDoPeriodo = lancamentosDasContas.filter(l => l.data.isBetween(de, ate))
 
     const saldoInicialContas = contas
@@ -33,6 +33,41 @@ const getters = {
       .reduce((ant, atual) => [...ant, _.last(ant) + atual], [saldoInicial])
     
     return [lancamentosDoPeriodo, saldos]
+  },
+  lancamentosDaConta: (state, getters) => (idConta, de, ate) => {
+    const data = de.clone()
+    let lancamentos = []
+    while (!data.isSame(ate, 'date')) {
+      lancamentos = [...lancamentos, ...getters.lancamentosDaContaDoDia(idConta, data)]
+      data.add(1, 'day')
+    }
+    lancamentos = [...lancamentos, ...getters.lancamentosDaContaDoDia(idConta, data)]
+    
+    return lancamentos
+  },
+  lancamentosDaContaDoDia: (state) => (idConta, dia) => {
+    const lancamentos = (state.byConta[idConta] || []).filter(l => l.data.isSame(dia, 'date'))
+
+    const inicioCorrente = lancamentos.find(l => l.lancamentoAnterior == null || l.lancamentoAnterior == undefined)
+    if (!inicioCorrente)
+      return []
+
+    const ordenados = [inicioCorrente]
+
+    for (let i = 1; i < lancamentos.length; i++) {
+      const continuacao = lancamentos.find(l => l.lancamentoAnterior === _.last(ordenados).id)
+      if (!continuacao)
+        return
+      ordenados.push(continuacao)
+    }
+    
+    return ordenados
+  },
+  lancamentoPosterior: (state) => (lancamento) => {
+    return state.byConta[lancamento.idConta].find(l => l.lancamentoAnterior === lancamento.id)
+  },
+  lancamentoId: (state) => (id) => {
+    return state.byId[id]
   }
 }
 
@@ -41,14 +76,8 @@ const mutations = {
     if (!state.byConta[lancamento.idConta]) {
       Vue.set(state.byConta, lancamento.idConta, [])
     }
-
-    var depoisDe = state.byConta[lancamento.idConta].findIndex(l => l.id === lancamento.lancamentoAnterior)
-    if (depoisDe >= 0) {
-      state.byConta[lancamento.idConta].splice(depoisDe + 1, 0, lancamento)
-    } else {
-      state.byConta[lancamento.idConta].push(lancamento)
-    }
-
+    
+    state.byConta[lancamento.idConta].push(lancamento)
     Vue.set(state.byId, lancamento.id, lancamento)
   },
   removeLancamento(state, lancamento) {
@@ -69,31 +98,48 @@ const actions = {
     })
       
   },
-  lancamentoCriar({state}, lancamento) {
-    lancamento.data = lancamento.data.toISOString()
-    if (!lancamento.lancamentoAnterior && state.byConta[lancamento.idConta] && state.byConta[lancamento.idConta].length > 0) {
-      lancamento.lancamentoAnterior = _.last(state.byConta[lancamento.idConta]).id
+  lancamentoSalvar({getters}, lancamento) {
+    if (!lancamento.id && !lancamento.lancamentoAnterior) {
+      
+      const doDia = getters.lancamentosDaContaDoDia(lancamento.idConta, lancamento.data)
+      if (doDia.length > 0) {
+        lancamento.lancamentoAnterior = _.last(doDia).id
+      }
     }
-    repo.add('/lancamentos/' + lancamento.idConta, lancamento)
+    
+    repo.save('/lancamentos/' + lancamento.idConta, lancamento)
   },
-  lancamentoExcluir({state}, lancamento) {
+  lancamentoExcluir({getters, dispatch}, lancamento) {
     repo.remove('/lancamentos/' + lancamento.idConta, lancamento.id)
     const lancamentoReferenciava = lancamento.lancamentoAnterior
     
-    const lancamentoMeReferencia = state.byConta[lancamento.idConta].find(l => l.lancamentoAnterior === lancamento.id)
+    const lancamentoMeReferencia = getters.lancamentoPosterior(lancamento)
 
     if (lancamentoMeReferencia) {
       lancamentoMeReferencia.lancamentoAnterior = lancamentoReferenciava
       
-      repo.update({
-        ['/lancamentos/' + lancamento.idConta + '/' + lancamentoMeReferencia.id]: lancamentoMeReferencia
-      })
+      dispatch('lancamentoSalvar', lancamentoMeReferencia)
     }
   },
-  lancamentoAtualizar(_, lancamento) {
-    repo.update({
-      ['/lancamentos/' + lancamento.idConta + '/' + lancamento.id]: lancamento
-    })
+  lancamentoSubir({state, getters, dispatch, commit}, lancamento) {
+    const lancamentoAcima = state.byId[lancamento.lancamentoAnterior]
+    const lancamentoAbaixo = getters.lancamentoPosterior(lancamento)
+    const lancamentoAtual = getters.lancamentoId(lancamento.id)
+
+    lancamentoAtual.lancamentoAnterior = lancamentoAcima ? lancamentoAcima.lancamentoAnterior : null
+    if (lancamentoAcima){
+      lancamentoAcima.lancamentoAnterior = lancamentoAtual.id
+      lancamentoAbaixo && (lancamentoAbaixo.lancamentoAnterior = lancamentoAcima.id)
+    }
+  
+    dispatch('lancamentoSalvar', lancamentoAtual)
+    lancamentoAcima && dispatch('lancamentoSalvar', lancamentoAcima)
+    lancamentoAbaixo && dispatch('lancamentoSalvar', lancamentoAbaixo)
+  },
+  lancamentoDescer({dispatch, getters}, lancamento) {
+    const lancamentoAbaixo = getters.lancamentoPosterior(lancamento)
+    if (lancamentoAbaixo)
+      dispatch('lancamentoSubir', lancamentoAbaixo)
   }
 }
 

@@ -1,9 +1,13 @@
 <template>
-  <form @submit.prevent="salvar">
-      <v-text-field placeholder="Nome" v-model="nome"></v-text-field>
-      <v-text-field placeholder="Saldo inicial" v-model="saldoInicial"></v-text-field>
-      <v-btn type="submit">Salvar</v-btn>
-  </form>
+  <v-form ref="form" @submit.prevent="salvar" v-model="isValido">
+    <v-text-field 
+      label="Nome" 
+      v-model="form.nome"
+      :rules="[v => !!v || 'Campo obrigatório']"
+    />
+    <v-text-field label="Saldo inicial" v-model="form.saldoInicial"></v-text-field>
+    <v-btn type="submit">Salvar</v-btn>
+  </v-form>
 </template>
 
 <script>
@@ -15,18 +19,26 @@ const initialForm = {
 
 export default {
   data() {
-    return Object.assign({}, initialForm)
+    return {
+      form: Object.assign({}, initialForm),
+      isValido: false
+    }
   },
   methods: {
     salvar() {
-      const {nome, saldoInicial} = this
+      this.$refs.form.validate()
+      if (!this.isValido)
+        return
+
+      const {nome, saldoInicial} = this.form
 
       this.$store.dispatch('contaCriar', {
         nome, saldoInicial
       })
 
       this.$emit("salvo")
-      Object.assign(this, initialForm)
+      Object.assign(this.form, initialForm)
+      this.$refs.form.resetValidation()
     }
   }, 
   watch: {

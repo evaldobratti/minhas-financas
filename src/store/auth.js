@@ -1,5 +1,7 @@
-import firebase from 'firebase'
-import repo from './repo'
+//import firebase from 'firebase/firebase-app'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
 
 if (process.env.NODE_ENV == 'development') {
   firebase.initializeApp({

@@ -31,7 +31,8 @@ export default new Router({
     {
       path: '/contas/:id',
       name: 'contas',
-      component: ContaView
+      component: ContaView,
+      props: true
     }
   ]
 })

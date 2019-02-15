@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="salvar">
     <date-picker label="Data" v-model="form.data" />
-    <v-text-field label="Descrição" v-model="form.descricao" />
+    <v-text-field ref="descricao" label="Descrição" v-model="form.descricao" />
     <v-text-field label="Valor" v-model="form.valor" />
     <v-switch v-model="form.efetivada" label="Efetivada" />
     <v-switch v-model="continuarCriando" label="Continuar criando" />
@@ -34,12 +34,16 @@ export default {
         idConta: this.idConta
       }
 
-      this.$store.dispatch('lancamentoCriar', parsed)
-      
+      this.$store.dispatch('lancamentoSalvar', parsed)
+
+      const data = this.form.data
       Object.assign(this.form, formOriginal)
+      this.form.data = data
 
       if (!this.continuarCriando) {
         this.$emit('salvo')
+      } else {
+        this.$refs.descricao.focus()
       }
     }
   },

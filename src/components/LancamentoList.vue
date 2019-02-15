@@ -6,15 +6,19 @@
     hide-actions
   >
     <template slot="items" slot-scope="props">
-      <tr>
+      <tr :key="props.item.id">
         <td>
           {{ props.item.data && props.item.data.format('DD/MM/YYYY') }}
         </td>
         <td>{{ props.item.descricao }}</td>
-        <td>{{ props.item.valor }}</td>
-        <td>{{ props.item.saldo }}</td>
+        <td><currency :value="props.item.valor" /></td>
+        <td><currency :value="props.item.saldo" /></td>
         <td><v-checkbox v-if="props.item.id" @change="$emit('alternaEfetiva', props.item)" v-model="props.item.efetivada" /></td>
-        <td><v-btn v-if="props.item.id" class="error" @click="$emit('excluir', props.item)">Excluir</v-btn></td>
+        <td>
+          <v-btn v-if="props.item.id" @click="$emit('subir', props.item)" :disabled="props.item.lancamentoAnterior == null">Subir</v-btn>
+          <v-btn v-if="props.item.id" @click="$emit('descer', props.item)" :disabled="temLancamentoPosterior(props.item) == null">Descer</v-btn>
+          <v-btn v-if="props.item.id" class="error" @click="$emit('excluir', props.item)">Excluir</v-btn>
+        </td>
         
       </tr>
     </template>
@@ -30,22 +34,28 @@ export default {
     return {
       headers: [
         {
-          text: 'Data'
+          text: 'Data',
+          sortable:false
         },
         {
-          text: 'Descrição'
+          text: 'Descrição',
+          sortable:false
         },
         {
-          text: 'Valor'
+          text: 'Valor',
+          sortable:false
         },
         {
-          text: 'Saldo'
+          text: 'Saldo',
+          sortable:false
         },
         {
-          text: 'Efetivada'
+          text: 'Efetivada',
+          sortable:false
         },
         {
-          text: 'Ações'
+          text: 'Ações',
+          sortable:false
         },
       ]
     }
@@ -63,6 +73,11 @@ export default {
           saldo: _.last(this.saldos)
         }
       ]
+    }
+  },
+  methods: {
+    temLancamentoPosterior(lancamento) {
+      return this.$store.getters.lancamentoPosterior(lancamento)
     }
   }
 

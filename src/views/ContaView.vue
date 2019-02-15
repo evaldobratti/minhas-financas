@@ -1,94 +1,40 @@
 <template>
-  <v-container>
-    <v-layout>
-      <v-flex>
-        <v-btn @click="dialogNovoLancamento = true">Novo lançamento</v-btn>
-        <v-btn @click="excluirConta" color="error">Excluir conta</v-btn>
-      </v-flex>
-    </v-layout>
-    <v-layout>
-      <v-flex><v-btn @click="mesAnterior">Anterior</v-btn></v-flex>
-      <v-flex><month-picker v-model="mesAtual" /></v-flex>
-      <v-flex><v-btn @click="mesProximo">Próximo</v-btn></v-flex>
-    </v-layout>
-    <v-layout>
-      <v-flex>
-        <lancamento-list 
-          :lancamentos="lancamentos[0]" 
-          :saldos="lancamentos[1]" 
-          @excluir="excluirLancamento"
-          @alternaEfetiva="alternaEfetiva"  />
-      </v-flex>
-    </v-layout>
-    <v-dialog
-      v-model="dialogNovoLancamento"
-      width="400"
-    >
-      <v-card>
-        <v-card-title class="headline">Novo lançamento na conta {{conta.nome}}</v-card-title>
-        <v-card-text>
-          <lancamento-form :idConta="conta.id" @salvo="dialogNovoLancamento = false" />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <div :key="this.id">
+    <conta-apresentacao  v-if="conta != null" :conta="conta" />
+  </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'
-import LancamentoForm from '../components/LancamentoForm'
-import LancamentoList from '../components/LancamentoList'
-import moment from 'moment'
+import ContaApresentacao from '../components/ContaApresentacao'
 
 export default {
-  created() {
-    this.validaExistenciaConta()
-  },
+  props:['id'],
   data() {
     return {
-      dialogNovoLancamento: false,
-      mesAtual: moment()
+      conta: null
     }
+  },
+  created() {
+    this.routerUpdated()
   },
   methods: {
-    validaExistenciaConta() {
-
-    },
-    excluirConta() {
-      if (confirm("Tem certeza disso?"))
-        this.$store.dispatch("contaExcluir", this.$route.params.id)
-      
-    },
-    excluirLancamento(lancamento) {
-      if (confirm("Tem certeza disso?"))
-        this.$store.dispatch("lancamentoExcluir", lancamento)
-    },
-    alternaEfetiva(lancamento) {
-      this.$store.dispatch("lancamentoAtualizar", lancamento)
-    },
-    mesAnterior() {
-      this.mesAtual = moment(this.mesAtual).add(-1, 'month')
-    },
-    mesProximo() {
-      this.mesAtual = moment(this.mesAtual).add(1, 'month')
+    routerUpdated() {
+      this.$store.dispatch('contaCarrega', this.$route.params.id).then(conta => {
+        this.conta = conta;
+      }).catch(() => {
+        this.$router.push({
+          path: "/404"
+        })
+      })
     }
   },
-  computed: {
-    conta() {
-      return this.$store.state.contas.byId[this.$route.params.id] || {}
-    },
-    lancamentos() {
-      const [de, ate] = this.periodo
-      return this.$store.getters.lancamentos([this.conta], de, ate)
-    },
-    periodo() {
-      return [this.mesAtual, this.mesAtual.clone().endOf('month')]
+  watch: {
+    id() {
+      this.routerUpdated()
     }
-
   },
   components: {
-    LancamentoForm,
-    LancamentoList
+    ContaApresentacao
   }
 }
 </script>

@@ -54,7 +54,9 @@
       <v-container fluid fill-height>
         <v-layout>
           <v-flex shrink>
-            <router-view></router-view>
+            <transition name="fade">
+              <router-view></router-view>
+            </transition>
           </v-flex>
         </v-layout>
       </v-container>
@@ -105,5 +107,11 @@ export default {
 </script>
 
 <style>
-
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+  position: absolute;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
 </style>
