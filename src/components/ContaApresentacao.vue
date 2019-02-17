@@ -20,6 +20,7 @@
           @alternaEfetiva="alternaEfetiva"  
           @subir="subirLancamento"
           @descer="descerLancamento"
+          @editar="editarLancamento"
         />
       </v-flex>
     </v-layout>
@@ -31,6 +32,18 @@
         <v-card-title class="headline">Novo lançamento na conta {{conta.nome}}</v-card-title>
         <v-card-text>
           <lancamento-form :idConta="conta.id" @salvo="dialogNovoLancamento = false" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog
+      v-model="dialogEditarLancamento"
+      width="400"
+    >
+      <v-card v-if="lancamentoEditar" :key="lancamentoEditar.id">
+        <v-card-title class="headline">Editando lançamento {{conta.nome}}</v-card-title>
+        <v-card-text>
+          <lancamento-form :idConta="conta.id" :lancamento="lancamentoEditar" @salvo="dialogEditarLancamento = false" />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -51,7 +64,9 @@ export default {
   data() {
     return {
       dialogNovoLancamento: false,
-      mesAtual: moment()
+      dialogEditarLancamento: false,
+      mesAtual: moment(),
+      lancamentoEditar: null
     }
   },
   methods: {
@@ -67,24 +82,28 @@ export default {
       }
       
     },
-    excluirLancamento(lancamento) {
+    excluirLancamento(idLancamento) {
       if (confirm("Tem certeza disso?"))
-        this.$store.dispatch("lancamentoExcluir", lancamento)
+        this.$store.dispatch("lancamentoExcluir", this.$store.getters.lancamentoId(idLancamento))
     },
-    alternaEfetiva(lancamento) {
-      this.$store.dispatch("lancamentoSalvar", lancamento)
+    alternaEfetiva(idLancamento) {
+      this.$store.dispatch("lancamentoSalvar", this.$store.getters.lancamentoId(idLancamento))
     },
-    subirLancamento(lancamento) {
-      this.$store.dispatch("lancamentoSubir", lancamento)
+    subirLancamento(idLancamento) {
+      this.$store.dispatch("lancamentoSubir", this.$store.getters.lancamentoId(idLancamento))
     },
-    descerLancamento(lancamento) {
-      this.$store.dispatch("lancamentoDescer", lancamento)
+    descerLancamento(idLancamento) {
+      this.$store.dispatch("lancamentoDescer", this.$store.getters.lancamentoId(idLancamento))
     },
     mesAnterior() {
       this.mesAtual = moment(this.mesAtual).add(-1, 'month')
     },
     mesProximo() {
       this.mesAtual = moment(this.mesAtual).add(1, 'month')
+    },
+    editarLancamento(idLancamento) {
+      this.lancamentoEditar = this.$store.getters.lancamentoId(idLancamento)
+      this.dialogEditarLancamento = true
     }
   },
   computed: {

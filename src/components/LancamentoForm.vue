@@ -2,9 +2,9 @@
   <form @submit.prevent="salvar">
     <date-picker label="Data" v-model="form.data" />
     <v-text-field ref="descricao" label="Descrição" v-model="form.descricao" />
-    <v-text-field label="Valor" v-model="form.valor" />
+    <v-text-field label="Valor" v-model.number="form.valor" />
     <v-switch v-model="form.efetivada" label="Efetivada" />
-    <v-switch v-model="continuarCriando" label="Continuar criando" />
+    <v-switch v-if="form.id == null" v-model="continuarCriando" label="Continuar criando" />
     <v-btn type="submit">Salvar</v-btn>
   </form>
 </template>
@@ -20,11 +20,16 @@ const formOriginal = {
 }
 
 export default {
-  props: ['idConta'],
+  props: ['idConta', 'lancamento'],
   data() {
     return {
       form: Object.assign({}, formOriginal),
       continuarCriando: false
+    }
+  },
+  created() {
+    if (this.lancamento) {
+      Object.assign(this.form, this.lancamento)
     }
   },
   methods: {
@@ -47,11 +52,11 @@ export default {
       }
     }
   },
-  watch: {
+ /* watch: {
     'form.valor'() {
       this.form.valor = Number(this.form.valor)
     }
-  }
+  }*/
 }
 </script>
 

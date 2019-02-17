@@ -13,11 +13,12 @@
         <td>{{ props.item.descricao }}</td>
         <td><currency :value="props.item.valor" /></td>
         <td><currency :value="props.item.saldo" /></td>
-        <td><v-checkbox v-if="props.item.id" @change="$emit('alternaEfetiva', props.item)" v-model="props.item.efetivada" /></td>
+        <td><v-checkbox v-if="props.item.id" @change="$emit('alternaEfetiva', props.item.id)" v-model="props.item.efetivada" /></td>
         <td>
-          <v-btn v-if="props.item.id" @click="$emit('subir', props.item)" :disabled="props.item.lancamentoAnterior == null">Subir</v-btn>
-          <v-btn v-if="props.item.id" @click="$emit('descer', props.item)" :disabled="temLancamentoPosterior(props.item) == null">Descer</v-btn>
-          <v-btn v-if="props.item.id" class="error" @click="$emit('excluir', props.item)">Excluir</v-btn>
+          <v-btn v-if="props.item.id" @click="$emit('subir', props.item.id)" :disabled="props.item.lancamentoAnterior == null">Subir</v-btn>
+          <v-btn v-if="props.item.id" @click="$emit('descer', props.item.id)" :disabled="temLancamentoPosterior(props.item) == null">Descer</v-btn>
+          <v-btn v-if="props.item.id" class="error" @click="$emit('excluir', props.item.id)">Excluir</v-btn>
+          <v-btn v-if="props.item.id" @click="$emit('editar', props.item.id)">Editar</v-btn>
         </td>
         
       </tr>

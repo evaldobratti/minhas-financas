@@ -98,16 +98,30 @@ const actions = {
     })
       
   },
-  lancamentoSalvar({getters}, lancamento) {
-    if (!lancamento.id && !lancamento.lancamentoAnterior) {
+  lancamentoSalvar({getters, dispatch}, lancamento) {
+    let lancamentoTrocouData = false
+    if (lancamento.id) {
+      let valorSalvo = getters.lancamentoId(lancamento.id)
       
+      if (!valorSalvo.data.isSame(lancamento.data, 'date')) {
+          lancamentoTrocouData = true
+          dispatch('lancamentoExcluir', valorSalvo)
+      }
+    }
+
+    if (lancamentoTrocouData || (!lancamento.id && !lancamento.lancamentoAnterior)) {
       const doDia = getters.lancamentosDaContaDoDia(lancamento.idConta, lancamento.data)
-      if (doDia.length > 0) {
+      if (doDia.length == 0) {
+        lancamento.lancamentoAnterior = null
+      } else {
         lancamento.lancamentoAnterior = _.last(doDia).id
       }
     }
     
     repo.save('/lancamentos/' + lancamento.idConta, lancamento)
+
+    if (lancamento.id)
+      Object.assign(getters.lancamentoId(lancamento.id), lancamento)
   },
   lancamentoExcluir({getters, dispatch}, lancamento) {
     repo.remove('/lancamentos/' + lancamento.idConta, lancamento.id)
