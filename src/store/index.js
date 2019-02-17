@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import lancamentos from './lancamentos'
 import auth from './auth'
 import contas from './contas'
+import transferencias from './transferencias'
 
 Vue.use(Vuex)
 
@@ -11,6 +12,7 @@ const store = new Vuex.Store({
     auth,
     lancamentos,
     contas,
+    transferencias,
   },
   mutations: {
     resetAll(state) {

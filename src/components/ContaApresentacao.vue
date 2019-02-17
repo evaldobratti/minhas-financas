@@ -83,11 +83,21 @@ export default {
       
     },
     excluirLancamento(idLancamento) {
-      if (confirm("Tem certeza disso?"))
-        this.$store.dispatch("lancamentoExcluir", this.$store.getters.lancamentoId(idLancamento))
+      if (confirm("Tem certeza disso?")) {
+        const lancamento = this.$store.getters.lancamentoId(idLancamento)
+        if (lancamento.idContaDestino)
+          this.$store.dispatch("transferenciaExcluir", lancamento)
+        else
+          this.$store.dispatch("lancamentoExcluir", lancamento)
+      }
     },
     alternaEfetiva(idLancamento) {
-      this.$store.dispatch("lancamentoSalvar", this.$store.getters.lancamentoId(idLancamento))
+      const lancamento = {...this.$store.getters.lancamentoId(idLancamento)}
+      lancamento.efetivada = !lancamento.efetivada
+      if (lancamento.idContaDestino)
+        this.$store.dispatch("transferenciaSalvar", lancamento)
+      else
+        this.$store.dispatch("lancamentoSalvar", lancamento)
     },
     subirLancamento(idLancamento) {
       this.$store.dispatch("lancamentoSubir", this.$store.getters.lancamentoId(idLancamento))

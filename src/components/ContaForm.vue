@@ -5,7 +5,7 @@
       v-model="form.nome"
       :rules="[v => !!v || 'Campo obrigatório']"
     />
-    <v-text-field label="Saldo inicial" v-model="form.saldoInicial"></v-text-field>
+    <v-text-field label="Saldo inicial" v-model.number="form.saldoInicial"></v-text-field>
     <v-btn type="submit">Salvar</v-btn>
   </v-form>
 </template>
@@ -40,13 +40,7 @@ export default {
       Object.assign(this.form, initialForm)
       this.$refs.form.resetValidation()
     }
-  }, 
-  watch: {
-    saldoInicial() {
-      this.saldoInicial = Number(this.saldoInicial)
-    }
   }
-
 }
 </script>
 

@@ -99,29 +99,33 @@ const actions = {
       
   },
   lancamentoSalvar({getters, dispatch}, lancamento) {
-    let lancamentoTrocouData = false
-    if (lancamento.id) {
-      let valorSalvo = getters.lancamentoId(lancamento.id)
+    return new Promise(acc => {
+      let lancamentoTrocouData = false
+      if (lancamento.id) {
+        let valorSalvo = getters.lancamentoId(lancamento.id)
+        
+        if (!valorSalvo.data.isSame(lancamento.data, 'date')) {
+            lancamentoTrocouData = true
+            dispatch('lancamentoExcluir', valorSalvo)
+        }
+      }
+
+      if (lancamentoTrocouData || (!lancamento.id && !lancamento.lancamentoAnterior)) {
+        const doDia = getters.lancamentosDaContaDoDia(lancamento.idConta, lancamento.data)
+        if (doDia.length == 0) {
+          lancamento.lancamentoAnterior = null
+        } else {
+          lancamento.lancamentoAnterior = _.last(doDia).id
+        }
+      }
       
-      if (!valorSalvo.data.isSame(lancamento.data, 'date')) {
-          lancamentoTrocouData = true
-          dispatch('lancamentoExcluir', valorSalvo)
-      }
-    }
-
-    if (lancamentoTrocouData || (!lancamento.id && !lancamento.lancamentoAnterior)) {
-      const doDia = getters.lancamentosDaContaDoDia(lancamento.idConta, lancamento.data)
-      if (doDia.length == 0) {
-        lancamento.lancamentoAnterior = null
-      } else {
-        lancamento.lancamentoAnterior = _.last(doDia).id
-      }
-    }
-    
-    repo.save('/lancamentos/' + lancamento.idConta, lancamento)
-
-    if (lancamento.id)
-      Object.assign(getters.lancamentoId(lancamento.id), lancamento)
+      repo.save('/lancamentos/' + lancamento.idConta, lancamento).then(id => {
+        if (lancamento.id)
+          Object.assign(getters.lancamentoId(lancamento.id), lancamento)
+        
+        acc(id)
+      })
+    })
   },
   lancamentoExcluir({getters, dispatch}, lancamento) {
     repo.remove('/lancamentos/' + lancamento.idConta, lancamento.id)

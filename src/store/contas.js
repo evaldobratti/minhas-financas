@@ -8,6 +8,12 @@ const state = {
 }
 
 const getters = {
+  contas(state) {
+    return state.list;
+  },
+  contaId: (state) => (idConta) => {
+    return state.byId[idConta]
+  }
 }
 
 const mutations = {

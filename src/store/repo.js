@@ -38,11 +38,18 @@ function hookRemoved(path, cb) {
 }
 
 export function save(path, value) {
-  if (value.id) {
-    firebase.database().ref(firebase.auth().currentUser.uid + path + '/' + value.id).set(normalize(value))
-  } else {
-    firebase.database().ref(firebase.auth().currentUser.uid + path).push(normalize(value))
-  }
+  return new Promise((acc) => {
+    if (value.id) {
+      firebase.database().ref(firebase.auth().currentUser.uid + path + '/' + value.id).set(normalize(value)).then((snap) => {
+        acc(value.id)
+      })
+    } else {
+      firebase.database().ref(firebase.auth().currentUser.uid + path).push(normalize(value)).then((ref) => {
+        acc(ref.key)
+      })
+    }
+  })
+  
 }
 
 function remove(path, id) {

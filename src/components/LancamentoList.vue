@@ -28,6 +28,7 @@
 
 <script>
 import _ from 'underscore'
+import { isNullOrUndefined } from 'util';
 
 export default {
   props: ['lancamentos', 'saldos'],
@@ -68,7 +69,12 @@ export default {
           descricao: 'Saldo anterior',
           saldo: this.saldos[0],
         },
-        ...this.lancamentos.map((l, ix) => ({...l, saldo: this.saldos[ix + 1]})),
+        ...this.lancamentos.map((l, ix) => ({
+          ...l, 
+          saldo: this.saldos[ix + 1],
+          descricao: l.idContaDestino ? 'Transferência para ' + this.$store.getters.contaId(l.idContaDestino).nome : l.descricao
+
+        })),
         {
           descricao: 'Saldo posterior',
           saldo: _.last(this.saldos)
