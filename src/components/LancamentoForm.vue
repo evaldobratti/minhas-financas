@@ -57,15 +57,18 @@ export default {
       } else {
         this.$store.dispatch('lancamentoSalvar', parsed)
       }
-
-      const data = this.form.data
-      Object.assign(this.form, formOriginal)
-      this.form.data = data
-      this.isTransferencia  = false
+      
       if (!this.continuarCriando) {
         this.$emit('salvo')
       } else {
         this.$refs.descricao.focus()
+      }
+
+      if (!this.form.id) {
+        const data = this.form.data
+        this.isTransferencia  = false
+        Object.assign(this.form, formOriginal)
+        this.form.data = data
       }
     }
   },

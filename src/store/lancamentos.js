@@ -15,17 +15,19 @@ const state = {
 const getters = {
   lancamentos: (state, getters) => (contas, de, ate) => {
     let lancamentosDasContas = contas.map(conta => getters.lancamentosDaConta(conta.id, de, ate)).reduce((ant, atual) => [...ant, ...atual], [])
+    
     let lancamentosDoPeriodo = lancamentosDasContas.filter(l => l.data.isBetween(de, ate))
 
     const saldoInicialContas = contas
       .map(c => c.saldoInicial)
       .reduce((ant, atual) => ant + atual, 0) 
 
-    const saldoAnterior = lancamentosDasContas
+    const saldoAnterior = contas.map(conta => state.byConta[conta.id] || [])
+      .reduce((ant, atual) => [...ant, ...atual], [])
       .filter(l => l.data.isBefore(de))
       .map(l => l.valor)
       .reduce((ant, atual) => ant + atual, 0)
-
+    
     const saldoInicial = saldoInicialContas + saldoAnterior
 
     const saldos = lancamentosDoPeriodo 

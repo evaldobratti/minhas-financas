@@ -58,9 +58,6 @@ import moment from 'moment'
 
 export default {
   props: ['conta'],
-  created() {
-    this.validaExistenciaConta()
-  },
   data() {
     return {
       dialogNovoLancamento: false,
@@ -70,26 +67,26 @@ export default {
     }
   },
   methods: {
-    validaExistenciaConta() {
-
-    },
     excluirConta() {
-      if (confirm("Tem certeza disso?")) {
-        this.$store.dispatch("contaExcluir", this.conta.id)
-        this.$router.push({
-          name: 'home'
-        })
-      }
-      
+      this.$confirm("Tem certeza disso?").then(val => {
+        if (val) {
+          this.$store.dispatch("contaExcluir", this.conta.id)
+          this.$router.push({
+            name: 'home'
+          })
+        }
+      })
     },
     excluirLancamento(idLancamento) {
-      if (confirm("Tem certeza disso?")) {
-        const lancamento = this.$store.getters.lancamentoId(idLancamento)
-        if (lancamento.idContaDestino)
-          this.$store.dispatch("transferenciaExcluir", lancamento)
-        else
-          this.$store.dispatch("lancamentoExcluir", lancamento)
-      }
+      this.$confirm("Tem certeza disso?").then(val => {
+        if (val) {
+          const lancamento = this.$store.getters.lancamentoId(idLancamento)
+          if (lancamento.idContaDestino)
+            this.$store.dispatch("transferenciaExcluir", lancamento)
+          else
+            this.$store.dispatch("lancamentoExcluir", lancamento)
+        }
+      })
     },
     alternaEfetiva(idLancamento) {
       const lancamento = {...this.$store.getters.lancamentoId(idLancamento)}
