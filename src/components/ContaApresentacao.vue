@@ -39,6 +39,7 @@
     <v-dialog
       v-model="dialogEditarLancamento"
       width="400"
+      lazy
     >
       <v-card v-if="lancamentoEditar" :key="lancamentoEditar.id">
         <v-card-title class="headline">Editando lançamento {{conta.nome}}</v-card-title>
