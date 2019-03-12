@@ -15,10 +15,10 @@
         <td><currency :value="props.item.saldo" /></td>
         <td><v-checkbox v-if="props.item.id" @change="$emit('alternaEfetiva', props.item.id)" v-model="props.item.efetivada" /></td>
         <td>
-          <v-btn v-if="props.item.id" @click="$emit('subir', props.item.id)" :disabled="props.item.lancamentoAnterior == null">Subir</v-btn>
-          <v-btn v-if="props.item.id" @click="$emit('descer', props.item.id)" :disabled="temLancamentoPosterior(props.item) == null">Descer</v-btn>
-          <v-btn v-if="props.item.id" class="error" @click="$emit('excluir', props.item.id)">Excluir</v-btn>
-          <v-btn v-if="props.item.id" @click="$emit('editar', props.item.id)">Editar</v-btn>
+          <v-btn fab small  v-if="props.item.id" @click="$emit('subir', props.item.id)" :disabled="props.item.lancamentoAnterior == null"><v-icon>expand_less</v-icon></v-btn>
+          <v-btn fab small  v-if="props.item.id" @click="$emit('descer', props.item.id)" :disabled="temLancamentoPosterior(props.item) == null"><v-icon>expand_more</v-icon></v-btn>
+          <v-btn fab small  v-if="props.item.id" class="error" @click="$emit('excluir', props.item.id)"><v-icon>delete</v-icon></v-btn>
+          <v-btn fab small v-if="props.item.id" @click="$emit('editar', props.item.id)"><v-icon>edit</v-icon></v-btn>
         </td>
         
       </tr>
