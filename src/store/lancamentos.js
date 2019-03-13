@@ -3,6 +3,44 @@ import Vue from 'vue'
 import moment from 'moment'
 import _ from 'underscore'
 
+const ordena = (lancamentos) => {
+  const datas = lancamentos
+    .map(l => l.data)
+    .reduce((x, y) => {
+      const contains = x.find(data => data.isSame(y))
+      return contains ? x : [...x, y]
+    }, [])
+    .sort((x, y) => x.valueOf() - y.valueOf())
+  
+  let lancamentosOrdenados = []
+
+  datas.forEach(data => {
+    const doDia = lancamentos.filter(l => l.data.isSame(data))
+
+    const recorrentesTransientes = doDia.filter(l => l.idRecorrencia != null && l.id == null)
+
+    recorrentesTransientes.forEach(l => doDia.splice(doDia.findIndex(x => l == x), 1))
+
+    if (doDia.length > 0) {
+      let ultimoAnalisado = doDia.find(l => l.lancamentoAnterior == undefined || l.lancamentoAnterior == null)
+      lancamentosOrdenados.push(ultimoAnalisado)
+      doDia.splice(doDia.findIndex(l => l == ultimoAnalisado), 1)
+
+      doDia.forEach(l => {
+        ultimoAnalisado = doDia.find(l => l.lancamentoAnterior === ultimoAnalisado.id)
+        lancamentosOrdenados.push(ultimoAnalisado)
+      })
+    }
+    lancamentosOrdenados = [
+      ...lancamentosOrdenados,
+      ...recorrentesTransientes
+    ]
+
+  })
+
+  return lancamentosOrdenados
+}
+
 const state = {
   byId: {
 
@@ -14,38 +52,32 @@ const state = {
 
 const getters = {
   lancamentos: (state, getters) => (contas, de, ate) => {
-    let lancamentosDasContas = contas.map(conta => getters.lancamentosDaConta(conta.id, de, ate)).reduce((ant, atual) => [...ant, ...atual], [])
-    
-    let lancamentosDoPeriodo = lancamentosDasContas.filter(l => l.data.isBetween(de, ate))
+    let lancamentosDasContas = contas.map(conta => state.byConta[conta.id] || []).reduce((ant, atual) => [...ant, ...atual], [])
+    let lancamentosTransientes = getters.lancamentosRecorrentesDaConta(contas[0].id, ate)
+
+    lancamentosDasContas = [
+      ...lancamentosDasContas,
+      ...lancamentosTransientes
+    ]
+
+    let lancamentosDoPeriodo = ordena(lancamentosDasContas.filter(l => l.data.isBetween(de, ate)))
 
     const saldoInicialContas = contas
       .map(c => c.saldoInicial)
       .reduce((ant, atual) => ant + atual, 0) 
 
-    const saldoAnterior = contas.map(conta => state.byConta[conta.id] || [])
-      .reduce((ant, atual) => [...ant, ...atual], [])
+    const saldoAnterior = lancamentosDasContas
       .filter(l => l.data.isBefore(de))
       .map(l => l.valor)
       .reduce((ant, atual) => ant + atual, 0)
     
     const saldoInicial = saldoInicialContas + saldoAnterior
-
+    console.info(lancamentosDoPeriodo)
     const saldos = lancamentosDoPeriodo 
       .map(l => l.valor)
       .reduce((ant, atual) => [...ant, _.last(ant) + atual], [saldoInicial])
     
     return [lancamentosDoPeriodo, saldos]
-  },
-  lancamentosDaConta: (state, getters) => (idConta, de, ate) => {
-    const data = de.clone()
-    let lancamentos = []
-    while (!data.isSame(ate, 'date')) {
-      lancamentos = [...lancamentos, ...getters.lancamentosDaContaDoDia(idConta, data)]
-      data.add(1, 'day')
-    }
-    lancamentos = [...lancamentos, ...getters.lancamentosDaContaDoDia(idConta, data)]
-    
-    return lancamentos
   },
   lancamentosDaContaDoDia: (state) => (idConta, dia) => {
     const lancamentos = (state.byConta[idConta] || []).filter(l => l.data.isSame(dia, 'date'))
@@ -70,6 +102,11 @@ const getters = {
   },
   lancamentoId: (state) => (id) => {
     return state.byId[id]
+  },
+  lancamentosDaRecorrencia: (state) => (idRecorrencia) => {
+    return Object.keys(state.byId)
+      .filter(lancamentoId => state.byId[lancamentoId].idRecorrencia == idRecorrencia)
+      .map(lancamentoId => state.byId[lancamentoId])
   }
 }
 
@@ -92,6 +129,7 @@ const actions = {
   carregaLancamentosConta({commit}, contaId) {
     repo.hookAdded('/lancamentos/' + contaId, lancamento => {
       lancamento.data = moment(lancamento.data)
+      lancamento.dataOriginal = moment(lancamento.dataOriginal)
       commit('addLancamento', lancamento)
     })
 

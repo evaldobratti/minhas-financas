@@ -80,7 +80,7 @@ describe('Recorrencia', () => {
           recorrenciaNoPeriodo, recorrenciaNoPeriodoComDataFim, recorrenciaForaDoPeriodoAntes, recorrenciaForaDoPeriodoDepois
         ]
       }
-    })(1, JANEIRO_1, moment("20110301", "YYYYMMDD"))
+    })(1, moment("20110301", "YYYYMMDD"))
 
     expect(list).toEqual(expect.arrayContaining([recorrenciaNoPeriodo, recorrenciaNoPeriodoComDataFim]))
   })
@@ -89,7 +89,7 @@ describe('Recorrencia', () => {
     const lancamentos = recorrencias.getters.lancamentosRecorrentesDaConta(null, {
       recorrenciasDaConta: () => [recorrenciaNoPeriodo],
       lancamentosDaRecorrencia: () => []
-    })(1, JANEIRO_1, moment("20110301", "YYYYMMDD"))
+    })(1, moment("20110301", "YYYYMMDD"))
 
     expect(lancamentos).toEqual([
       {
@@ -117,7 +117,7 @@ describe('Recorrencia', () => {
     const lancamentos = recorrencias.getters.lancamentosRecorrentesDaConta(null, {
       recorrenciasDaConta: () => [recorrenciaNoPeriodoComDataFim],
       lancamentosDaRecorrencia: () => []
-    })(1, JANEIRO_1, moment("20110501", "YYYYMMDD"))
+    })(1, moment("20110501", "YYYYMMDD"))
 
     expect(lancamentos).toEqual([
       {
@@ -137,7 +137,7 @@ describe('Recorrencia', () => {
     const lancamentos = recorrencias.getters.lancamentosRecorrentesDaConta(null, {
       recorrenciasDaConta: () => [recorrenciaNoPeriodo, recorrenciaNoPeriodoComDataFim],
       lancamentosDaRecorrencia: () => []
-    })(1, JANEIRO_1, moment("20110501", "YYYYMMDD"))
+    })(1, moment("20110501", "YYYYMMDD"))
 
     expect(lancamentos).toEqual([
       {
@@ -194,7 +194,7 @@ describe('Recorrencia', () => {
       lancamentosDaRecorrencia: () => [{
         dataOriginal: moment('20110201', 'YYYYMMDD')
       }]
-    })(1, JANEIRO_1, moment("20110501", "YYYYMMDD"))
+    })(1, moment("20110501", "YYYYMMDD"))
 
     expect(lancamentos.length).toBe(0)
   })
@@ -261,7 +261,7 @@ describe('Recorrencia', () => {
     const lancamentos = recorrencias.getters.lancamentosRecorrentesDaConta(null, {
       recorrenciasDaConta: () => [parcelamento],
       lancamentosDaRecorrencia: () => []
-    })(1, JANEIRO_1, moment("20110201", "YYYYMMDD"))
+    })(1, moment("20110201", "YYYYMMDD"))
     
     expect(lancamentos).toEqual([{
       data: moment("20110201", "YYYYMMDD"),
@@ -292,7 +292,7 @@ describe('Recorrencia', () => {
     const lancamentos = recorrencias.getters.lancamentosRecorrentesDaConta(null, {
       recorrenciasDaConta: () => [parcelamento],
       lancamentosDaRecorrencia: () => []
-    })(1, JANEIRO_1, moment("20110401", "YYYYMMDD"))
+    })(1, moment("20110401", "YYYYMMDD"))
     
     expect(lancamentos).toEqual(expect.arrayContaining([{
       data: moment("20110201", "YYYYMMDD"),
@@ -313,5 +313,5 @@ describe('Recorrencia', () => {
     }]))
   })
 
-  
+
 })

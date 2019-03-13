@@ -26,7 +26,7 @@
     </v-layout>
     <v-dialog
       v-model="dialogNovoLancamento"
-      width="400"
+      width="600"
     >
       <v-card>
         <v-card-title class="headline">Novo lançamento na conta {{conta.nome}}</v-card-title>
@@ -38,10 +38,9 @@
 
     <v-dialog
       v-model="dialogEditarLancamento"
-      width="400"
-      lazy
+      width="600"
     >
-      <v-card v-if="lancamentoEditar" :key="lancamentoEditar.id">
+      <v-card v-if="lancamentoEditar" :key="lancamentoEditar.id || lancamentoEditar.idRecorrencia">
         <v-card-title class="headline">Editando lançamento {{conta.nome}}</v-card-title>
         <v-card-text>
           <lancamento-form :idConta="conta.id" :lancamento="lancamentoEditar" @salvo="dialogEditarLancamento = false" />
@@ -79,7 +78,7 @@ export default {
       })
     },
     excluirLancamento(idLancamento) {
-      this.$confirm("Tem certeza disso?").then(val => {
+      this.$confirm("Tem certeza disso? HÁ UM BUG EM QUE LANÇAMENTOS DE RECORRENCIA AINDA NÃO PODEM SER EXCLUIDOS").then(val => {
         if (val) {
           const lancamento = this.$store.getters.lancamentoId(idLancamento)
           if (lancamento.idContaDestino)
@@ -89,8 +88,7 @@ export default {
         }
       })
     },
-    alternaEfetiva(idLancamento) {
-      const lancamento = {...this.$store.getters.lancamentoId(idLancamento)}
+    alternaEfetiva(lancamento) {
       lancamento.efetivada = !lancamento.efetivada
       if (lancamento.idContaDestino)
         this.$store.dispatch("transferenciaSalvar", lancamento)
@@ -109,8 +107,8 @@ export default {
     mesProximo() {
       this.mesAtual = moment(this.mesAtual).add(1, 'month')
     },
-    editarLancamento(idLancamento) {
-      this.lancamentoEditar = this.$store.getters.lancamentoId(idLancamento)
+    editarLancamento(lancamento) {
+      this.lancamentoEditar = lancamento
       this.dialogEditarLancamento = true
     }
   },

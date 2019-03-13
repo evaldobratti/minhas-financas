@@ -27,6 +27,13 @@ const state = {
   }
 }
 
+const mutations = {
+  addRecorrencia(state, recorrencia) {
+    state.byConta[recorrencia.idConta] = state.byConta[recorrencia.idConta] || []
+    state.byConta[recorrencia.idConta].push(recorrencia)
+  }
+}
+
 const periodos = {
   mensal: (periodo) => {
     const val = periodo.clone().add(1, 'month')
@@ -36,15 +43,16 @@ const periodos = {
 }
 
 const getters = {
-  recorrenciasDaConta: (state) => (idConta, periodoDe, periodoAte) => {
+  recorrenciasDaConta: (state) => (idConta, periodoAte) => {
     const recorrencias = state.byConta[idConta] || []
+    
     return recorrencias.filter(r => 
-      r.dataInicio.isSameOrAfter(periodoDe) && (r.dataFim == null || r.dataFim.isSameOrBefore(periodoAte))
+      r.dataInicio.isSameOrBefore(periodoAte)
     )
   },
-  lancamentosRecorrentesDaConta: (state, getters) => (idConta, periodoDe, periodoAte) => {
-    const recorrencias = getters.recorrenciasDaConta(idConta, periodoDe, periodoAte)
-
+  lancamentosRecorrentesDaConta: (state, getters) => (idConta, periodoAte) => {
+    const recorrencias = getters.recorrenciasDaConta(idConta, periodoAte)
+    
     return recorrencias.map(r => {
       const lancamentosGerados = getters.lancamentosDaRecorrencia(r.id)
 
@@ -71,12 +79,21 @@ const getters = {
         dataAtual = periodoAdicionar(dataAtual)
       }
       return lancamentos
-    }).reduce((x, y) => [...x, ...y])
+    }).reduce((x, y) => [...x, ...y], [])
 
   }
 }
 
 const actions = {
+  posLogin({commit}) {
+    repo.hookAdded('/recorrencias', recorrencia => {
+      recorrencia.dataInicio = moment(recorrencia.dataInicio)
+      recorrencia.dataFim = recorrencia.dataFim != null || recorrencia.dataFim != undefined
+        ? moment(recorrencia.dataFim)
+        : null
+      commit('addRecorrencia', recorrencia)
+    })
+  },
   recorrenciaSalvar({dispatch}, {recorrenciaBase, lancamentoBase}) {
     const recorrencia = {
       valor: lancamentoBase.valor,
@@ -124,5 +141,6 @@ const actions = {
 export default {
   state, 
   getters,
-  actions
+  actions,
+  mutations
 }

@@ -30,30 +30,32 @@
       >
         transferencia
       </v-tab>
-      <v-tab
-        :key="2"
-        ripple
-      >
-        recorrencia
-      </v-tab>
       <v-tab-item :key="0">
         <v-text-field ref="descricao" label="Descrição" v-model="form.descricao" />
       </v-tab-item>
       <v-tab-item :key="1">
         <v-select :items="contas" label="Para conta" item-text="nome" item-value="id" v-model="form.idContaDestino" />
       </v-tab-item>
-      <v-tab-item :key="2">
-        <v-switch v-model="recorrencia.indefinidamente" label="Repetir indefinidamente" />
-        <v-text-field v-if="!recorrencia.indefinidamente" label="Iniciar na parcela" v-model="recorrencia.parcelaInicio" />
-        <v-text-field v-if="!recorrencia.indefinidamente" label="até" v-model="recorrencia.parcelaFim" />
-        <v-text-field label="Descrição" v-model="form.descricao" />
-      </v-tab-item>
     </v-tabs>
 
     <v-text-field label="Valor" v-model.number="form.valor" />
 
-    <v-switch v-model="form.efetivada" label="Efetivada" />
-    <v-switch v-if="form.id == null" v-model="continuarCriando" label="Continuar criando" />
+    <v-layout row flex>
+      <v-flex>
+        <v-switch v-model="recorrencia.isRecorrente" label="Repetir" />
+      </v-flex>
+      <v-flex>
+        <v-switch v-model="form.efetivada" label="Efetivada" />
+      </v-flex>
+      <v-flex>
+        <v-switch v-if="form.id == null" v-model="continuarCriando" label="Continuar criando" />
+      </v-flex>
+    </v-layout>
+    <div v-if="recorrencia.isRecorrente">
+        <v-switch v-model="recorrencia.isIndefinidamente" label="Repetir indefinidamente" />
+        <v-text-field v-if="!recorrencia.isIndefinidamente" label="Iniciar na parcela" v-model.number="recorrencia.parcelaInicio" />
+        <v-text-field v-if="!recorrencia.isIndefinidamente" label="até" v-model.number="recorrencia.parcelaFim" />
+      </div>
     <v-btn type="submit">Salvar</v-btn>
   </form>
 </template>
@@ -77,9 +79,10 @@ export default {
       continuarCriando: false,
       isTransferencia: false,
       isRecorrencia: false,
-      abaAtiva: 1,
+      abaAtiva: 0,
       recorrencia: {
-        indefinidamente: false,
+        isRecorrente: false,
+        isIndefinidamente: false,
         parcelaInicio: 1,
         parcelaFim: null
       }
@@ -110,6 +113,11 @@ export default {
 
       if (this.isTransferencia && parsed.idContaDestino != null) {
         this.$store.dispatch('transferenciaSalvar', parsed)
+      } else if (this.recorrencia.isRecorrente && parsed.idRecorrencia == null) {
+        this.$store.dispatch('recorrenciaSalvar', {
+          recorrenciaBase: this.recorrencia,
+          lancamentoBase: parsed
+        })
       } else {
         this.$store.dispatch('lancamentoSalvar', parsed)
       }

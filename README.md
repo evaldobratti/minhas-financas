@@ -35,3 +35,7 @@ npm run test:unit
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### TODO
+Remover dataOriginal do lançamento e adicionar novamente a lista de datas geradas na recorrencia, e então, implementar a exclusão de lançamentos de recorrência.
