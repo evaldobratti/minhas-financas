@@ -17,9 +17,9 @@ const ordena = (lancamentos) => {
   datas.forEach(data => {
     const doDia = lancamentos.filter(l => l.data.isSame(data))
 
-    const recorrentesTransientes = doDia.filter(l => l.idRecorrencia != null && l.id == null)
+    const transientes = doDia.filter(l => l.id == null)
 
-    recorrentesTransientes.forEach(l => doDia.splice(doDia.findIndex(x => l == x), 1))
+    transientes.forEach(l => doDia.splice(doDia.findIndex(x => l == x), 1))
 
     if (doDia.length > 0) {
       let ultimoAnalisado = doDia.find(l => l.lancamentoAnterior == undefined || l.lancamentoAnterior == null)
@@ -33,7 +33,7 @@ const ordena = (lancamentos) => {
     }
     lancamentosOrdenados = [
       ...lancamentosOrdenados,
-      ...recorrentesTransientes
+      ...transientes
     ]
 
   })
@@ -102,11 +102,6 @@ const getters = {
   },
   lancamentoId: (state) => (id) => {
     return state.byId[id]
-  },
-  lancamentosDaRecorrencia: (state) => (idRecorrencia) => {
-    return Object.keys(state.byId)
-      .filter(lancamentoId => state.byId[lancamentoId].idRecorrencia == idRecorrencia)
-      .map(lancamentoId => state.byId[lancamentoId])
   }
 }
 
@@ -163,12 +158,19 @@ const actions = {
         if (lancamento.id)
           Object.assign(getters.lancamentoId(lancamento.id), lancamento)
         
+        if (lancamento.onSalvar)
+          lancamento.onSalvar(dispatch, id, lancamento)
+
         acc(id)
       })
     })
   },
   lancamentoExcluir({getters, dispatch}, lancamento) {
     repo.remove('/lancamentos/' + lancamento.idConta, lancamento.id)
+
+    if (lancamento.onSalvar)
+      lancamento.onSalvar(dispatch, null, lancamento)
+
     const lancamentoReferenciava = lancamento.lancamentoAnterior
     
     const lancamentoMeReferencia = getters.lancamentoPosterior(lancamento)

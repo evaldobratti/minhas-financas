@@ -113,7 +113,7 @@ export default {
 
       if (this.isTransferencia && parsed.idContaDestino != null) {
         this.$store.dispatch('transferenciaSalvar', parsed)
-      } else if (this.recorrencia.isRecorrente && parsed.idRecorrencia == null) {
+      } else if (this.recorrencia.isRecorrente && parsed.id == null) {
         this.$store.dispatch('recorrenciaSalvar', {
           recorrenciaBase: this.recorrencia,
           lancamentoBase: parsed

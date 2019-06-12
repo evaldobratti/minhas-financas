@@ -1,5 +1,6 @@
 import repo from './repo'
 import moment from 'moment'
+import Vue from 'vue'
 
 const descricaoLancamento = (recorrencia, ix) => {
   return  recorrencia.isParcelamento 
@@ -7,23 +8,12 @@ const descricaoLancamento = (recorrencia, ix) => {
     : recorrencia.descricao
 }
 
-const recorrencia = {
-  valor: 0,
-  frequencia: 'MENSAL',
-  isIndefinidamente: false,
-  dataFim: null,
-  idConta: '',
-  lancamentos: [
-    {
-      data: new Date(),
-      idLancamento: ''
-    }
-  ]
-}
-
 const state = {
   byConta: {
 
+  },
+  recorrenciasGeradas: {
+    
   }
 }
 
@@ -31,6 +21,9 @@ const mutations = {
   addRecorrencia(state, recorrencia) {
     state.byConta[recorrencia.idConta] = state.byConta[recorrencia.idConta] || []
     state.byConta[recorrencia.idConta].push(recorrencia)
+  },
+  addRecorrenciaGerada(state, recorrenciaGerada) {
+    Vue.set(state.recorrenciasGeradas, recorrenciaGerada.id, recorrenciaGerada)
   }
 }
 
@@ -50,6 +43,14 @@ const getters = {
       r.dataInicio.isSameOrBefore(periodoAte)
     )
   },
+  lancamentosDaRecorrencia: (state) => (idRecorrencia) => {
+    const recorrenciasGeradas = state.recorrenciasGeradas[idRecorrencia] || {}
+    return Object.keys(recorrenciasGeradas)
+      .filter(k => k != "id")
+      .map(k => ({
+        data: recorrenciasGeradas[k].data
+      }))
+  },
   lancamentosRecorrentesDaConta: (state, getters) => (idConta, periodoAte) => {
     const recorrencias = getters.recorrenciasDaConta(idConta, periodoAte)
     
@@ -61,17 +62,21 @@ const getters = {
       const lancamentos = []
       let ix = (r.parcelaInicio || 1) + 1
       while (dataAtual.isSameOrBefore(periodoAte) && (r.dataFim == null || dataAtual.isSameOrBefore(r.dataFim))) {
-        const lancamentoExistente = lancamentosGerados.find(l => l.dataOriginal.isSame(dataAtual))
+        const lancamentoExistente = lancamentosGerados.find(l => l.data.isSame(dataAtual))
         
         if (!lancamentoExistente) {
           lancamentos.push({
             data: dataAtual,
-            dataOriginal: dataAtual,
             descricao: descricaoLancamento(r, ix),
             efetivada: false,
             idConta: r.idConta,
-            idRecorrencia: r.id,
-            valor: r.valor
+            valor: r.valor,
+            onSalvar: (dispatch, idLancamento, lancamento) => {
+              dispatch('recorrenciaLancamentoSalvar', {
+                idLancamento, data: lancamento.data, idRecorrencia: r.id
+              })
+            }
+
           })
         }
 
@@ -93,6 +98,16 @@ const actions = {
         : null
       commit('addRecorrencia', recorrencia)
     })
+
+    const hookRecorrenciasGeradas = (rg) => {
+      Object.keys(rg)
+        .filter(k => k != "id")
+        .forEach(k => rg[k].data = moment(rg[k].data))
+      
+      commit('addRecorrenciaGerada', rg)
+    }
+
+    repo.hookAdded('/recorrenciasGeradas', hookRecorrenciasGeradas)
   },
   recorrenciaSalvar({dispatch}, {recorrenciaBase, lancamentoBase}) {
     const recorrencia = {
@@ -129,12 +144,32 @@ const actions = {
     }
 
     return new Promise((acc) => {
-      repo.save('/recorrencias', recorrencia).then((idRecorrencia) => {
-        lancamento.idRecorrencia = idRecorrencia
-        dispatch('lancamentoSalvar', lancamento)
+      dispatch('lancamentoSalvar', lancamento).then((idLancamento) => {
+        repo.save('/recorrencias', recorrencia).then((id) => {
+          dispatch('recorrenciaLancamentoSalvar', {idLancamento, data: lancamento.data, idRecorrencia: id})
+        })        
         acc()
       })
     })
+  },
+  async recorrenciaLancamentoSalvar({getters, state, commit}, {idLancamento, data, idRecorrencia}) {
+    const jaGerado = getters.lancamentosDaRecorrencia(idRecorrencia).find(l => l.data.isSame(data))
+
+    if (jaGerado)
+      return
+
+    const rg = {
+      idLancamento, 
+      data, 
+      idRecorrencia
+    }
+
+    let id = await repo.save('/recorrenciasGeradas/' + idRecorrencia, rg)
+    
+    const recorrenciasGeradas = state.recorrenciasGeradas[idRecorrencia];
+    Vue.set(recorrenciasGeradas, id, rg)
+
+    commit('addRecorrenciaGerada', recorrenciasGeradas)
   }
 }
 

@@ -37,6 +37,16 @@ function hookRemoved(path, cb) {
   })
 }
 
+export function hookChanged(path, cb) {
+  firebase.database().ref(firebase.auth().currentUser.uid + path).on('child_changed', (snapshot) => {
+    const val = snapshot.val()
+    const key = snapshot.key
+    cb({
+      ...val, id: key
+    })
+  })
+}
+
 export function save(path, value) {
   return new Promise((acc) => {
     if (value.id) {
@@ -72,5 +82,5 @@ function load(path) {
 }
 
 export default {
-  hookAdded, hookRemoved, save, remove, load
+  hookAdded, hookRemoved, save, remove, load, hookChanged
 }

@@ -40,7 +40,7 @@
       v-model="dialogEditarLancamento"
       width="600"
     >
-      <v-card v-if="lancamentoEditar" :key="lancamentoEditar.id || lancamentoEditar.idRecorrencia">
+      <v-card v-if="lancamentoEditar" :key="JSON.stringify(lancamentoEditar)">
         <v-card-title class="headline">Editando lançamento {{conta.nome}}</v-card-title>
         <v-card-text>
           <lancamento-form :idConta="conta.id" :lancamento="lancamentoEditar" @salvo="dialogEditarLancamento = false" />
@@ -77,10 +77,9 @@ export default {
         }
       })
     },
-    excluirLancamento(idLancamento) {
+    excluirLancamento(lancamento) {
       this.$confirm("Tem certeza disso? HÁ UM BUG EM QUE LANÇAMENTOS DE RECORRENCIA AINDA NÃO PODEM SER EXCLUIDOS").then(val => {
         if (val) {
-          const lancamento = this.$store.getters.lancamentoId(idLancamento)
           if (lancamento.idContaDestino)
             this.$store.dispatch("transferenciaExcluir", lancamento)
           else

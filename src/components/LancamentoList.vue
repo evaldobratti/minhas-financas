@@ -13,12 +13,12 @@
         <td>{{ descricao(props) }}</td>
         <td><currency :value="props.item.valor" /></td>
         <td><currency :value="props.item.saldo" /></td>
-        <td><v-checkbox v-if="props.item.id || props.item.idRecorrencia" @change="$emit('alternaEfetiva', lancamentos[props.index - 1])" v-model="props.item.efetivada" /></td>
+        <td><v-checkbox @change="$emit('alternaEfetiva', lancamentos[props.index - 1])" v-model="props.item.efetivada" /></td>
         <td>
-          <v-btn fab small v-if="props.item.id" @click="$emit('subir', props.item.id)" :disabled="isReordenavel(props.item) && props.item.lancamentoAnterior == null"><v-icon>expand_less</v-icon></v-btn>
-          <v-btn fab small v-if="props.item.id" @click="$emit('descer', props.item.id)" :disabled="isReordenavel(props.item) && temLancamentoPosterior(props.item) == null"><v-icon>expand_more</v-icon></v-btn>
-          <v-btn fab small v-if="props.item.id" class="error" @click="$emit('excluir', props.item.id)"><v-icon>delete</v-icon></v-btn>
-          <v-btn fab small v-if="props.item.id || props.item.idRecorrencia" @click="$emit('editar', lancamentos[props.index - 1])"><v-icon>edit</v-icon></v-btn>
+          <v-btn fab small v-if="props.item.data" class="error" @click="$emit('excluir', props.item)"><v-icon>delete</v-icon></v-btn>
+          <v-btn fab small v-if="props.item.data" @click="$emit('editar', lancamentos[props.index - 1])"><v-icon>edit</v-icon></v-btn>
+          <v-btn fab small v-if="isReordenavel(props.item) && props.item.lancamentoAnterior == null" @click="$emit('subir', props.item.id)"><v-icon>expand_less</v-icon></v-btn>
+          <v-btn fab small v-if="isReordenavel(props.item) && temLancamentoPosterior(props.item) == null" @click="$emit('descer', props.item.id)"><v-icon>expand_more</v-icon></v-btn>
         </td>
         
       </tr>
@@ -95,7 +95,7 @@ export default {
       if (lancamento.id)
         return lancamento.id
 
-      return lancamento.idRecorrencia + lancamento.dataOriginal.valueOf()
+      return JSON.stringify(lancamento)
     },
     descricao(item) {
       const l = this.lancamentos[item.index - 1]
