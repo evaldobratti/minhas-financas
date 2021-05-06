@@ -11,7 +11,7 @@
   "dependencies": {
     "firebase": "^5.8.1",
     "moment": "^2.24.0",
-    "underscore": "^1.9.1",
+    "underscore": "^1.12.1",
     "vue": "^2.5.21",
     "vue-router": "^3.0.1",
     "vuetify": "^1.4.3",
