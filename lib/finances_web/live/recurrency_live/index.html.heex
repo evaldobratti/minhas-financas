@@ -1,0 +1,51 @@
+<h1>Listing Recurrencies</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal FinancesWeb.RecurrencyLive.FormComponent,
+    id: @recurrency.id || :new,
+    title: @page_title,
+    action: @live_action,
+    recurrency: @recurrency,
+    return_to: Routes.recurrency_index_path(@socket, :index) %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Is forever</th>
+      <th>Value</th>
+      <th>Frequency</th>
+      <th>Date start</th>
+      <th>Date end</th>
+      <th>Description</th>
+      <th>Parcel start</th>
+      <th>Parcel end</th>
+      <th>Is parcel</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="recurrencies">
+    <%= for recurrency <- @recurrencies do %>
+      <tr id={"recurrency-#{recurrency.id}"}>
+        <td><%= recurrency.is_forever %></td>
+        <td><%= recurrency.value %></td>
+        <td><%= recurrency.frequency %></td>
+        <td><%= recurrency.date_start %></td>
+        <td><%= recurrency.date_end %></td>
+        <td><%= recurrency.description %></td>
+        <td><%= recurrency.parcel_start %></td>
+        <td><%= recurrency.parcel_end %></td>
+        <td><%= recurrency.is_parcel %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.recurrency_show_path(@socket, :show, recurrency) %></span>
+          <span><%= live_patch "Edit", to: Routes.recurrency_index_path(@socket, :edit, recurrency) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: recurrency.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Recurrency", to: Routes.recurrency_index_path(@socket, :new) %></span>

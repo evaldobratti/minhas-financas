@@ -1,0 +1,62 @@
+<h1>Show Recurrency</h1>
+
+<%= if @live_action in [:edit] do %>
+  <%= live_modal FinancesWeb.RecurrencyLive.FormComponent,
+    id: @recurrency.id,
+    title: @page_title,
+    action: @live_action,
+    recurrency: @recurrency,
+    return_to: Routes.recurrency_show_path(@socket, :show, @recurrency) %>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Is forever:</strong>
+    <%= @recurrency.is_forever %>
+  </li>
+
+  <li>
+    <strong>Value:</strong>
+    <%= @recurrency.value %>
+  </li>
+
+  <li>
+    <strong>Frequency:</strong>
+    <%= @recurrency.frequency %>
+  </li>
+
+  <li>
+    <strong>Date start:</strong>
+    <%= @recurrency.date_start %>
+  </li>
+
+  <li>
+    <strong>Date end:</strong>
+    <%= @recurrency.date_end %>
+  </li>
+
+  <li>
+    <strong>Description:</strong>
+    <%= @recurrency.description %>
+  </li>
+
+  <li>
+    <strong>Parcel start:</strong>
+    <%= @recurrency.parcel_start %>
+  </li>
+
+  <li>
+    <strong>Parcel end:</strong>
+    <%= @recurrency.parcel_end %>
+  </li>
+
+  <li>
+    <strong>Is parcel:</strong>
+    <%= @recurrency.is_parcel %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.recurrency_show_path(@socket, :edit, @recurrency), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.recurrency_index_path(@socket, :index) %></span>

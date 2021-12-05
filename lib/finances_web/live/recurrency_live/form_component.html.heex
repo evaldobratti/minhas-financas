@@ -1,0 +1,52 @@
+<div>
+  <h2><%= @title %></h2>
+
+  <.form
+    let={f}
+    for={@changeset}
+    id="recurrency-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save">
+  
+    <%= label f, :is_forever %>
+    <%= checkbox f, :is_forever %>
+    <%= error_tag f, :is_forever %>
+  
+    <%= label f, :value %>
+    <%= number_input f, :value, step: "any" %>
+    <%= error_tag f, :value %>
+  
+    <%= label f, :frequency %>
+    <%= text_input f, :frequency %>
+    <%= error_tag f, :frequency %>
+  
+    <%= label f, :date_start %>
+    <%= date_select f, :date_start %>
+    <%= error_tag f, :date_start %>
+  
+    <%= label f, :date_end %>
+    <%= date_select f, :date_end %>
+    <%= error_tag f, :date_end %>
+  
+    <%= label f, :description %>
+    <%= text_input f, :description %>
+    <%= error_tag f, :description %>
+  
+    <%= label f, :parcel_start %>
+    <%= number_input f, :parcel_start %>
+    <%= error_tag f, :parcel_start %>
+  
+    <%= label f, :parcel_end %>
+    <%= number_input f, :parcel_end %>
+    <%= error_tag f, :parcel_end %>
+  
+    <%= label f, :is_parcel %>
+    <%= checkbox f, :is_parcel %>
+    <%= error_tag f, :is_parcel %>
+  
+    <div>
+      <%= submit "Save", phx_disable_with: "Saving..." %>
+    </div>
+  </.form>
+</div>
