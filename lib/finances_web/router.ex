@@ -18,6 +18,31 @@ defmodule FinancesWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+
+    live "/accounts", AccountLive.Index, :index
+    live "/accounts/new", AccountLive.Index, :new
+    live "/accounts/:id/edit", AccountLive.Index, :edit
+
+    live "/accounts/:id", AccountLive.Show, :show
+    live "/accounts/:id/show/edit", AccountLive.Show, :edit
+
+    live "/entries", EntryLive.Index, :index
+    live "/entries/new", EntryLive.Index, :new
+    live "/entries/:id/edit", EntryLive.Index, :edit
+    live "/entries/:id", EntryLive.Show, :show
+    live "/entries/:id/show/edit", EntryLive.Show, :edit
+
+    live "/recurrencies", RecurrencyLive.Index, :index
+    live "/recurrencies/new", RecurrencyLive.Index, :new
+    live "/recurrencies/:id/edit", RecurrencyLive.Index, :edit
+    live "/recurrencies/:id", RecurrencyLive.Show, :show
+    live "/recurrencies/:id/show/edit", RecurrencyLive.Show, :edit
+
+    live "/transfers", TransferLive.Index, :index
+    live "/transfers/new", TransferLive.Index, :new
+    live "/transfers/:id/edit", TransferLive.Index, :edit
+    live "/transfers/:id", TransferLive.Show, :show
+    live "/transfers/:id/show/edit", TransferLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -40,6 +65,7 @@ defmodule FinancesWeb.Router do
       live_dashboard "/dashboard", metrics: FinancesWeb.Telemetry
     end
   end
+
 
   # Enables the Swoosh mailbox preview in development.
   #
