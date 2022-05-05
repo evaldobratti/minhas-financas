@@ -27,7 +27,7 @@ defmodule FinancesWeb.EntryLive.FormComponent do
     save_entry(socket, socket.assigns.action, entry_params)
   end
 
-  defp save_entry(socket, :edit, entry_params) do
+  defp save_entry(socket, :entry_edit, entry_params) do
     case Entries.update_entry(socket.assigns.entry, entry_params) do
       {:ok, _entry} ->
         {:noreply,
@@ -40,8 +40,10 @@ defmodule FinancesWeb.EntryLive.FormComponent do
     end
   end
 
-  defp save_entry(socket, :new, entry_params) do
-    case Entries.create_entry(entry_params) do
+  defp save_entry(socket, :entry_new, entry_params) do
+    params = Map.put(entry_params, "account_id", socket.assigns.account_id)
+
+    case Entries.create_entry(params) do
       {:ok, _entry} ->
         {:noreply,
          socket

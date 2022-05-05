@@ -27,7 +27,7 @@ defmodule FinancesWeb.AccountLive.FormComponent do
     save_account(socket, socket.assigns.action, account_params)
   end
 
-  defp save_account(socket, :edit, account_params) do
+  defp save_account(socket, :account_edit, account_params) do
     case Entries.update_account(socket.assigns.account, account_params) do
       {:ok, _account} ->
         {:noreply,
@@ -40,7 +40,7 @@ defmodule FinancesWeb.AccountLive.FormComponent do
     end
   end
 
-  defp save_account(socket, :new, account_params) do
+  defp save_account(socket, :account_new, account_params) do
     case Entries.create_account(account_params) do
       {:ok, _account} ->
         {:noreply,

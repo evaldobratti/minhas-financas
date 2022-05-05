@@ -25,7 +25,8 @@ config :finances, FinancesWeb.Endpoint,
   secret_key_base: "Ibu15phLQC2d67rqrvXdmX3pkGGP2EX2Y4lKbnAq321RyPZ53aNqm52MUJD3cNON",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
 # ## SSL Support

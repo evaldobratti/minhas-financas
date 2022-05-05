@@ -15,7 +15,7 @@ defmodule Finances.Entries.Entry do
   @doc false
   def changeset(entry, attrs) do
     entry
-    |> cast(attrs, [:date, :description, :is_carried_out, :value])
-    |> validate_required([:date, :description, :is_carried_out, :value])
+    |> cast(attrs, [:date, :description, :is_carried_out, :value, :account_id])
+    |> validate_required([:date, :description, :is_carried_out, :value, :account_id])
   end
 end

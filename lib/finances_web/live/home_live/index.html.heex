@@ -1,0 +1,86 @@
+<div class="flex w-full">
+  <div class="w-1/5 px-4">
+    <div class="flex pb-4">
+      <h1>Accounts</h1>
+      <div class="ml-auto">
+        <%= live_patch "New", to: Routes.home_index_path(@socket, :account_new), class: "text-blue-600" %>
+      </div>
+    </div>
+
+    <%= if @live_action in [:account_new, :account_edit] do %>
+      <%= live_modal FinancesWeb.AccountLive.FormComponent,
+        id: @account.id || :new,
+        title: @page_title,
+        action: @live_action,
+        account: @account,
+        return_to: Routes.home_index_path(@socket, :index) %>
+    <% end %>
+
+
+    <div class="flex">
+      <div>
+        Name
+      </div>
+      <div class="ml-auto">
+        Initial Balance
+      </div>
+    </div>
+    <%= for account <- @accounts do %>
+      <div class="flex">
+        <div>
+          <%= live_patch account.name, to: Routes.home_index_path(@socket, :account_show, account.id), class: "text-blue-600" %>
+        </div>
+        <div class="ml-auto px-4">
+          <%= account.initial_balance %>
+        </div>
+        <div>
+          <%= live_patch "Edit", to: Routes.home_index_path(@socket, :account_edit, account.id), class: "text-blue-600" %>
+        </div>
+      </div>
+      
+    <% end %>
+  </div>
+
+  <div>
+    <%= if @live_action in [:account_show, :entry_new] do %>
+      <h1>
+        <%= @account.name %> 
+      </h1>
+      <div class="flex w-full">
+        <div>
+          <%= live_patch "New entry", to: Routes.home_index_path(@socket, :entry_new, @account.id), class: "text-blue-600" %>
+        </div>
+        <div class="ml-5">
+          <button phx-click="month-previous" class="text-blue-600">Previous</button>
+          <%= Timex.format!(@date, "{0M}/{YYYY}") %>
+          <button phx-click="month-next" class="text-blue-600">Next</button>
+        </div>
+      </div>
+
+      <div>
+
+      </div>
+
+      <div>
+        <%= for entry <- @entries do %>
+          <%= Timex.format!(entry.date, "{0D}/{0M}/{YYYY}") %>
+          <%= entry.description %>
+          <%= entry.value %>
+          <%= entry.is_carried_out %>
+        <% end %>
+        
+      </div>
+
+      <%= if @live_action == :entry_new do %>
+        <%= live_modal FinancesWeb.EntryLive.FormComponent,
+          id: @entry.id || :new,
+          title: @page_title,
+          action: @live_action,
+          entry: @entry,
+          account_id: @account.id,
+          return_to: Routes.home_index_path(@socket, :account_show, @account.id) %>
+      <% end %>
+
+    <% end %>
+  </div>
+</div>

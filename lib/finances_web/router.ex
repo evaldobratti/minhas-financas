@@ -17,17 +17,21 @@ defmodule FinancesWeb.Router do
   scope "/", FinancesWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", HomeLive.Index, :index
+    live "/accounts/new", HomeLive.Index, :account_new
+    live "/accounts/:id/edit", HomeLive.Index, :account_edit
+    live "/accounts/:id", HomeLive.Index, :account_show
+    live "/accounts/:id/entries/new", HomeLive.Index, :entry_new
+
 
     live "/accounts", AccountLive.Index, :index
-    live "/accounts/new", AccountLive.Index, :new
-    live "/accounts/:id/edit", AccountLive.Index, :edit
-
-    live "/accounts/:id", AccountLive.Show, :show
+    # live "/accounts/new", AccountLive.Index, :new
+    # live "/accounts/:id/edit", AccountLive.Index, :edit
+    #
+   # live "/accounts/:id", AccountLive.Show, :show
     live "/accounts/:id/show/edit", AccountLive.Show, :edit
 
     live "/entries", EntryLive.Index, :index
-    live "/entries/new", EntryLive.Index, :new
     live "/entries/:id/edit", EntryLive.Index, :edit
     live "/entries/:id", EntryLive.Show, :show
     live "/entries/:id/show/edit", EntryLive.Show, :edit

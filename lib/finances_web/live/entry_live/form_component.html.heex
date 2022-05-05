@@ -9,22 +9,30 @@
     phx-change="validate"
     phx-submit="save">
   
-    <%= label f, :date %>
-    <%= date_select f, :date %>
-    <%= error_tag f, :date %>
+    <div>
+      <%= label f, :date %>
+      <%= date_select f, :date %>
+      <%= error_tag f, :date %>
+    </div>
+
+    <div>
+      <%= label f, :description %>
+      <%= text_input f, :description %>
+      <%= error_tag f, :description %>
+    </div> 
+    
+    <div>
+      <%= label f, :is_carried_out %>
+      <%= checkbox f, :is_carried_out %>
+      <%= error_tag f, :is_carried_out %>
+    </div>
   
-    <%= label f, :description %>
-    <%= text_input f, :description %>
-    <%= error_tag f, :description %>
-  
-    <%= label f, :is_carried_out %>
-    <%= checkbox f, :is_carried_out %>
-    <%= error_tag f, :is_carried_out %>
-  
-    <%= label f, :value %>
-    <%= number_input f, :value, step: "any" %>
-    <%= error_tag f, :value %>
-  
+    <div>
+      <%= label f, :value %>
+      <%= number_input f, :value, step: "any" %>
+      <%= error_tag f, :value %>
+    </div>
+
     <div>
       <%= submit "Save", phx_disable_with: "Saving..." %>
     </div>
